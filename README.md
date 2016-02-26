@@ -1,7 +1,7 @@
 # LightZPrimeAnalysis
 
-Yang Bai and collaborators have a model in which a light Z' 
-which only has enough mass to decay to a pair of oppositely
+Yang Bai and collaborators have a model in which there exists a 
+light Z', which only has enough mass to decay to a pair of oppositely
 charged light hadrons (pi+/-, K+/-), with an additional
 dark matter candidate.  The process to study is:
 
@@ -19,3 +19,5 @@ cd LightZPrimeAnalysis/LightZPrimeAnalyzer/test
 cmsRun testLightZPrimeAnalyzer.py >& test.log
 
 Examine test.log and the root file created for your amusement.
+
+If you are amused, work away and find it in 13-TeV LHC data we are collecting
