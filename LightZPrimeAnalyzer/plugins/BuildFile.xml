@@ -3,5 +3,7 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="DataFormats/HepMCCandidate"/>
 <use name="LightZPrimeAnalysis/LightZPrimeAnalyzer"/>
+<use name="LightZPrimeAnalysis/LightZPrimeGenAnalyzer"/>
 <flags EDM_PLUGIN="1"/>
