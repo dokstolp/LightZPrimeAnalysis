@@ -10,6 +10,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000000
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:/nfs_scratch/dasu/LightZPrimeDecay/GEN.root'))
 
+process.TFileService = cms.Service("TFileService", fileName = cms.string('LightZPrimeGenAnalyzer.root'))
+
 process.load("LightZPrimeAnalysis.LightZPrimeAnalyzer.LightZPrimeGenAnalyzer_cfi")
 
 process.p = cms.Path(process.LightZPrimeGenAnalyzer)

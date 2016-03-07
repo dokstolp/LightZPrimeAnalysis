@@ -29,8 +29,7 @@ git clone https://github.com/SridharaDasu/LightZPrimeAnalysis.git
 cd $CMSSW_BASE/src/LightZPrimeAnalysis/LightZPrimeGenerator/test
 cmsRun LightZPrimeDecayAndHadronizer.py
 cd $CMSSW_BASE/src/LightZPrimeAnalysis/LightZPrimeAnalyzer/test
-cmsRun testLightZPrimeGenAnalyzer.py > LightZPrimeDM.dat&
-root -b -q readASCIINTuple.C\(\"LightZPrimeDM.dat\"\)
+cmsRun testLightZPrimeGenAnalyzer.py
 ```
 
 Examine the root file created for your amusement.
