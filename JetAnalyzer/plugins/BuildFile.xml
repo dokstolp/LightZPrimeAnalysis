@@ -6,7 +6,6 @@
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/HepMCCandidate"/>
-<use name="LightZPrimeAnalysis/LightZPrimeAnalyzer"/>
-<use name="LightZPrimeAnalysis/LightZPrimeGenAnalyzer"/>
+<use name="LightZPrimeAnalysis/JetAnalyzer"/>
 <use name="LightZPrimeAnalysis/JetWidthCalculator"/>
 <flags EDM_PLUGIN="1"/>
