@@ -29,7 +29,7 @@ Instructions:
 ```bash
 cd $CMSSW_BASE/src
 cmsenv
-git clone https://github.com/SridharaDasu/LightZPrimeAnalysis.git
+git clone https://github.com/uhussain/LightZPrimeAnalysis.git
 cd $CMSSW_BASE/src/LightZPrimeAnalysis/LightZPrimeGenerator/test
 cmsRun LightZPrimeDecayAndHadronizer.py
 cd $CMSSW_BASE/src/LightZPrimeAnalysis/LightZPrimeAnalyzer/test
