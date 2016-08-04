@@ -13,7 +13,7 @@
 //
 // Original Author:  Sridhara Rao Dasu
 //         Created:  Tue, 23 Feb 2016 04:57:10 GMT
-//
+// Edited by: Usama Hussain
 //
 
 
@@ -26,7 +26,8 @@ using namespace std;
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
-
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
@@ -67,11 +68,25 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       virtual void endJob() override;
 
       // ----------member data ---------------------------
+  //bool addFilterInfoAOD_;
+  //bool addFilterInfoMINIAOD_;
 
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
+  edm::EDGetTokenT<bool> cSCHandle_;
+  edm::EDGetTokenT<bool> hcalNoiseHandle_;
+  edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
+  edm::EDGetTokenT<bool> eCALTPHandle_;
+  edm::EDGetTokenT<bool> bADSCHandle_;
 
+  edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
+ // string                                           trgResultsProcess_;
+
+  vector<float> jetPt_;
+  vector<float> jetEta_;
+  vector<float> jetPhi_;
+  uint32_t metFilters_;
   double totalET;
   double HT;
   double METValue;
@@ -108,7 +123,9 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   uint32_t j1nCons;
   uint32_t j2nCons;
-
+  int HLTMET170_;
+  int HLTtau50MET120_;
+  int HLTtau120_;
   TTree* tree;
 
 };
@@ -128,18 +145,29 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
 {
 
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
-  pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJets"));
+  pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
+  trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
+  cSCHandle_= consumes<bool>(edm::InputTag("CSCTightHaloFilter", ""));
+  hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
+  hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
+  eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
+  bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
 
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
 
+  
+  tree->Branch("metFilters", &metFilters_);
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
   tree->Branch("METValue", &METValue);
   tree->Branch("METPhi", &METPhi);
   tree->Branch("nJets", &nJets);
+  tree->Branch("jetPt",&jetPt_);
+  tree->Branch("jetEta",          &jetEta_);
+  tree->Branch("jetPhi",          &jetPhi_);
   tree->Branch("nGoodJets", &nGoodJets);
   tree->Branch("j1PT", &j1PT);
   tree->Branch("j1Eta", &j1Eta);
@@ -169,7 +197,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2phiWidthInECal", &j2phiWidthInECal);
   tree->Branch("j2etaWidthInHCal", &j2etaWidthInHCal);
   tree->Branch("j2phiWidthInHCal", &j2phiWidthInHCal);
-
+  tree->Branch("HLTMET170",               &HLTMET170_);
+  tree->Branch("HLTtau50MET120",    &HLTtau50MET120_);
+  tree->Branch("HLTtau120", &HLTtau120_);
 }
 
 
@@ -191,6 +221,36 @@ void
 JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
+   metFilters_ = 0;
+   if (iEvent.isRealData()){
+    
+     Handle<bool> cSCHandle;
+     iEvent.getByToken(cSCHandle_, cSCHandle);
+     bool CSCHaloResult_ = *cSCHandle;
+     
+     Handle<bool> hcalNoiseHandle;
+     iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
+     bool HBHENoiseResult_ = *hcalNoiseHandle;
+     
+     Handle<bool> hcalIsoNoiseHandle;
+     iEvent.getByToken(hcalIsoNoiseHandle_, hcalIsoNoiseHandle);
+     bool HBHEIsoNoiseResult_ = *hcalIsoNoiseHandle;
+     
+     Handle<bool> eCALTPHandle;
+     iEvent.getByToken(eCALTPHandle_, eCALTPHandle);
+     bool EcalDeadCellTFResult_ = *eCALTPHandle;
+
+     Handle<bool> bADSCHandle;
+     iEvent.getByToken(bADSCHandle_, bADSCHandle);
+     bool EEBadSCResult_ = *bADSCHandle;
+
+   if ( !HBHENoiseResult_      ) metFilters_ += 1; 
+   if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
+   if ( !CSCHaloResult_        ) metFilters_ += 4; 
+    //if ( !goodVertexResult_     ) metFilters_ += 8; 
+   if ( !EEBadSCResult_        ) metFilters_ += 16; 
+   if ( !EcalDeadCellTFResult_ ) metFilters_ += 32; 
+   }
 
    Handle< vector<reco::PFCandidate> > pfCands;
    iEvent.getByToken(pfCandsToken, pfCands);
@@ -201,6 +261,33 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
 
+   //HLT treatment
+   HLTMET170_               = 0;
+   HLTtau50MET120_    = 0;
+   HLTtau120_         = 0;
+
+   Handle<edm::TriggerResults> trgResultsHandle;
+   iEvent.getByToken(trgResultsLabel_, trgResultsHandle);
+  
+ //  bool cfg_changed = true;
+  // HLTConfigProvider hltCfg;
+  // hltCfg.init(iEvent.getRun(), iSetup, trgResultsProcess_, cfg_changed);
+  
+   const edm::TriggerNames &trgNames = iEvent.triggerNames(*trgResultsHandle);
+   
+   for (size_t i = 0; i < trgNames.size(); ++i) {
+    const string &name = trgNames.triggerName(i);
+    //Jet triggers
+  
+   // if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) HLTMET170_ = (trgResultsHandle->accept(i)) ? 1 : 0;
+    //  else if (name.find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v3") != string::npos) HLTtau50MET120_ = (trgResultsHandle->accept(i)) ? 1 : 0;
+     if (name.find("HLT_PFMET90_PFMHT90_IDTight") != string::npos) {HLTtau120_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+
+}
+   //Clear previous events
+   jetPt_.clear();
+   jetEta_.clear();
+   jetPhi_.clear();
    // Set event level quantities
 
    totalET = 0;
@@ -250,6 +337,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        HT += jet.pt();
        nGoodJets++;
      }
+     //storing jetpT,jetEta,jetPhi
+     jetPt_.push_back(jet.pt());
+     jetEta_.push_back(jet.eta());  
+     jetPhi_.push_back(jet.phi());
+
      totalET += jet.pt(); // Use all jets
      nJets++;
    }
@@ -263,7 +355,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	     << "; nPFCands = " << pfCands->size() << std::endl;
 
    tree->Fill();
-   
+  
 }
 
 // ------------ method called once each job just before starting event loop  ------------

@@ -5,6 +5,7 @@
 <use name="FWCore/PluginManager"/>
 <use name="FWCore/ParameterSet"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="HLTrigger/HLTcore"/>
 <use name="DataFormats/HepMCCandidate"/>
 <use name="LightZPrimeAnalysis/JetAnalyzer"/>
 <use name="LightZPrimeAnalysis/JetWidthCalculator"/>
