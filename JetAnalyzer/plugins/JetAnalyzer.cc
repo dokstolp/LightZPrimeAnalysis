@@ -81,11 +81,20 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> bADSCHandle_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
- // string                                           trgResultsProcess_;
 
   vector<float> jetPt_;
+  vector<float> jetEn_;
   vector<float> jetEta_;
   vector<float> jetPhi_;
+  vector<float> jetCHF_;
+  vector<float> jetNHF_;
+  vector<float> jetCEF_;
+  vector<float> jetNEF_;
+  vector<int>   jetNCH_;
+  vector<float> jetHFHAE_;
+  vector<float> jetHFEME_;
+  vector<int>   jetNConstituents_;
+  vector<bool>  jetPFLooseId_;  
   uint32_t metFilters_;
   double totalET;
   double HT;
@@ -123,9 +132,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   uint32_t j1nCons;
   uint32_t j2nCons;
-  int HLTMET170_;
-  int HLTtau50MET120_;
-  int HLTtau120_;
+  int HLTMET90_;
   TTree* tree;
 
 };
@@ -167,7 +174,17 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("nJets", &nJets);
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
+  tree->Branch("jetEn",           &jetEn_);
   tree->Branch("jetPhi",          &jetPhi_);
+  tree->Branch("jetPFLooseId", &jetPFLooseId_);
+  tree->Branch("jetCHF",       &jetCHF_);
+  tree->Branch("jetNHF",       &jetNHF_);
+  tree->Branch("jetCEF",       &jetCEF_);
+  tree->Branch("jetNEF",       &jetNEF_);
+  tree->Branch("jetNCH",       &jetNCH_); 
+  tree->Branch("jetHFHAE",         &jetHFHAE_);
+  tree->Branch("jetHFEME",         &jetHFEME_);
+  tree->Branch("jetNConstituents", &jetNConstituents_);
   tree->Branch("nGoodJets", &nGoodJets);
   tree->Branch("j1PT", &j1PT);
   tree->Branch("j1Eta", &j1Eta);
@@ -197,9 +214,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2phiWidthInECal", &j2phiWidthInECal);
   tree->Branch("j2etaWidthInHCal", &j2etaWidthInHCal);
   tree->Branch("j2phiWidthInHCal", &j2phiWidthInHCal);
-  tree->Branch("HLTMET170",               &HLTMET170_);
-  tree->Branch("HLTtau50MET120",    &HLTtau50MET120_);
-  tree->Branch("HLTtau120", &HLTtau120_);
+  tree->Branch("HLTMET90",               &HLTMET90_);
 }
 
 
@@ -262,16 +277,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(pfMETsToken, pfMETs);
 
    //HLT treatment
-   HLTMET170_               = 0;
-   HLTtau50MET120_    = 0;
-   HLTtau120_         = 0;
+   HLTMET90_               = 0;
 
    Handle<edm::TriggerResults> trgResultsHandle;
    iEvent.getByToken(trgResultsLabel_, trgResultsHandle);
   
- //  bool cfg_changed = true;
-  // HLTConfigProvider hltCfg;
-  // hltCfg.init(iEvent.getRun(), iSetup, trgResultsProcess_, cfg_changed);
   
    const edm::TriggerNames &trgNames = iEvent.triggerNames(*trgResultsHandle);
    
@@ -279,15 +289,23 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     const string &name = trgNames.triggerName(i);
     //Jet triggers
   
-   // if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) HLTMET170_ = (trgResultsHandle->accept(i)) ? 1 : 0;
-    //  else if (name.find("HLT_LooseIsoPFTau50_Trk30_eta2p1_MET120_v3") != string::npos) HLTtau50MET120_ = (trgResultsHandle->accept(i)) ? 1 : 0;
-     if (name.find("HLT_PFMET90_PFMHT90_IDTight") != string::npos) {HLTtau120_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFMET90_PFMHT90_IDTight") != string::npos) {HLTMET90_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
 
 }
    //Clear previous events
    jetPt_.clear();
+   jetEn_.clear();
    jetEta_.clear();
    jetPhi_.clear();
+   jetPFLooseId_                           .clear();
+   jetCHF_                                 .clear();
+   jetNHF_                                 .clear();
+   jetCEF_                                 .clear();
+   jetNEF_                                 .clear();
+   jetNCH_                                 .clear();
+   jetHFHAE_                               .clear();
+   jetHFEME_                               .clear();
+   jetNConstituents_                       .clear();   
    // Set event level quantities
 
    totalET = 0;
@@ -337,14 +355,42 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        HT += jet.pt();
        nGoodJets++;
      }
-     //storing jetpT,jetEta,jetPhi
+     //storing jetpT,jetEta,jetPhi and all other variables
      jetPt_.push_back(jet.pt());
+     jetEn_.push_back(jet.energy());
      jetEta_.push_back(jet.eta());  
      jetPhi_.push_back(jet.phi());
-
+     jetCEF_.push_back(   jet.chargedEmEnergyFraction());
+     jetNEF_.push_back(   jet.neutralEmEnergyFraction());
+     jetCHF_.push_back(   jet.chargedHadronEnergyFraction());
+     jetNHF_.push_back(   jet.neutralHadronEnergyFraction());
+     jetNCH_.push_back(   jet.chargedMultiplicity());    
+     jetHFHAE_.push_back( jet.HFHadronEnergy());
+     jetHFEME_.push_back( jet.HFEMEnergy());
+     jetNConstituents_.push_back(jet.numberOfDaughters());
+     
      totalET += jet.pt(); // Use all jets
      nJets++;
-   }
+   
+     //jet PF Loose ID
+     bool jetID = true;
+     if (fabs(jet.eta()) <= 3.0) {
+      if (!(jet.neutralHadronEnergyFraction() < 0.99))                       jetID = false;
+      if (!(jet.neutralEmEnergyFraction() < 0.99))                           jetID = false;
+      if (!((jet.chargedMultiplicity() + jet.neutralMultiplicity()) > 1))  jetID = false;
+      if (fabs(jet.eta()) <= 2.4) {
+        if (!(jet.chargedHadronEnergyFraction() > 0))  jetID = false;
+        if (!(jet.chargedMultiplicity() > 0))          jetID = false;
+        if (!(jet.chargedEmEnergyFraction() < 0.99))   jetID = false;
+      }
+    }
+    if (fabs(jet.eta()) > 3.0) {
+      if (!(jet.neutralEmEnergyFraction() < 0.90))  jetID = false;
+      if (!(jet.neutralMultiplicity() > 10))        jetID = false;
+    }
+    jetPFLooseId_.push_back(jetID);
+
+  }
    
    METValue = (*pfMETs)[0].pt();
    METPhi = (*pfMETs)[0].phi();

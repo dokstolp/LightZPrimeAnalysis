@@ -24,7 +24,7 @@ process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/st
 #'/store/mc/RunIISpring16MiniAODv2/TTToSemiLeptonic_13TeV_ScaleUp-powheg/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/60000/3E18D980-1F20-E611-9CE6-0CC47A6C183A.root'))
 #'file:/cms/uhussain/ZprimeDM/CMSSW_7_6_1/src/Zprime_SUS-RunIIWinter15pLHEMiniAODv2-1000_4.root'))
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzer_3triggers.root'))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzer.root'))
 #addFilterInfoAOD_ = True
 process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzer_cfi")
 process.load("LightZPrimeAnalysis.JetAnalyzer.ggMETFilters_cff")
