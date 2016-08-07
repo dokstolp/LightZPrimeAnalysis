@@ -68,17 +68,16 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       virtual void endJob() override;
 
       // ----------member data ---------------------------
-  //bool addFilterInfoAOD_;
-  //bool addFilterInfoMINIAOD_;
 
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
-  edm::EDGetTokenT<bool> cSCHandle_;
+  edm::EDGetTokenT<bool> globalHandle_;
   edm::EDGetTokenT<bool> hcalNoiseHandle_;
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
+  //edm::EDGetTokenT<bool> goodvertextHandle_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
 
@@ -155,11 +154,12 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
-  cSCHandle_= consumes<bool>(edm::InputTag("CSCTightHaloFilter", ""));
+  globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));  
   hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
+  //goodvertextHandle_ = consumes<bool>(edm::InputTag("goodVertices","offlinePrimaryVertices"));
 
   usesResource("TFileService");
   edm::Service<TFileService> fs;
@@ -239,10 +239,14 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    metFilters_ = 0;
    if (iEvent.isRealData()){
     
-     Handle<bool> cSCHandle;
-     iEvent.getByToken(cSCHandle_, cSCHandle);
-     bool CSCHaloResult_ = *cSCHandle;
-     
+     Handle<bool> globalHandle;
+     iEvent.getByToken(globalHandle_, globalHandle);
+     bool GlobalHaloResult_ = *globalHandle;
+    
+   //  Handle<bool>goodvertextHandle;
+   //  iEvent.getByToken(goodvertextHandle_,goodvertextHandle);
+   //  bool goodVertexResult_ = *goodvertextHandle;
+ 
      Handle<bool> hcalNoiseHandle;
      iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
      bool HBHENoiseResult_ = *hcalNoiseHandle;
@@ -261,9 +265,9 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    if ( !HBHENoiseResult_      ) metFilters_ += 1; 
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
-   if ( !CSCHaloResult_        ) metFilters_ += 4; 
-    //if ( !goodVertexResult_     ) metFilters_ += 8; 
-   if ( !EEBadSCResult_        ) metFilters_ += 16; 
+   if ( !GlobalHaloResult_        ) metFilters_ += 4; std::cout <<"globalHaloFilterFired"<<std::endl;
+ //  if ( !goodVertexResult_     ) metFilters_ += 8; std::cout <<"goodvertexFired"<<std::endl;
+   if ( !EEBadSCResult_        ) metFilters_ += 16; std::cout <<"eescfilterFired"<<std::endl;
    if ( !EcalDeadCellTFResult_ ) metFilters_ += 32; 
    }
 
