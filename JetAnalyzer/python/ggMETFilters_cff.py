@@ -6,6 +6,9 @@ eeBadScFilter.taggingMode = cms.bool(True)
 from RecoMET.METFilters.globalTightHalo2016Filter_cfi import *
 globalTightHalo2016Filter.taggingMode = cms.bool(True)
 
+from RecoMET.METFilters.primaryVertexFilter_cfi import *
+primaryVertexFilter.vertexCollection = cms.InputTag('offlinePrimaryVertices')
+
 #primaryVertexFilter = cms.EDFilter("GoodVertexFilter",
 #                                   vertexCollection = cms.InputTag('offlinePrimaryVertices'),
 #                                   minimumNDOF = cms.uint32(4) ,
@@ -31,7 +34,7 @@ EcalDeadCellTriggerPrimitiveFilter.taggingMode = cms.bool(True)
 
 ggMETFiltersSequence = cms.Sequence(
      HBHENoiseFilterResultProducer*
-    #goodVertices*
+     primaryVertexFilter*
      eeBadScFilter*
      globalTightHalo2016Filter*
      EcalDeadCellTriggerPrimitiveFilter

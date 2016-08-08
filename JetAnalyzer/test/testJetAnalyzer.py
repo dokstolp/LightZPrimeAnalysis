@@ -43,4 +43,6 @@ process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
 
 #process.p = cms.Path(process.printTree+process.JetAnalyzer)
 
-process.p = cms.Path(process.JetAnalyzer)
+process.p = cms.Path(process.primaryVertexFilter*process.JetAnalyzer)
+dump_file = open("dump_file_withfilter.py", "w")
+dump_file.write(process.dumpPython())

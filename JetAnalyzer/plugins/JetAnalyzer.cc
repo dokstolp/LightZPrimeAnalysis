@@ -36,7 +36,8 @@ using namespace std;
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
-
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "LightZPrimeAnalysis/JetWidthCalculator/interface/JetWidthCalculator.hh"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -72,15 +73,24 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
+  edm::EDGetTokenT< vector<reco::GsfElectron> > electronCollection_;
   edm::EDGetTokenT<bool> globalHandle_;
   edm::EDGetTokenT<bool> hcalNoiseHandle_;
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
-  //edm::EDGetTokenT<bool> goodvertextHandle_;
+ // edm::EDGetTokenT<bool> goodvertextHandle_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
-
+ 
+  // elecontr ID decisions objects
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > eleHEEPIdMapToken_;
+ 
+  //jet variables
   vector<float> jetPt_;
   vector<float> jetEn_;
   vector<float> jetEta_;
@@ -93,12 +103,23 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> jetHFHAE_;
   vector<float> jetHFEME_;
   vector<int>   jetNConstituents_;
-  vector<bool>  jetPFLooseId_;  
+  vector<bool>  jetPFLooseId_;
+ 
+  //electron variables
+  Int_t          nEle_;
+  vector<float>  elePt_;
+  vector<float>  eleEta_;
+  vector<float>  elePhi_;
+  vector<ULong64_t> eleIDbit_;
+ 
   uint32_t metFilters_;
   double totalET;
   double HT;
-  double METValue;
-  double METPhi;
+  float METValue;
+  float  METPhi;
+  float  METsumEt_;
+  float  METmEtSig_;
+  float  METSig_;
   double j1PT;
   double j1Eta;
   double j1Phi;
@@ -153,14 +174,17 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
+  electronCollection_ = consumes< vector<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
   globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));  
   hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
-  //goodvertextHandle_ = consumes<bool>(edm::InputTag("goodVertices","offlinePrimaryVertices"));
-
+  //  goodvertextHandle_ = consumes<bool>(edm::InputTag("primaryVertexFilter",""));
+  
+  eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag(""));
+  
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
@@ -171,6 +195,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("HT", &HT);
   tree->Branch("METValue", &METValue);
   tree->Branch("METPhi", &METPhi);
+  tree->Branch("METsumEt",       &METsumEt_);
+  tree->Branch("METmEtSig",      &METmEtSig_);
+  tree->Branch("METSig",         &METSig_);
   tree->Branch("nJets", &nJets);
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
@@ -185,6 +212,11 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("jetHFHAE",         &jetHFHAE_);
   tree->Branch("jetHFEME",         &jetHFEME_);
   tree->Branch("jetNConstituents", &jetNConstituents_);
+  tree->Branch("nEle",                    &nEle_);
+  tree->Branch("elePt",                   &elePt_);
+  tree->Branch("eleEta",                  &eleEta_);
+  tree->Branch("elePhi",                  &elePhi_); 
+  tree->Branch("eleIDbit",                   &eleIDbit_);
   tree->Branch("nGoodJets", &nGoodJets);
   tree->Branch("j1PT", &j1PT);
   tree->Branch("j1Eta", &j1Eta);
@@ -243,10 +275,10 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      iEvent.getByToken(globalHandle_, globalHandle);
      bool GlobalHaloResult_ = *globalHandle;
     
-   //  Handle<bool>goodvertextHandle;
-   //  iEvent.getByToken(goodvertextHandle_,goodvertextHandle);
-   //  bool goodVertexResult_ = *goodvertextHandle;
- 
+//     Handle<bool> goodvertextHandle;
+//     iEvent.getByToken(goodvertextHandle_,goodvertextHandle);
+//     bool goodVertexResult_ = *goodvertextHandle;
+// 
      Handle<bool> hcalNoiseHandle;
      iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
      bool HBHENoiseResult_ = *hcalNoiseHandle;
@@ -266,7 +298,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if ( !HBHENoiseResult_      ) metFilters_ += 1; 
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
    if ( !GlobalHaloResult_        ) metFilters_ += 4; std::cout <<"globalHaloFilterFired"<<std::endl;
- //  if ( !goodVertexResult_     ) metFilters_ += 8; std::cout <<"goodvertexFired"<<std::endl;
+   //   if ( !goodVertexResult_     ) metFilters_ += 8; std::cout <<"goodvertexFired"<<std::endl;
    if ( !EEBadSCResult_        ) metFilters_ += 16; std::cout <<"eescfilterFired"<<std::endl;
    if ( !EcalDeadCellTFResult_ ) metFilters_ += 32; 
    }
@@ -279,6 +311,22 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
+   
+   nEle_ = 0;
+   
+   Handle<vector<reco::GsfElectron> > electronHandle;
+   iEvent.getByToken(electronCollection_, electronHandle);
+
+   Handle<edm::ValueMap<bool> >  veto_id_decisions;
+   iEvent.getByToken(eleVetoIdMapToken_ ,         veto_id_decisions); 
+   Handle<edm::ValueMap<bool> >  loose_id_decisions;
+   iEvent.getByToken(eleLooseIdMapToken_ ,        loose_id_decisions);
+   Handle<edm::ValueMap<bool> >  medium_id_decisions;
+   iEvent.getByToken(eleMediumIdMapToken_,        medium_id_decisions); 
+   Handle<edm::ValueMap<bool> >  tight_id_decisions; 
+   iEvent.getByToken(eleTightIdMapToken_,         tight_id_decisions);
+   Handle<edm::ValueMap<bool> >  heep_id_decisions;
+   iEvent.getByToken(eleHEEPIdMapToken_ ,         heep_id_decisions);
 
    //HLT treatment
    HLTMET90_               = 0;
@@ -310,6 +358,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jetHFHAE_                               .clear();
    jetHFEME_                               .clear();
    jetNConstituents_                       .clear();   
+   elePt_                      .clear();
+   eleEta_                     .clear();
+   elePhi_                     .clear();
+   eleIDbit_                   .clear();
+
    // Set event level quantities
 
    totalET = 0;
@@ -395,9 +448,43 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jetPFLooseId_.push_back(jetID);
 
   }
+  
+   for(uint32_t i = 0; i < electronHandle->size(); i++) {
+     const pat::Electron &electron = (*electronHandle)[i];
+     elePt_              .push_back(electron.pt());
+     eleEta_             .push_back(electron.eta());
+     elePhi_             .push_back(electron.phi());
+     nEle_++;
    
+
+   const auto el = electronHandle->ptrAt(nEle_);
+      
+   UShort_t tmpeleIDbit = 0;
+
+   bool isPassVeto  = (*veto_id_decisions)[el->originalObjectRef()];
+   if(isPassVeto) setbit(tmpeleIDbit, 0);
+
+   bool isPassLoose  = (*loose_id_decisions)[el->originalObjectRef()];
+   if(isPassLoose) setbit(tmpeleIDbit, 1);
+   
+   bool isPassMedium = (*medium_id_decisions)[el->originalObjectRef()];
+   if(isPassMedium) setbit(tmpeleIDbit, 2);
+
+   bool isPassTight  = (*tight_id_decisions)[el->originalObjectRef()];
+   if(isPassTight) setbit(tmpeleIDbit, 3);
+   
+   bool isPassHEEP = (*heep_id_decisions)[el->originalObjectRef()];
+   if(isPassHEEP) setbit(tmpeleIDbit, 4);
+
+   eleIDbit_.push_back(tmpeleIDbit);
+   }  
+   METValue = -99, METPhi = -99, METsumEt_ = -99, METmEtSig_ = -99, METSig_ = -99;
+ 
    METValue = (*pfMETs)[0].pt();
    METPhi = (*pfMETs)[0].phi();
+   METsumEt_ = (*pfMETs)[0].sumEt();
+   METmEtSig_ = ((*pfMETs)[0].mEtSig() < 1.e10) ? (*pfMETs)[0].mEtSig() : 0;
+   METSig_ = ((*pfMETs)[0].significance() < 1.e10) ? (*pfMETs)[0].significance() : 0;    
    
    std::cout << "TotalET = " << totalET << "; nJets = " << nJets 
 	     << "; HT = " << HT << "; nGoodJets = " << nGoodJets 
