@@ -7,6 +7,7 @@
 <use name="DataFormats/PatCandidates"/>
 <use name="HLTrigger/HLTcore"/>
 <use name="DataFormats/HepMCCandidate"/>
+<use name="RecoEcal/EgammaCoreTools"/>
 <use name="LightZPrimeAnalysis/JetAnalyzer"/>
 <use name="LightZPrimeAnalysis/JetWidthCalculator"/>
 <flags EDM_PLUGIN="1"/>

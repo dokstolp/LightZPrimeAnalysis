@@ -13,7 +13,7 @@
 //
 // Original Author:  Sridhara Rao Dasu
 //         Created:  Tue, 23 Feb 2016 04:57:10 GMT
-// Edited by: Usama Hussain
+// Second Author: Usama Hussain
 //
 
 
@@ -37,6 +37,7 @@ using namespace std;
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "LightZPrimeAnalysis/JetWidthCalculator/interface/JetWidthCalculator.hh"
 
@@ -55,6 +56,7 @@ using namespace std;
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
+
 class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
    public:
       explicit JetAnalyzer(const edm::ParameterSet&);
@@ -67,13 +69,13 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       virtual void beginJob() override;
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
-
       // ----------member data ---------------------------
 
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
-  edm::EDGetTokenT< vector<reco::GsfElectron> > electronCollection_;
+  //edm::EDGetTokenT< vector<reco::GsfElectron> > electronCollection_;
+  edm::EDGetToken electronCollection_;
   edm::EDGetTokenT<bool> globalHandle_;
   edm::EDGetTokenT<bool> hcalNoiseHandle_;
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
@@ -174,7 +176,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
-  electronCollection_ = consumes< vector<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
+  electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
   globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));  
   hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
@@ -183,7 +185,11 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
   //  goodvertextHandle_ = consumes<bool>(edm::InputTag("primaryVertexFilter",""));
   
-  eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag(""));
+  eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-veto"));
+  eleLooseIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-loose"));
+  eleMediumIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-medium"));
+  eleTightIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-tight")); 
+  eleHEEPIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"));  
   
   usesResource("TFileService");
   edm::Service<TFileService> fs;
@@ -262,6 +268,10 @@ JetAnalyzer::~JetAnalyzer()
 //
 // member functions
 //
+void setbit(UShort_t& x, UShort_t bit){
+  UShort_t a = 1;
+  x |= (a << bit);
+}
 
 // ------------ method called for each event  ------------
 void
@@ -314,7 +324,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    nEle_ = 0;
    
-   Handle<vector<reco::GsfElectron> > electronHandle;
+   Handle<edm::View<reco::GsfElectron> > electronHandle;
    iEvent.getByToken(electronCollection_, electronHandle);
 
    Handle<edm::ValueMap<bool> >  veto_id_decisions;
@@ -448,36 +458,38 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jetPFLooseId_.push_back(jetID);
 
   }
-  
+   
+ 
    for(uint32_t i = 0; i < electronHandle->size(); i++) {
-     const pat::Electron &electron = (*electronHandle)[i];
-     elePt_              .push_back(electron.pt());
-     eleEta_             .push_back(electron.eta());
-     elePhi_             .push_back(electron.phi());
+     //const pat::Electron &electron = (*electronHandle)[i];
+     const auto el = electronHandle->ptrAt(i);
+     elePt_              .push_back(el->pt());
+     eleEta_             .push_back(el->eta());
+     elePhi_             .push_back(el->phi());
      nEle_++;
    
 
-   const auto el = electronHandle->ptrAt(nEle_);
+    // const auto el = electronHandle->ptrAt(nEle_);
       
-   UShort_t tmpeleIDbit = 0;
+     UShort_t tmpeleIDbit = 0;
 
-   bool isPassVeto  = (*veto_id_decisions)[el->originalObjectRef()];
-   if(isPassVeto) setbit(tmpeleIDbit, 0);
+     bool isPassVeto  = (*veto_id_decisions)[el];
+     if(isPassVeto) setbit(tmpeleIDbit, 0);
 
-   bool isPassLoose  = (*loose_id_decisions)[el->originalObjectRef()];
-   if(isPassLoose) setbit(tmpeleIDbit, 1);
+     bool isPassLoose  = (*loose_id_decisions)[el];
+     if(isPassLoose) setbit(tmpeleIDbit, 1);
    
-   bool isPassMedium = (*medium_id_decisions)[el->originalObjectRef()];
-   if(isPassMedium) setbit(tmpeleIDbit, 2);
+     bool isPassMedium = (*medium_id_decisions)[el];
+     if(isPassMedium) setbit(tmpeleIDbit, 2);
 
-   bool isPassTight  = (*tight_id_decisions)[el->originalObjectRef()];
-   if(isPassTight) setbit(tmpeleIDbit, 3);
+     bool isPassTight  = (*tight_id_decisions)[el];
+     if(isPassTight) setbit(tmpeleIDbit, 3);
    
-   bool isPassHEEP = (*heep_id_decisions)[el->originalObjectRef()];
-   if(isPassHEEP) setbit(tmpeleIDbit, 4);
+     bool isPassHEEP = (*heep_id_decisions)[el];
+     if(isPassHEEP) setbit(tmpeleIDbit, 4);
 
-   eleIDbit_.push_back(tmpeleIDbit);
-   }  
+     eleIDbit_.push_back(tmpeleIDbit);
+     }  
    METValue = -99, METPhi = -99, METsumEt_ = -99, METmEtSig_ = -99, METSig_ = -99;
  
    METValue = (*pfMETs)[0].pt();
