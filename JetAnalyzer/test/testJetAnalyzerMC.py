@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('JetAnalyzer')
+process = cms.Process('JetAnalyzerMC')
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.options = cms.untracked.PSet( allowUnscheduled = cms.untracked.bool(True) )
@@ -14,11 +14,11 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016B/MET/AOD/PromptReco-v2/000/274/968/00000/FABA80F3-2F32-E611-88CB-02163E013556.root'))
-
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:0036B88E-5009-E611-9C57-0CC47A009148.root'))
+#'/store/mc/RunIISpring16DR80/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v3/00000/0036B88E-5009-E611-9C57-0CC47A009148.root'))
 #
 # Set up electron ID (VID framework)
 #
@@ -28,11 +28,9 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 # DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
 dataFormat = DataFormat.AOD
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzerdata.root'))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzerMC.root'))
 #addFilterInfoAOD_ = True
-process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzer_cfi")
-process.load("LightZPrimeAnalysis.JetAnalyzer.ggMETFilters_cff")
-#process.JetAnalyzer.addFilterInfo=cms.bool(True)
+process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzerMC_cfi")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #turn on VID producer,
@@ -56,8 +54,8 @@ for idmod in my_id_modules:
 #    printIndex  = cms.untracked.bool(True)
 #)
 
-#process.p = cms.Path(process.printTree+process.JetAnalyzer)
+#process.p = cms.Path(process.printTree+process.JetAnalyzerMC)
 
-process.p = cms.Path(process.egmGsfElectronIDSequence*process.ggMETFiltersSequence*process.JetAnalyzer)
-dump_file = open("dump_file_withfilter.py", "w")
-dump_file.write(process.dumpPython())
+process.p = cms.Path(process.egmGsfElectronIDSequence*process.JetAnalyzerMC)
+#dump_file = open("dump_file_withfilter.py", "w")
+#dump_file.write(process.dumpPython())

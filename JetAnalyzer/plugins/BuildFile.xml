@@ -9,5 +9,6 @@
 <use name="DataFormats/HepMCCandidate"/>
 <use name="RecoEcal/EgammaCoreTools"/>
 <use name="LightZPrimeAnalysis/JetAnalyzer"/>
+<use name="LightZPrimeAnalysis/JetAnalyzerMC.cc"/>
 <use name="LightZPrimeAnalysis/JetWidthCalculator"/>
 <flags EDM_PLUGIN="1"/>
