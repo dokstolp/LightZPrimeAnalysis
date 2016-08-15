@@ -32,7 +32,7 @@ using namespace std;
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
+#include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -96,9 +96,9 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float>  genWeights_;
   float nTrueVertices_;
   int   nup_;
-  int   numGenJets_;
-  float genHT_;  
-  
+  int   numGenJets_; 
+  float genHT_; 
+ 
   //jet variables
   vector<float> jetPt_;
   vector<float> jetEn_;
@@ -216,7 +216,7 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("nTrueVertices", &nTrueVertices_, "nTrueVertices/F");
   tree->Branch("NUP", &nup_, "NUP/I");
   tree->Branch("numGenJets", &numGenJets_, "numGenJets/I");
-  tree->Branch("genHT", &genHT_, "genHT/I"); 
+  tree->Branch("genHT", &genHT_, "genHT/F"); 
  
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
@@ -386,13 +386,13 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
  
   if (lheEventProduct.isValid()){ 
   	const lhef::HEPEUP& lheEvent = lheEventProduct->hepeup();
-  	std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
-  	nup_ = lheParticles.size();
+	std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
+  	nup_ = lheEvent.NUP;
   	for ( int idxParticle = 0; idxParticle < nup_; ++idxParticle ) {
    		int absPdgId = TMath::Abs(lheEvent.IDUP[idxParticle]);
    		int status = lheEvent.ISTUP[idxParticle];
-   		if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
-       			genHT_ += TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
+                if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
+       			genHT_+= TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
        			++numGenJets_;
    		} 
   	}
