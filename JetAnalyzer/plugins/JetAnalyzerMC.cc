@@ -101,7 +101,7 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   //some must have variables for tuples
   int     run_;
-  Long64_t  event_;
+  int  event_;
   int     lumis_; 
   
   //jet variables
