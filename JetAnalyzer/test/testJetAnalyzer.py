@@ -28,7 +28,7 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 # DataFormat.AOD or DataFormat.MiniAOD, as appropriate 
 dataFormat = DataFormat.AOD
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzerdata.root'))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzer.root'))
 #addFilterInfoAOD_ = True
 process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzer_cfi")
 process.load("LightZPrimeAnalysis.JetAnalyzer.ggMETFilters_cff")

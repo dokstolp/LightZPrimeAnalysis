@@ -38,7 +38,13 @@ dataset = {
   'ST_t-channel_top_4f': '/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v3/AODSIM',
   'ST_t-channel_atop_4f': '/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
   'ST_tW_top_5f': '/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
-  'ST_tW_atop_5f': '/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM'
+  'ST_tW_atop_5f': '/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',    'Zvv100to200':'/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3_ext1-v2/AODSIM',
+  'Zvv200to400':'/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3_ext1-v1/AODSIM',
+  'Zvv400to600':'/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3_ext1-v1/AODSIM',
+  'Zvv600to800':'/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'Zvv800to1200':'/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'Zvv1200to2500':'/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'Zvv2500toInf':'/ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM'
 }
 
 if __name__ == '__main__':
@@ -61,7 +67,9 @@ config.JobType.psetName = 'testJetAnalyzerMC.py'
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #Already submitted:
-listOfSamples = ['GJets_HT-40To100','GJets_HT-100To200','GJets_HT-200To400','GJets_HT-400To600','GJets_HT-600ToInf','TTJets','TTJets1','QCD_HT100to200','QCD_HT200to300','QCD_HT300to500','QCD_HT500to700','QCD_HT700to1000','QCD_HT1000to1500','QCD_HT1500to2000','QCD_HT2000toInf','WJetsFXFX','WJets','W1Jets','W2Jets','W3Jets','W4Jets','W5Jets','W6Jets','W7Jets','ZllG','WW','WZ','ZZ','DYJetsToLL_FXFX','DYJets_HT100to200','DYJets_HT200to400','DYJets_HT400to600','DYJets_HT600toInf','ST_s-channel_4f','ST_t-channel_top_4f','ST_t-channel_atop_4f','ST_tW_top_5f','ST_tW_atop_5f']
+#listOfSamples = ['GJets_HT-40To100','GJets_HT-100To200','GJets_HT-200To400','GJets_HT-400To600','GJets_HT-600ToInf','TTJets','TTJets1','QCD_HT100to200','QCD_HT200to300','QCD_HT300to500','QCD_HT500to700','QCD_HT700to1000','QCD_HT1000to1500','QCD_HT1500to2000','QCD_HT2000toInf','WJetsFXFX','WJets','W1Jets','W2Jets','W3Jets','W4Jets','W5Jets','W6Jets','W7Jets','ZllG','WW','WZ','ZZ','DYJetsToLL_FXFX','DYJets_HT100to200','DYJets_HT200to400','DYJets_HT400to600','DYJets_HT600toInf','ST_s-channel_4f','ST_t-channel_top_4f','ST_t-channel_atop_4f','ST_tW_top_5f','ST_tW_atop_5f']
+#listOfSamples = ['Zvv100to200','Zvv200to400','Zvv400to600','Zvv600to800','Zvv800to1200','Zvv1200to2500','Zvv2500toInf']
+listOfSamples = ['W6Jets']
 for sample in listOfSamples:  
   config.General.requestName = sample
   config.Data.inputDataset = dataset[sample]
