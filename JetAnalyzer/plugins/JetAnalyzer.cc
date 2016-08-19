@@ -91,6 +91,11 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleHEEPIdMapToken_;
+
+  //some must have variables for tuples
+  int     run_;
+  Long64_t  event_;
+  int     lumis_;
  
   //jet variables
   vector<float> jetPt_;
@@ -207,7 +212,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
 
-  
+  tree->Branch("run",     &run_);
+  tree->Branch("event",   &event_);
+  tree->Branch("lumis",   &lumis_);  
   tree->Branch("metFilters", &metFilters_);
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
@@ -301,29 +308,29 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    metFilters_ = 0;
    if (iEvent.isRealData()){
     
-     Handle<bool> globalHandle;
-     iEvent.getByToken(globalHandle_, globalHandle);
-     bool GlobalHaloResult_ = *globalHandle;
+   Handle<bool> globalHandle;
+   iEvent.getByToken(globalHandle_, globalHandle);
+   bool GlobalHaloResult_ = *globalHandle;
     
 //     Handle<bool> goodvertextHandle;
 //     iEvent.getByToken(goodvertextHandle_,goodvertextHandle);
 //     bool goodVertexResult_ = *goodvertextHandle;
 // 
-     Handle<bool> hcalNoiseHandle;
-     iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
-     bool HBHENoiseResult_ = *hcalNoiseHandle;
+   Handle<bool> hcalNoiseHandle;
+   iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
+   bool HBHENoiseResult_ = *hcalNoiseHandle;
      
-     Handle<bool> hcalIsoNoiseHandle;
-     iEvent.getByToken(hcalIsoNoiseHandle_, hcalIsoNoiseHandle);
-     bool HBHEIsoNoiseResult_ = *hcalIsoNoiseHandle;
+   Handle<bool> hcalIsoNoiseHandle;
+   iEvent.getByToken(hcalIsoNoiseHandle_, hcalIsoNoiseHandle);
+   bool HBHEIsoNoiseResult_ = *hcalIsoNoiseHandle;
      
-     Handle<bool> eCALTPHandle;
-     iEvent.getByToken(eCALTPHandle_, eCALTPHandle);
-     bool EcalDeadCellTFResult_ = *eCALTPHandle;
+   Handle<bool> eCALTPHandle;
+   iEvent.getByToken(eCALTPHandle_, eCALTPHandle);
+   bool EcalDeadCellTFResult_ = *eCALTPHandle;
 
-     Handle<bool> bADSCHandle;
-     iEvent.getByToken(bADSCHandle_, bADSCHandle);
-     bool EEBadSCResult_ = *bADSCHandle;
+   Handle<bool> bADSCHandle;
+   iEvent.getByToken(bADSCHandle_, bADSCHandle);
+   bool EEBadSCResult_ = *bADSCHandle;
 
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
@@ -341,6 +348,10 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
+
+   run_    = iEvent.id().run();
+   event_  = iEvent.id().event();
+   lumis_  = iEvent.luminosityBlock();
    
    nEle_ = 0;
    

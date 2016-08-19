@@ -14,11 +14,12 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:0036B88E-5009-E611-9C57-0CC47A009148.root'))
-#'/store/mc/RunIISpring16DR80/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v3/00000/0036B88E-5009-E611-9C57-0CC47A009148.root'))
+#'/store/data/Run2016B/MET/AOD/PromptReco-v2/000/274/968/00000/FABA80F3-2F32-E611-88CB-02163E013556.root'))
+
 #
 # Set up electron ID (VID framework)
 #
@@ -31,6 +32,7 @@ dataFormat = DataFormat.AOD
 process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAnalyzerMC.root'))
 #addFilterInfoAOD_ = True
 process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzerMC_cfi")
+#process.JetAnalyzer.addFilterInfo=cms.bool(True)
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #turn on VID producer,
@@ -44,18 +46,4 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-#process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
-#    src = cms.InputTag("prunedGenParticles"),
-#    src = cms.InputTag("genParticles"),
-#    printP4 = cms.untracked.bool(False),
-#    printPtEtaPhi = cms.untracked.bool(True),
-#    printVertex = cms.untracked.bool(False),
-#    printStatus = cms.untracked.bool(True),
-#    printIndex  = cms.untracked.bool(True)
-#)
-
-#process.p = cms.Path(process.printTree+process.JetAnalyzerMC)
-
 process.p = cms.Path(process.egmGsfElectronIDSequence*process.JetAnalyzerMC)
-#dump_file = open("dump_file_withfilter.py", "w")
-#dump_file.write(process.dumpPython())

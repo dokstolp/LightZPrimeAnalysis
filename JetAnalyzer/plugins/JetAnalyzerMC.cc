@@ -98,7 +98,12 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int   nup_;
   int   numGenJets_; 
   float genHT_; 
- 
+
+  //some must have variables for tuples
+  int     run_;
+  Long64_t  event_;
+  int     lumis_; 
+  
   //jet variables
   vector<float> jetPt_;
   vector<float> jetEn_;
@@ -209,7 +214,10 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
 
-  //lhe and genlevel Info
+  tree->Branch("run",     &run_);
+  tree->Branch("event",   &event_);
+  tree->Branch("lumis",   &lumis_);  
+  //lhe and genlevel Info  
   tree->Branch("genEventWeight", &genWeight_, "genWeight/F"); //genEventInfo->weight();
   tree->Branch("genlheWeights", &genWeights_); // genWeights_.push_back(lheInfo->weights()[i].wgt);
   tree->Branch("numWeights", &numWeights_, "numWeights/I"); //genWeights_.size();
@@ -314,6 +322,10 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
    
+   run_    = iEvent.id().run();
+   event_  = iEvent.id().event();
+   lumis_  = iEvent.luminosityBlock();   
+
    nEle_ = 0;
    
    Handle<edm::View<reco::GsfElectron> > electronHandle;
