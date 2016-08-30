@@ -41,3 +41,15 @@ cmsRun testJetAnalyzer.py
 Examine the root file created for your amusement.
 
 If you are amused, work away and find it in 13-TeV LHC data we are collecting
+
+Instructions (in order to apply all recommended MET Filters):
+```bash
+cmsrel CMSSW_8_0_11
+cmsenv
+git cms-init
+git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
+git clone -b usamabranch https://github.com/uhussain/LightZPrimeAnalysis.git
+cd CMSSW_8_0_11/src/LightZPrimeAnalysis/JetAnalyzer/test
+cmsRun testJetAnalyzer.py
+```
+https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Details about the application of the filters:
