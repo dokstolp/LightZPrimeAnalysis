@@ -36,9 +36,13 @@ using namespace std;
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "LightZPrimeAnalysis/JetWidthCalculator/interface/JetWidthCalculator.hh"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -74,16 +78,17 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
-  //edm::EDGetTokenT< vector<reco::GsfElectron> > electronCollection_;
+  edm::EDGetTokenT< vector<reco::CaloMET> > caloMETToken;  
   edm::EDGetToken electronCollection_;
+  edm::EDGetTokenT<vector<reco::Muon> > muonToken;  
   edm::EDGetTokenT<bool> globalHandle_;
   edm::EDGetTokenT<bool> hcalNoiseHandle_;
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
- // edm::EDGetTokenT<bool> goodvertextHandle_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
+  edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
  
   // elecontr ID decisions objects
   edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
@@ -96,6 +101,9 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int     run_;
   int  event_;
   int     lumis_;
+  int npv_;
+  int    nTrksPV_;
+  int     nVtx_;
  
   //jet variables
   vector<float> jetPt_;
@@ -129,15 +137,30 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int PassMedium_;
   int PassTight_;
   int PassHEEP_; 
+
+  //muon variables 
+  Int_t          nMu_;
+  vector<float>  muPt_;
+  vector<float>  muEn_;
+  vector<float>  muEta_;
+  vector<float>  muPhi_;
+  vector<int>    muCharge_;
+  vector<int>    muType_;
+  vector<Bool_t> muIsLooseID_;
+  vector<Bool_t> muIsMediumID_;
+  vector<Bool_t> muIsTightID_;
+  vector<Bool_t> muIsSoftID_;
+  vector<Bool_t> muIsHighPtID_;
   
   uint32_t metFilters_;
   double totalET;
   double HT;
-  float METValue;
-  float  METPhi;
-  float  METsumEt_;
-  float  METmEtSig_;
-  float  METSig_;
+  float pfMET;
+  float  pfMETPhi;
+  float  pfMETsumEt_;
+  float  pfMETmEtSig_;
+  float  pfMETSig_;
+  float caloMET;
   double j1PT;
   double j1Eta;
   double j1Phi;
@@ -183,7 +206,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // static data member definitions
 //
-
+reco::Vertex vtx_0;
 //
 // constructors and destructor
 //
@@ -193,14 +216,16 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
+  caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));  
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
+  muonToken = consumes< vector<reco::Muon> >(edm::InputTag("muons"));
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
   globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));  
   hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
-  //  goodvertextHandle_ = consumes<bool>(edm::InputTag("primaryVertexFilter",""));
+  vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   
   eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-veto"));
   eleLooseIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-loose"));
@@ -216,13 +241,17 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("event",   &event_);
   tree->Branch("lumis",   &lumis_);  
   tree->Branch("metFilters", &metFilters_);
+  tree->Branch("npv",&npv_,"npv/I");
+  tree->Branch("nTrksPV",&nTrksPV_);
+
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
-  tree->Branch("METValue", &METValue);
-  tree->Branch("METPhi", &METPhi);
-  tree->Branch("METsumEt",       &METsumEt_);
-  tree->Branch("METmEtSig",      &METmEtSig_);
-  tree->Branch("METSig",         &METSig_);
+  tree->Branch("pfMET", &pfMET);
+  tree->Branch("pfMETPhi", &pfMETPhi);
+  tree->Branch("pfMETsumEt",       &pfMETsumEt_);
+  tree->Branch("pfMETmEtSig",      &pfMETmEtSig_);
+  tree->Branch("pfMETSig",         &pfMETSig_);
+  tree->Branch("caloMET", &caloMET);  
   tree->Branch("nJets", &nJets);
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
@@ -252,6 +281,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("ElectronPassMediumID", &PassMedium_); 
   tree->Branch("ElectronPassTightID", &PassTight_);
   tree->Branch("ElectronPassHEEPID", &PassHEEP_);
+  tree->Branch("nMu",           &nMu_);
+  tree->Branch("muPt",          &muPt_);
+  tree->Branch("muEn",          &muEn_);
+  tree->Branch("muEta",         &muEta_);
+  tree->Branch("muPhi",         &muPhi_);
+  tree->Branch("muCharge",      &muCharge_);
+  tree->Branch("muType",        &muType_);
+  tree->Branch("muIsLooseID",   &muIsLooseID_);
+  tree->Branch("muIsMediumID",  &muIsMediumID_);
+  tree->Branch("muIsTightID",   &muIsTightID_);
+  tree->Branch("muIsSoftID",    &muIsSoftID_);
+  tree->Branch("muIsHighPtID",  &muIsHighPtID_);
 
   tree->Branch("nGoodJets", &nGoodJets);
   tree->Branch("j1PT", &j1PT);
@@ -312,10 +353,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(globalHandle_, globalHandle);
    bool GlobalHaloResult_ = *globalHandle;
     
-//     Handle<bool> goodvertextHandle;
-//     iEvent.getByToken(goodvertextHandle_,goodvertextHandle);
-//     bool goodVertexResult_ = *goodvertextHandle;
-// 
    Handle<bool> hcalNoiseHandle;
    iEvent.getByToken(hcalNoiseHandle_, hcalNoiseHandle);
    bool HBHENoiseResult_ = *hcalNoiseHandle;
@@ -335,7 +372,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
    if ( !GlobalHaloResult_        ) metFilters_ += 4; 
-   //   if ( !goodVertexResult_     ) metFilters_ += 8; std::cout <<"goodvertexFired"<<std::endl;
    if ( !EEBadSCResult_        ) metFilters_ += 16;
    if ( !EcalDeadCellTFResult_ ) metFilters_ += 32;
    }
@@ -349,9 +385,30 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
 
+   Handle< vector<reco::CaloMET> > caloMETs;
+   iEvent.getByToken(caloMETToken, caloMETs);
+
    run_    = iEvent.id().run();
    event_  = iEvent.id().event();
    lumis_  = iEvent.luminosityBlock();
+
+   Handle< vector<reco::Vertex> > vtxHandle;
+   iEvent.getByToken(vtxToken_, vtxHandle);
+
+   //number of primary vertices 
+   npv_ = vtxHandle->size();    
+   if (vtxHandle.isValid()) {
+   nVtx_ = 0;
+   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
+   const reco::Vertex& vertex = (*vtxHandle)[v];
+   if (v == 0) {
+       vtx_0 = vertex;
+   } 
+   if (nVtx_ == 0) {
+       nTrksPV_ = vertex.nTracks();
+    }
+   }
+   }
    
    nEle_ = 0;
    
@@ -369,6 +426,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<edm::ValueMap<bool> >  heep_id_decisions;
    iEvent.getByToken(eleHEEPIdMapToken_ ,         heep_id_decisions);
 
+   nMu_ = 0;
+
+   Handle< vector<reco::Muon> > recoMuons;
+   iEvent.getByToken(muonToken, recoMuons);
+
    //HLT treatment
    HLTMET300_               = 0;
    HLTMET170_HBHE =0;
@@ -384,7 +446,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //Jet triggers
   
      if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
-     if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFMET170_HBHE_BeamHaloCleaned_v2") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    //Clear previous events
    jetPt_.clear();
@@ -410,6 +472,18 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    elePt_                      .clear();
    eleEta_                     .clear();
    elePhi_                     .clear();
+
+   muPt_         .clear();
+   muEn_         .clear();
+   muEta_        .clear();
+   muPhi_        .clear();
+   muCharge_     .clear();
+   muType_       .clear();
+   muIsLooseID_  .clear();
+   muIsMediumID_ .clear();
+   muIsTightID_  .clear();
+   muIsSoftID_   .clear();
+   muIsHighPtID_ .clear();
 
    // Set event level quantities
 
@@ -534,18 +608,49 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      bool isPassHEEP = (*heep_id_decisions)[el];
      if(isPassHEEP) PassHEEP_ = isPassHEEP ? 1 : 0;
 
-     }  
-   METValue = -99, METPhi = -99, METsumEt_ = -99, METmEtSig_ = -99, METSig_ = -99;
+     } 
+   int nMu50=0;
+   //Loop over the recoMuon collection
+   for(uint32_t i = 0; i < recoMuons->size(); i++) {
+     const reco::Muon& muon = (*recoMuons)[i];
+     if (muon.pt() < 3) continue;
+     if (! (muon.isPFMuon() || muon.isGlobalMuon() || muon.isTrackerMuon())) continue;
+
+     muPt_    .push_back(muon.pt());
+     muEn_    .push_back(muon.energy());
+     muEta_   .push_back(muon.eta());
+     muPhi_   .push_back(muon.phi());
+     muCharge_.push_back(muon.charge());
+     muType_.push_back(muon.type());
+     if (muon.pt()>50){
+     nMu50++;
+     std::cout<<"HighMuonPt: "<<muon.pt()<<std::endl;
+     }
+     //std::cout<<"primaryvertex: ("<<vtx_0.x()<<", "<<vtx_0.y()<<", "<<vtx_0.z()<<")"<<std::endl;
+     muIsLooseID_.push_back(muon::isLooseMuon(muon));
+     muIsMediumID_.push_back(muon::isMediumMuon(muon));
+     muIsTightID_.push_back(muon::isTightMuon(muon,vtx_0));
+     muIsSoftID_.push_back(muon::isSoftMuon(muon,vtx_0));
+     muIsHighPtID_.push_back(muon::isHighPtMuon(muon,vtx_0));
+
+     nMu_++;
+   }
+   std::cout<<" TotalMuons: "<< nMu_<<"; highPtMuons: "<<nMu50<<std::endl;
  
-   METValue = (*pfMETs)[0].pt();
-   METPhi = (*pfMETs)[0].phi();
-   METsumEt_ = (*pfMETs)[0].sumEt();
-   METmEtSig_ = ((*pfMETs)[0].mEtSig() < 1.e10) ? (*pfMETs)[0].mEtSig() : 0;
-   METSig_ = ((*pfMETs)[0].significance() < 1.e10) ? (*pfMETs)[0].significance() : 0;    
-   
+   pfMET = -99, pfMETPhi = -99, pfMETsumEt_ = -99, pfMETmEtSig_ = -99, pfMETSig_ = -99;
+ 
+   pfMET = (*pfMETs)[0].pt();
+   pfMETPhi = (*pfMETs)[0].phi();
+   pfMETsumEt_ = (*pfMETs)[0].sumEt();
+   pfMETmEtSig_ = ((*pfMETs)[0].mEtSig() < 1.e10) ? (*pfMETs)[0].mEtSig() : 0;
+   pfMETSig_ = ((*pfMETs)[0].significance() < 1.e10) ? (*pfMETs)[0].significance() : 0;    
+  
+   caloMET = -99;
+   caloMET = (*caloMETs)[0].pt();
+ 
    std::cout << "TotalET = " << totalET << "; nJets = " << nJets 
 	     << "; HT = " << HT << "; nGoodJets = " << nGoodJets 
-	     << "; MET = (" << METValue << ", " << METPhi << ")" 
+	     << "; pfMET = (" << pfMET << ", " << pfMETPhi << ")" 
 	     << "; nPFCands = " << pfCands->size() << std::endl;
 
    tree->Fill();
