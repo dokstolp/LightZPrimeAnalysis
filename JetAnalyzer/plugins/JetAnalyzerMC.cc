@@ -90,6 +90,8 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
   edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genEventInfoToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> >pileupSummaryInfoToken_;
@@ -240,6 +242,8 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", ""));
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
+  BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
+  BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));
   lheEventProductToken_ = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
   genEventInfoToken_ = consumes<GenEventInfoProduct>(edm::InputTag("generator"));  
   pileupSummaryInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
@@ -393,11 +397,25 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(bADSCHandle_, bADSCHandle);
    bool EEBadSCResult_ = *bADSCHandle;
 
+   Handle<bool> ifilterbadChCand;
+   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+   bool filterbadChCandidate = *ifilterbadChCand;
+
+   Handle<bool> ifilterbadPFMuon;
+   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+   bool filterbadPFMuon = *ifilterbadPFMuon;
+   
+   std::cout<<"event: "<<event_<<std::endl;
+   std::cout<<"metFilters: "<<metFilters_<<std::endl;
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2;
    if ( !GlobalHaloResult_        ) metFilters_ += 4;
-   if ( !EEBadSCResult_        ) metFilters_ += 16;
-   if ( !EcalDeadCellTFResult_ ) metFilters_ += 32;
+   if ( !EEBadSCResult_        ) metFilters_ += 8;
+   if ( !EcalDeadCellTFResult_ ) metFilters_ += 16;
+   if ( !filterbadChCandidate) metFilters_ += 32;
+   std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
+   if ( !filterbadPFMuon) metFilters_ += 64;
+   std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;
 
    Handle< vector<reco::PFCandidate> > pfCands;
    iEvent.getByToken(pfCandsToken, pfCands);
@@ -429,7 +447,7 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //Jet triggers
    
      if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
-     if (name.find("HLT_PFMET170_HBHE_BeamHaloCleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    Handle< vector<reco::Vertex> > vtxHandle;
    iEvent.getByToken(vtxToken_, vtxHandle); 
