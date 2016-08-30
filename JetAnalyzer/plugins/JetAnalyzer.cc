@@ -86,6 +86,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
@@ -225,6 +227,8 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
+  BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
+  BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));  
   vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   
   eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-veto"));
@@ -369,11 +373,26 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(bADSCHandle_, bADSCHandle);
    bool EEBadSCResult_ = *bADSCHandle;
 
+   Handle<bool> ifilterbadChCand;
+   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+   bool filterbadChCandidate = *ifilterbadChCand;
+   
+   Handle<bool> ifilterbadPFMuon;
+   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+   bool filterbadPFMuon = *ifilterbadPFMuon;
+   
+   std::cout<<"event: "<<event_<<std::endl;
+   std::cout<<"metFilters: "<<metFilters_<<std::endl;
+
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
    if ( !GlobalHaloResult_        ) metFilters_ += 4; 
-   if ( !EEBadSCResult_        ) metFilters_ += 16;
-   if ( !EcalDeadCellTFResult_ ) metFilters_ += 32;
+   if ( !EEBadSCResult_        ) metFilters_ += 8;
+   if ( !EcalDeadCellTFResult_ ) metFilters_ += 16;
+   if ( !filterbadChCandidate) metFilters_ += 32;
+   std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
+   if ( !filterbadPFMuon) metFilters_ += 64;
+   std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;   
    }
 
    Handle< vector<reco::PFCandidate> > pfCands;
@@ -446,7 +465,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //Jet triggers
   
      if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
-     if (name.find("HLT_PFMET170_HBHE_BeamHaloCleaned_v2") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    //Clear previous events
    jetPt_.clear();
