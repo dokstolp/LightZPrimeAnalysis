@@ -14,7 +14,7 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:0036B88E-5009-E611-9C57-0CC47A009148.root'))
@@ -33,6 +33,7 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string('JetAna
 #addFilterInfoAOD_ = True
 process.load("LightZPrimeAnalysis.JetAnalyzer.JetAnalyzerMC_cfi")
 #process.JetAnalyzer.addFilterInfo=cms.bool(True)
+process.load("LightZPrimeAnalysis.JetAnalyzer.ggMETFilters_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 
 #turn on VID producer,
@@ -46,4 +47,4 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.p = cms.Path(process.egmGsfElectronIDSequence*process.JetAnalyzerMC)
+process.p = cms.Path(process.egmGsfElectronIDSequence*process.ggMETFiltersSequence*process.JetAnalyzerMC)

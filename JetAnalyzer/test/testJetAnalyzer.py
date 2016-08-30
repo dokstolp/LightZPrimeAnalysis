@@ -14,7 +14,7 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016B/MET/AOD/PromptReco-v2/000/274/968/00000/FABA80F3-2F32-E611-88CB-02163E013556.root'))
@@ -46,18 +46,7 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-#process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
-#    src = cms.InputTag("prunedGenParticles"),
-#    src = cms.InputTag("genParticles"),
-#    printP4 = cms.untracked.bool(False),
-#    printPtEtaPhi = cms.untracked.bool(True),
-#    printVertex = cms.untracked.bool(False),
-#    printStatus = cms.untracked.bool(True),
-#    printIndex  = cms.untracked.bool(True)
-#)
-
-#process.p = cms.Path(process.printTree+process.JetAnalyzer)
 
 process.p = cms.Path(process.egmGsfElectronIDSequence*process.ggMETFiltersSequence*process.JetAnalyzer)
-dump_file = open("dump_file_withfilter.py", "w")
-dump_file.write(process.dumpPython())
+#dump_file = open("dump_file_withfilter.py", "w")
+#dump_file.write(process.dumpPython())
