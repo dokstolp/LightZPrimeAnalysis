@@ -90,12 +90,14 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
   edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;
   edm::EDGetTokenT<GenEventInfoProduct> genEventInfoToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> >pileupSummaryInfoToken_;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
 
-  edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
+  //edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
   // elecontr ID decisions objects
   edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
@@ -182,6 +184,10 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j1NHdFr;
   double j1CEmFr;
   double j1NEmFr;
+  double j1PhoEFr;
+  double j1EleEFr;
+  double j1MuEFr;
+  double j1CMuEFr;
   double j1etaWidth;
   double j1phiWidth;
   double j1etaWidthInECal;
@@ -195,6 +201,10 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j2NHdFr;
   double j2CEmFr;
   double j2NEmFr;
+  double j2PhoEFr;
+  double j2EleEFr;
+  double j2MuEFr;
+  double j2CMuEFr;  
   double j2etaWidth;
   double j2phiWidth;
   double j2etaWidthInECal;
@@ -207,8 +217,22 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   uint32_t j1nCons;
   uint32_t j2nCons;
-  int HLTMET300_;
-  int HLTMET170_HBHE;  
+  int j1CMty;
+  int j1NMty;
+  int j1CHdMty;
+  int j1NHdMty;
+  int j1PhoMty;
+  int j1EleMty;
+  int j1MuMty;
+  int j2CMty;
+  int j2NMty;
+  int j2CHdMty;
+  int j2NHdMty;
+  int j2PhoMty;
+  int j2EleMty;
+  int j2MuMty;
+ // int HLTMET300_;
+ // int HLTMET170_HBHE;  
   TTree* tree;
 
 };
@@ -234,12 +258,14 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
   muonToken = consumes< vector<reco::Muon> >(edm::InputTag("muons")); 
-  trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));  
+  //trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));  
   globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));
   hcalNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHENoiseFilterResult"));
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", ""));
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
+  BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
+  BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));
   lheEventProductToken_ = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
   genEventInfoToken_ = consumes<GenEventInfoProduct>(edm::InputTag("generator"));  
   pileupSummaryInfoToken_ = consumes<std::vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
@@ -314,11 +340,11 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("muPhi",         &muPhi_);
   tree->Branch("muCharge",      &muCharge_);
   tree->Branch("muType",        &muType_);
-  tree->Branch("muIsLooseID",   &muIsLooseID_);
-  tree->Branch("muIsMediumID",  &muIsMediumID_);
-  tree->Branch("muIsTightID",   &muIsTightID_);
-  tree->Branch("muIsSoftID",    &muIsSoftID_);
-  tree->Branch("muIsHighPtID",  &muIsHighPtID_); 
+ // tree->Branch("muIsLooseID",   &muIsLooseID_);
+ // tree->Branch("muIsMediumID",  &muIsMediumID_);
+  //tree->Branch("muIsTightID",   &muIsTightID_);
+  //tree->Branch("muIsSoftID",    &muIsSoftID_);
+  //tree->Branch("muIsHighPtID",  &muIsHighPtID_); 
 
   tree->Branch("nGoodJets", &nGoodJets);
   tree->Branch("j1PT", &j1PT);
@@ -328,7 +354,18 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("j1NHdFr", &j1NHdFr);
   tree->Branch("j1CEmFr", &j1CEmFr);
   tree->Branch("j1NEmFr", &j1NEmFr);
+  tree->Branch("j1PhoEFr", &j1PhoEFr);
+  tree->Branch("j1EleEFr", &j1EleEFr);
+  tree->Branch("j1MuEFr", &j1MuEFr);
+  tree->Branch("j1CMuEFr", &j1CMuEFr);
   tree->Branch("j1nCons", &j1nCons);
+  tree->Branch("j1CMty", &j1CMty);
+  tree->Branch("j1NMty", &j1NMty);
+  tree->Branch("j1CHdMty", &j1CHdMty);
+  tree->Branch("j1NHdMty", &j1NHdMty);
+  tree->Branch("j1PhoMty", &j1PhoMty);
+  tree->Branch("j1EleMty", &j1EleMty);
+  tree->Branch("j1MuMty", &j1MuMty);  
   tree->Branch("j1etaWidth", &j1etaWidth);
   tree->Branch("j1phiWidth", &j1phiWidth);
   tree->Branch("j1etaWidthInECal", &j1etaWidthInECal);
@@ -342,15 +379,26 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("j2NHdFr", &j2NHdFr);
   tree->Branch("j2CEmFr", &j2CEmFr);
   tree->Branch("j2NEmFr", &j2NEmFr);
+  tree->Branch("j2PhoEFr", &j2PhoEFr);
+  tree->Branch("j2EleEFr", &j2EleEFr);
+  tree->Branch("j2MuEFr", &j2MuEFr);
+  tree->Branch("j2CMuEFr", &j2CMuEFr);
   tree->Branch("j2nCons", &j2nCons);
+  tree->Branch("j2CMty", &j2CMty);
+  tree->Branch("j2NMty", &j2NMty);
+  tree->Branch("j2CHdMty", &j2CHdMty);
+  tree->Branch("j2NHdMty", &j2NHdMty);
+  tree->Branch("j2PhoMty", &j2PhoMty);
+  tree->Branch("j2EleMty", &j2EleMty);
+  tree->Branch("j2MuMty", &j2MuMty);  
   tree->Branch("j2etaWidth", &j2etaWidth);
   tree->Branch("j2phiWidth", &j2phiWidth);
   tree->Branch("j2etaWidthInECal", &j2etaWidthInECal);
   tree->Branch("j2phiWidthInECal", &j2phiWidthInECal);
   tree->Branch("j2etaWidthInHCal", &j2etaWidthInHCal);
   tree->Branch("j2phiWidthInHCal", &j2phiWidthInHCal);
-  tree->Branch("HLTPFMET300",               &HLTMET300_);
-  tree->Branch("HLTPFMET170_HBHECleaned", &HLTMET170_HBHE);
+ // tree->Branch("HLTPFMET300",               &HLTMET300_);
+ // tree->Branch("HLTPFMET170_HBHECleaned", &HLTMET170_HBHE);
 }
 
 
@@ -393,11 +441,25 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(bADSCHandle_, bADSCHandle);
    bool EEBadSCResult_ = *bADSCHandle;
 
+   Handle<bool> ifilterbadChCand;
+   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+   bool filterbadChCandidate = *ifilterbadChCand;
+
+   Handle<bool> ifilterbadPFMuon;
+   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+   bool filterbadPFMuon = *ifilterbadPFMuon;
+   
+   std::cout<<"event: "<<event_<<std::endl;
+   std::cout<<"metFilters: "<<metFilters_<<std::endl;
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2;
    if ( !GlobalHaloResult_        ) metFilters_ += 4;
-   if ( !EEBadSCResult_        ) metFilters_ += 16;
-   if ( !EcalDeadCellTFResult_ ) metFilters_ += 32;
+   if ( !EEBadSCResult_        ) metFilters_ += 8;
+   if ( !EcalDeadCellTFResult_ ) metFilters_ += 16;
+   if ( !filterbadChCandidate) metFilters_ += 32;
+   std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
+   if ( !filterbadPFMuon) metFilters_ += 64;
+   std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;
 
    Handle< vector<reco::PFCandidate> > pfCands;
    iEvent.getByToken(pfCandsToken, pfCands);
@@ -415,22 +477,22 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    event_  = iEvent.id().event();
    lumis_  = iEvent.luminosityBlock();   
 
-   HLTMET300_               = 0;
-   HLTMET170_HBHE =0;
+   //HLTMET300_               = 0;
+   //HLTMET170_HBHE =0;
 
-   Handle<edm::TriggerResults> trgResultsHandle;
-   iEvent.getByToken(trgResultsLabel_, trgResultsHandle);
+   //Handle<edm::TriggerResults> trgResultsHandle;
+   //iEvent.getByToken(trgResultsLabel_, trgResultsHandle);
 
    //HLT Treatment
-   const edm::TriggerNames &trgNames = iEvent.triggerNames(*trgResultsHandle);
+   //const edm::TriggerNames &trgNames = iEvent.triggerNames(*trgResultsHandle);
 
-   for (size_t i = 0; i < trgNames.size(); ++i) {
-    const string &name = trgNames.triggerName(i);
+  // for (size_t i = 0; i < trgNames.size(); ++i) {
+  //  const string &name = trgNames.triggerName(i);
     //Jet triggers
    
-     if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
-     if (name.find("HLT_PFMET170_HBHE_BeamHaloCleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
-   }
+  //   if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+  //   if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+ //  }
    Handle< vector<reco::Vertex> > vtxHandle;
    iEvent.getByToken(vtxToken_, vtxHandle); 
 
@@ -501,11 +563,11 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    muPhi_        .clear();
    muCharge_     .clear();
    muType_       .clear();
-   muIsLooseID_  .clear();
-   muIsMediumID_ .clear();
-   muIsTightID_  .clear();
-   muIsSoftID_   .clear();
-   muIsHighPtID_ .clear(); 
+   //muIsLooseID_  .clear();
+  // muIsMediumID_ .clear();
+  // muIsTightID_  .clear();
+  // muIsSoftID_   .clear();
+  // muIsHighPtID_ .clear(); 
   //Treatment of the negative event weight (especially in MG5_aMCNLO)
   //weight can be retrieved by GenEventInfoProduct. In each event, we can take it as followings
   
@@ -571,7 +633,18 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j1NHdFr = jet.neutralHadronEnergyFraction();
        j1CEmFr = jet.chargedEmEnergyFraction();
        j1NEmFr = jet.neutralEmEnergyFraction();
+       j1PhoEFr = jet.photonEnergyFraction();
+       j1EleEFr = jet.electronEnergyFraction();
+       j1MuEFr = jet.muonEnergyFraction();
+       j1CMuEFr = jet.chargedMuEnergyFraction();
        j1nCons = jet.nConstituents();
+       j1CMty = jet.chargedMultiplicity();
+       j1NMty = jet.neutralMultiplicity();
+       j1CHdMty = jet.chargedHadronMultiplicity();
+       j1NHdMty = jet.neutralHadronMultiplicity();
+       j1PhoMty = jet.photonMultiplicity();
+       j1EleMty = jet.electronMultiplicity();
+       j1MuMty = jet.muonMultiplicity();       
        JetWidthCalculator jwc(jet);
        j1etaWidth = jwc.getEtaWidth();
        j1phiWidth = jwc.getPhiWidth();
@@ -588,7 +661,18 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2NHdFr = jet.neutralHadronEnergyFraction();
        j2CEmFr = jet.chargedEmEnergyFraction();
        j2NEmFr = jet.neutralEmEnergyFraction();
+       j2PhoEFr = jet.photonEnergyFraction();
+       j2EleEFr = jet.electronEnergyFraction();
+       j2MuEFr = jet.muonEnergyFraction();
+       j2CMuEFr = jet.chargedMuEnergyFraction();
        j2nCons = jet.nConstituents();
+       j2CMty = jet.chargedMultiplicity();
+       j2NMty = jet.neutralMultiplicity();
+       j2CHdMty = jet.chargedHadronMultiplicity();
+       j2NHdMty = jet.neutralHadronMultiplicity();
+       j2PhoMty = jet.photonMultiplicity();
+       j2EleMty = jet.electronMultiplicity();
+       j2MuMty = jet.muonMultiplicity();       
        JetWidthCalculator jwc(jet);
        j2etaWidth = jwc.getEtaWidth();
        j2phiWidth = jwc.getPhiWidth();
@@ -693,11 +777,11 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      std::cout<<"HighMuonPt: "<<muon.pt()<<std::endl;
      }
      std::cout<<"primaryvertex: ("<<vtx.x()<<", "<<vtx.y()<<", "<<vtx.z()<<")"<<std::endl;
-     muIsLooseID_.push_back(muon::isLooseMuon(muon));
-     muIsMediumID_.push_back(muon::isMediumMuon(muon));
-     muIsTightID_.push_back(muon::isTightMuon(muon,vtx));
-     muIsSoftID_.push_back(muon::isSoftMuon(muon,vtx));
-     muIsHighPtID_.push_back(muon::isHighPtMuon(muon,vtx));
+     //muIsLooseID_.push_back(muon::isLooseMuon(muon));
+     //muIsMediumID_.push_back(muon::isMediumMuon(muon));
+     //muIsTightID_.push_back(muon::isTightMuon(muon,vtx));
+     //muIsSoftID_.push_back(muon::isSoftMuon(muon,vtx));
+     //muIsHighPtID_.push_back(muon::isHighPtMuon(muon,vtx));
 
      nMu_++;
    }

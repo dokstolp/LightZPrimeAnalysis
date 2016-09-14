@@ -86,6 +86,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> hcalIsoNoiseHandle_;
   edm::EDGetTokenT<bool> eCALTPHandle_;
   edm::EDGetTokenT<bool> bADSCHandle_;
+  edm::EDGetTokenT<bool> BadChCandFilterToken_;
+  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
@@ -168,6 +170,10 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j1NHdFr;
   double j1CEmFr;
   double j1NEmFr;
+  double j1PhoEFr;
+  double j1EleEFr;
+  double j1MuEFr;
+  double j1CMuEFr;
   double j1etaWidth;
   double j1phiWidth;
   double j1etaWidthInECal;
@@ -181,6 +187,10 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j2NHdFr;
   double j2CEmFr;
   double j2NEmFr;
+  double j2PhoEFr;
+  double j2EleEFr;
+  double j2MuEFr;
+  double j2CMuEFr;
   double j2etaWidth;
   double j2phiWidth;
   double j2etaWidthInECal;
@@ -193,6 +203,20 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   uint32_t j1nCons;
   uint32_t j2nCons;
+  int j1CMty;
+  int j1NMty;
+  int j1CHdMty;
+  int j1NHdMty;
+  int j1PhoMty;
+  int j1EleMty;
+  int j1MuMty;
+  int j2CMty;
+  int j2NMty;
+  int j2CHdMty;
+  int j2NHdMty;
+  int j2PhoMty;
+  int j2EleMty;
+  int j2MuMty;
   int HLTMET300_;
   int HLTMET170_HBHE;
   TTree* tree;
@@ -225,6 +249,8 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   hcalIsoNoiseHandle_ = consumes<bool>(edm::InputTag("HBHENoiseFilterResultProducer", "HBHEIsoNoiseFilterResult"));
   eCALTPHandle_ =  consumes<bool>(edm::InputTag("EcalDeadCellTriggerPrimitiveFilter", "")); 
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
+  BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
+  BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));  
   vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   
   eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-veto"));
@@ -302,7 +328,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j1NHdFr", &j1NHdFr);
   tree->Branch("j1CEmFr", &j1CEmFr);
   tree->Branch("j1NEmFr", &j1NEmFr);
+  tree->Branch("j1PhoEFr", &j1PhoEFr);
+  tree->Branch("j1EleEFr", &j1EleEFr);
+  tree->Branch("j1MuEFr", &j1MuEFr);
+  tree->Branch("j1CMuEFr", &j1CMuEFr);
   tree->Branch("j1nCons", &j1nCons);
+  tree->Branch("j1CMty", &j1CMty);
+  tree->Branch("j1NMty", &j1NMty);
+  tree->Branch("j1CHdMty", &j1CHdMty);
+  tree->Branch("j1NHdMty", &j1NHdMty);
+  tree->Branch("j1PhoMty", &j1PhoMty);
+  tree->Branch("j1EleMty", &j1EleMty);
+  tree->Branch("j1MuMty", &j1MuMty);
   tree->Branch("j1etaWidth", &j1etaWidth);
   tree->Branch("j1phiWidth", &j1phiWidth);
   tree->Branch("j1etaWidthInECal", &j1etaWidthInECal);
@@ -316,7 +353,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2NHdFr", &j2NHdFr);
   tree->Branch("j2CEmFr", &j2CEmFr);
   tree->Branch("j2NEmFr", &j2NEmFr);
+  tree->Branch("j2PhoEFr", &j2PhoEFr);
+  tree->Branch("j2EleEFr", &j2EleEFr);
+  tree->Branch("j2MuEFr", &j2MuEFr);
+  tree->Branch("j2CMuEFr", &j2CMuEFr);
   tree->Branch("j2nCons", &j2nCons);
+  tree->Branch("j2CMty", &j2CMty);
+  tree->Branch("j2NMty", &j2NMty);
+  tree->Branch("j2CHdMty", &j2CHdMty);
+  tree->Branch("j2NHdMty", &j2NHdMty);
+  tree->Branch("j2PhoMty", &j2PhoMty);
+  tree->Branch("j2EleMty", &j2EleMty);
+  tree->Branch("j2MuMty", &j2MuMty);
   tree->Branch("j2etaWidth", &j2etaWidth);
   tree->Branch("j2phiWidth", &j2phiWidth);
   tree->Branch("j2etaWidthInECal", &j2etaWidthInECal);
@@ -369,11 +417,26 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(bADSCHandle_, bADSCHandle);
    bool EEBadSCResult_ = *bADSCHandle;
 
+   Handle<bool> ifilterbadChCand;
+   iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+   bool filterbadChCandidate = *ifilterbadChCand;
+   
+   Handle<bool> ifilterbadPFMuon;
+   iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+   bool filterbadPFMuon = *ifilterbadPFMuon;
+   
+   std::cout<<"event: "<<event_<<std::endl;
+   std::cout<<"metFilters: "<<metFilters_<<std::endl;
+
    if ( !HBHENoiseResult_      ) metFilters_ += 1;
    if ( !HBHEIsoNoiseResult_   ) metFilters_ += 2; 
    if ( !GlobalHaloResult_        ) metFilters_ += 4; 
-   if ( !EEBadSCResult_        ) metFilters_ += 16;
-   if ( !EcalDeadCellTFResult_ ) metFilters_ += 32;
+   if ( !EEBadSCResult_        ) metFilters_ += 8;
+   if ( !EcalDeadCellTFResult_ ) metFilters_ += 16;
+   if ( !filterbadChCandidate) metFilters_ += 32;
+   std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
+   if ( !filterbadPFMuon) metFilters_ += 64;
+   std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;   
    }
 
    Handle< vector<reco::PFCandidate> > pfCands;
@@ -446,7 +509,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     //Jet triggers
   
      if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
-     if (name.find("HLT_PFMET170_HBHE_BeamHaloCleaned_v2") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    //Clear previous events
    jetPt_.clear();
@@ -504,7 +567,18 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j1NHdFr = jet.neutralHadronEnergyFraction();
        j1CEmFr = jet.chargedEmEnergyFraction();
        j1NEmFr = jet.neutralEmEnergyFraction();
+       j1PhoEFr = jet.photonEnergyFraction();
+       j1EleEFr = jet.electronEnergyFraction();
+       j1MuEFr = jet.muonEnergyFraction();
+       j1CMuEFr = jet.chargedMuEnergyFraction();
        j1nCons = jet.nConstituents();
+       j1CMty = jet.chargedMultiplicity();
+       j1NMty = jet.neutralMultiplicity();
+       j1CHdMty = jet.chargedHadronMultiplicity();
+       j1NHdMty = jet.neutralHadronMultiplicity();
+       j1PhoMty = jet.photonMultiplicity();
+       j1EleMty = jet.electronMultiplicity();
+       j1MuMty = jet.muonMultiplicity();
        JetWidthCalculator jwc(jet);
        j1etaWidth = jwc.getEtaWidth();
        j1phiWidth = jwc.getPhiWidth();
@@ -521,7 +595,18 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2NHdFr = jet.neutralHadronEnergyFraction();
        j2CEmFr = jet.chargedEmEnergyFraction();
        j2NEmFr = jet.neutralEmEnergyFraction();
+       j2PhoEFr = jet.photonEnergyFraction();
+       j2EleEFr = jet.electronEnergyFraction();
+       j2MuEFr = jet.muonEnergyFraction();
+       j2CMuEFr = jet.chargedMuEnergyFraction();
        j2nCons = jet.nConstituents();
+       j2CMty = jet.chargedMultiplicity();
+       j2NMty = jet.neutralMultiplicity();
+       j2CHdMty = jet.chargedHadronMultiplicity();
+       j2NHdMty = jet.neutralHadronMultiplicity();
+       j2PhoMty = jet.photonMultiplicity();
+       j2EleMty = jet.electronMultiplicity();
+       j2MuMty = jet.muonMultiplicity();
        JetWidthCalculator jwc(jet);
        j2etaWidth = jwc.getEtaWidth();
        j2phiWidth = jwc.getPhiWidth();
