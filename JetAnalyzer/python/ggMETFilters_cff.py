@@ -17,10 +17,18 @@ HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResul
 from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import *
 EcalDeadCellTriggerPrimitiveFilter.taggingMode = cms.bool(True)
 
+from RecoMET.METFilters.BadChargedCandidateFilter_cfi import *
+BadChargedCandidateFilter.taggingMode = cms.bool(True)
+
+from RecoMET.METFilters.BadPFMuonFilter_cfi import *
+BadPFMuonFilter.taggingMode = cms.bool(True)
+
 ggMETFiltersSequence = cms.Sequence(
      HBHENoiseFilterResultProducer*
      primaryVertexFilter*
      eeBadScFilter*
      globalTightHalo2016Filter*
+     BadChargedCandidateFilter*
+     BadPFMuonFilter*
      EcalDeadCellTriggerPrimitiveFilter
 )

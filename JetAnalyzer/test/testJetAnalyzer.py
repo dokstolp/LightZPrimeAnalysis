@@ -14,12 +14,10 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016B/MET/AOD/PromptReco-v2/000/274/968/00000/FABA80F3-2F32-E611-88CB-02163E013556.root'))
-
-#
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(' /store/data/Run2016D/MET/AOD/PromptReco-v2/000/276/315/00000/286DBB5B-F444-E611-AA93-02163E011B53.root'))#
 # Set up electron ID (VID framework)
 #
 

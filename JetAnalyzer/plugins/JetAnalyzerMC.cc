@@ -164,12 +164,12 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float>  muPhi_;
   vector<int>    muCharge_;
   vector<int>    muType_;
-  vector<Bool_t> muIsLooseID_;
+/*  vector<Bool_t> muIsLooseID_;
   vector<Bool_t> muIsMediumID_;
   vector<Bool_t> muIsTightID_;
   vector<Bool_t> muIsSoftID_;
   vector<Bool_t> muIsHighPtID_;
-
+*/
   //track variables
   vector<float>  trkPt_;
   vector<float>  trkEta_;
@@ -707,7 +707,8 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        const reco::TrackRefVector j1tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j1tracksRef;//make a copy of RefVector to sort it
        j1nTracks = j1tracks.size();
-       std::cout<<"Number of tracks: "<< j1nTracks<<std::endl;
+       if(j1nTracks >0){
+       std::cout<<"Number of tracks(Leading Jet): "<< j1nTracks<<std::endl;
        for (const auto &trkRef : j1tracks){
         reco::Track trk = *trkRef;
 	j1tracksRef.push_back(trkRef);
@@ -734,6 +735,7 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
        std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
        std::cout<<"TrackRef copy contents end"<<std::endl; 
+       }
        j1CMty = jet.chargedMultiplicity();
        j1NMty = jet.neutralMultiplicity();
        j1CHdMty = jet.chargedHadronMultiplicity();
@@ -765,7 +767,8 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        const reco::TrackRefVector j2tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j2tracksRef;//make a copy of RefVector to sort it
        j2nTracks = j2tracks.size();
-       std::cout<<"Number of tracks: "<< j2nTracks<<std::endl;
+       if(j2nTracks >0){
+       std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
        for (const auto &trkRef : j2tracks){
         reco::Track trk = *trkRef;
         j2tracksRef.push_back(trkRef);
@@ -792,7 +795,7 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         }
        std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
        std::cout<<"TrackRef copy contents end"<<std::endl;
-
+       }
        j2CMty = jet.chargedMultiplicity();
        j2NMty = jet.neutralMultiplicity();
        j2CHdMty = jet.chargedHadronMultiplicity();
