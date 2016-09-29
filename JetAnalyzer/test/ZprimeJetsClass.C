@@ -90,13 +90,8 @@ void ZprimeJetsClass::Loop(Long64_t maxEvents, int reportEvery)
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     
     jetCand   = getJetCand(200,2.4,0.8,0.1);
-    //Plot dPhimin between Jet and MET before applying the dPhiJetMET cut of 0.5 
-    //dphimin = dPhiJetMETmin(jetCand); 
-    //if(dphimin!=TMath::Pi()&& jetCand.size()>0){
-    //    h_dphimin->Fill(dphimin);
-    //}
 
-    jetCand1 = dPhiJetMETcut(jetCand);
+
     muonVeto = HighPtMuonVeto(50.0); //muonPt cut of 50 GeV
     double deltar = 0.0 ;
     deltar= dR(j1etaWidth,j1phiWidth);
@@ -107,37 +102,46 @@ void ZprimeJetsClass::Loop(Long64_t maxEvents, int reportEvery)
     if (metFilters==0)
       {     
         fillHistos(1);
-        dphimin = dPhiJetMETmin(jetCand);
-    	if(dphimin!=TMath::Pi()&& jetCand.size()>0){
-            h_dphimin->Fill(dphimin);
-        }
 	if (HLTPFMET300==1) 
       	  {
 	    fillHistos(2);
-	    if (jetCand1.size()>0)
+	    if(jetCand.size()>0 && j1NEmFr<0.6 && j1CHdFr > 0.4)
 	      {
-	        fillHistos(3);
+		fillHistos(3);
 	    	if (pfMET>320)
 	          {
 		    fillHistos(4);
 		    if (metcut<0.5)
 		      {
 		        fillHistos(5);
-		        h_deltar->Fill(deltar);
-		        if (deltar<0.1)
-		          {
-			    fillHistos(6);
-		            h_deltar_cut->Fill(deltar);
-			    if (j1NEmFr<0.6 && j1CHdFr > 0.4)
+			double minDPhiJetMET = TMath::Pi();
+			double minDPhiJetMET_first4 = TMath::Pi();
+			for(int j = 0; j < jetCand.size(); j++)
+			  {
+			    if(DeltaPhi((*jetPhi)[j],pfMETPhi)<minDPhiJetMET)
 			      {
+				minDPhiJetMET = DeltaPhi((*jetPhi)[j],pfMETPhi);
+				if(j < 4)
+				  minDPhiJetMET_first4 = DeltaPhi((*jetPhi)[j],pfMETPhi);
+			      }
+			  }
+			h_dphimin->Fill(minDPhiJetMET_first4);
+			if(dPhiJetMETcut(jetCand))
+			  {
+			    fillHistos(6);
+			    h_deltar->Fill(deltar);
+			    if (deltar<0.1)
+			      {
+				h_deltar_cut->Fill(deltar);
 				fillHistos(7);
-			   }
-		        }
+			      }
+			  }
 		      }
-		    }
-		}
-	    }
-         }
+		  }
+	      }
+	  }
+      }
+  
     tree->Fill();
 
     if (jentry%reportEvery == 0)
@@ -287,23 +291,38 @@ std::vector<int> ZprimeJetsClass::getJetCand(double jetPtCut, double jetEtaCut, 
   return tmpCand;
 }
 
-std::vector<int> ZprimeJetsClass::dPhiJetMETcut(std::vector<int> jets)
+bool ZprimeJetsClass::dPhiJetMETcut(std::vector<int> jets)
 {
-  std::vector<int> tmpCand1;
-  tmpCand1.clear();
-
   //reject jet if it is found within DeltaPhi(jet,MET) < 0.5 
+  bool passes = false;
   
   int njetsMax = jets.size();
   //Only look at first four jets (because that's what monojet analysis do)
   if(njetsMax > 4)
     njetsMax = 4;
-  for(int j=0;j< njetsMax; j++){
+  int j=0;
+  for(;j< njetsMax; j++){
 
-        if(DeltaPhi((*jetPhi)[j],pfMETPhi) > 0.5){
-          tmpCand1.push_back(j);
-  
-        }
+    if(DeltaPhi((*jetPhi)[j],pfMETPhi) < 0.5)
+      break;
   }
-  return tmpCand1;
+
+  if(j==njetsMax)
+    passes = true;
+
+  return passes;
+  
 } 
+
+
+
+//bool ZprimeJetsClass::electron_veto(int jet_index)
+//{
+//  bool veto_passed = true;
+//  for(int i = 0; i < nEle; i++)
+//    {
+//      if (if(elePt->at(i)> 10 && eleEta->at(i) < 2.4 && )
+//    }
+//
+//
+//}
