@@ -255,7 +255,7 @@ public :
    virtual float DeltaPhi(float phi1, float phi2);
    virtual bool HighPtMuonVeto(double muonPtCut);
    virtual vector<int> getJetCand(double jetPtCut, double jetEtaCut, double jetNHFCut, double jetCHFCut);
-   virtual vector<int> dPhiJetMETcut(std::vector<int> jets);
+   virtual bool  dPhiJetMETcut(std::vector<int> jets);
    virtual float dPhiJetMETmin(std::vector<int> jets);
 };
 
