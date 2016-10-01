@@ -136,11 +136,71 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float>  elePt_;
   vector<float>  eleEta_;
   vector<float>  elePhi_;
-  int PassVeto_;
-  int PassLoose_;
-  int PassMedium_;
-  int PassTight_;
-  int PassHEEP_; 
+  vector<int> PassVeto_;
+  vector<int>  PassLoose_;
+  vector<int> PassMedium_;
+  vector<int>  PassTight_;
+  vector<int> PassHEEP_; 
+
+
+  vector<int>    eleCharge_;
+  vector<int>    eleChargeConsistent_;
+  vector<float>  eleEn_;
+  vector<float>  eleSCEn_;
+  vector<float>  eleESEn_;
+  vector<float>  eleESEnP1_;
+  vector<float>  eleESEnP2_;
+  vector<float>  eleESEnP1Raw_;
+  vector<float>  eleESEnP2Raw_;
+  vector<float>  eleD0_;
+  vector<float>  eleDz_;
+  vector<float>  eleR9_;
+  vector<float>  eleCalibPt_;
+  vector<float>  eleCalibEn_;
+  vector<float>  eleSCEta_;
+  vector<float>  eleSCPhi_;
+  vector<float>  eleSCRawEn_;
+  vector<float>  eleSCEtaWidth_;
+  vector<float>  eleSCPhiWidth_;
+  vector<float>  eleHoverE_;
+  vector<float>  eleEoverP_;
+  vector<float>  eleEoverPout_;
+  vector<float>  eleEoverPInv_;
+  vector<float>  eleBrem_;
+  vector<float>  eledEtaAtVtx_;
+  vector<float>  eledPhiAtVtx_;
+  vector<float>  eledEtaAtCalo_;
+  vector<float>  eleSigmaIEtaIEta_;
+  vector<float>  eleSigmaIPhiIPhi_;
+  vector<float>  eleSigmaIEtaIEtaFull5x5_;
+  vector<float>  eleSigmaIPhiIPhiFull5x5_;
+  vector<int>    eleConvVeto_;
+  vector<int>    eleMissHits_;
+  vector<float>  eleESEffSigmaRR_;
+  vector<float>  elePFChIso_;
+  vector<float>  elePFPhoIso_;
+  vector<float>  elePFNeuIso_;
+  vector<float>  elePFPUIso_;
+  vector<float>  elePFClusEcalIso_;
+  vector<float>  elePFClusHcalIso_;
+  vector<float>  elePFMiniIso_;
+  vector<float>  eleIDMVANonTrg_;
+  vector<float>  eleIDMVATrg_;
+  vector<float>  eledEtaseedAtVtx_;
+  vector<float>  eleE1x5_;
+  vector<float>  eleE2x5_;
+  vector<float>  eleE5x5_;
+  vector<float>  eleE1x5Full5x5_;
+  vector<float>  eleE2x5Full5x5_;
+  vector<float>  eleE5x5Full5x5_;
+  vector<float>  eleR9Full5x5_;
+
+
+
+
+
+
+
 
   //muon variables 
   Int_t          nMu_;
@@ -347,6 +407,59 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("muIsSoftID",    &muIsSoftID_);
   tree->Branch("muIsHighPtID",  &muIsHighPtID_);
 */  
+
+
+  tree->Branch("nEle",                    &nEle_);
+  tree->Branch("eleCharge",               &eleCharge_);
+  tree->Branch("eleChargeConsistent",     &eleChargeConsistent_);
+  tree->Branch("eleEn",                   &eleEn_);
+  tree->Branch("eleSCEn",                 &eleSCEn_);
+  tree->Branch("eleD0",                   &eleD0_);
+  tree->Branch("eleDz",                   &eleDz_);
+  tree->Branch("elePt",                   &elePt_);
+  tree->Branch("eleEta",                  &eleEta_);
+  tree->Branch("elePhi",                  &elePhi_);
+  tree->Branch("eleR9",                   &eleR9_);
+  tree->Branch("eleCalibPt",              &eleCalibPt_);
+  tree->Branch("eleCalibEn",              &eleCalibEn_);
+  tree->Branch("eleSCEta",                &eleSCEta_);
+  tree->Branch("eleSCPhi",                &eleSCPhi_);
+  tree->Branch("eleSCRawEn",              &eleSCRawEn_);
+  tree->Branch("eleSCEtaWidth",           &eleSCEtaWidth_);
+  tree->Branch("eleSCPhiWidth",           &eleSCPhiWidth_);
+  tree->Branch("eleHoverE",               &eleHoverE_);
+  tree->Branch("eleEoverP",               &eleEoverP_);
+  tree->Branch("eleEoverPout",            &eleEoverPout_);
+  tree->Branch("eleEoverPInv",            &eleEoverPInv_);
+  tree->Branch("eleBrem",                 &eleBrem_);
+  tree->Branch("eledEtaAtVtx",            &eledEtaAtVtx_);
+  tree->Branch("eledPhiAtVtx",            &eledPhiAtVtx_);
+  tree->Branch("eledEtaAtCalo",           &eledEtaAtCalo_);
+  tree->Branch("eleSigmaIEtaIEta",        &eleSigmaIEtaIEta_);
+  tree->Branch("eleSigmaIPhiIPhi",        &eleSigmaIPhiIPhi_);
+  tree->Branch("eleSigmaIEtaIEtaFull5x5", &eleSigmaIEtaIEtaFull5x5_);
+  tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
+  tree->Branch("eleConvVeto",             &eleConvVeto_);
+  tree->Branch("eleMissHits",             &eleMissHits_);
+  tree->Branch("elePFChIso",              &elePFChIso_);
+  tree->Branch("elePFPhoIso",             &elePFPhoIso_);
+  tree->Branch("elePFNeuIso",             &elePFNeuIso_);
+  tree->Branch("elePFPUIso",              &elePFPUIso_);
+  tree->Branch("elePFClusEcalIso",        &elePFClusEcalIso_);
+  tree->Branch("elePFClusHcalIso",        &elePFClusHcalIso_);
+  tree->Branch("elePFMiniIso",            &elePFMiniIso_);
+  tree->Branch("eleIDMVANonTrg",          &eleIDMVANonTrg_);
+  tree->Branch("eleIDMVATrg",             &eleIDMVATrg_);
+  tree->Branch("eledEtaseedAtVtx",        &eledEtaseedAtVtx_);
+  tree->Branch("eleE1x5",                 &eleE1x5_);
+  tree->Branch("eleE2x5",                 &eleE2x5_);
+  tree->Branch("eleE5x5",                 &eleE5x5_);
+  tree->Branch("eleE1x5Full5x5",          &eleE1x5Full5x5_);
+  tree->Branch("eleE2x5Full5x5",          &eleE2x5Full5x5_);
+  tree->Branch("eleE5x5Full5x5",          &eleE5x5Full5x5_);
+  tree->Branch("eleR9Full5x5",                &eleR9Full5x5_);
+
+
   tree->Branch("trackPt",&trkPt_);
   tree->Branch("trackEta",&trkEta_);
   tree->Branch("trackPhi",&trkPhi_);
@@ -600,6 +713,64 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    elePt_                      .clear();
    eleEta_                     .clear();
    elePhi_                     .clear();
+   PassVeto_.clear();
+   PassLoose_.clear();
+   PassMedium_.clear();
+   PassTight_.clear();
+   PassHEEP_.clear();
+   eleCharge_                  .clear();
+   eleChargeConsistent_        .clear();
+   eleEn_                      .clear();
+   eleSCEn_                    .clear();
+   eleD0_                      .clear();
+   eleDz_                      .clear();
+   elePt_                      .clear();
+   eleEta_                     .clear();
+   elePhi_                     .clear();
+   eleR9_                      .clear();
+   eleCalibPt_                 .clear();
+   eleCalibEn_                 .clear();
+   eleSCEta_                   .clear();
+   eleSCPhi_                   .clear();
+   eleSCRawEn_                 .clear();
+   eleSCEtaWidth_              .clear();
+   eleSCPhiWidth_              .clear();
+   eleHoverE_                  .clear();
+   eleEoverP_                  .clear();
+   eleEoverPout_               .clear();
+   eleEoverPInv_               .clear();
+   eleBrem_                    .clear();
+   eledEtaAtVtx_               .clear();
+   eledPhiAtVtx_               .clear();
+   eledEtaAtCalo_              .clear();
+   eleSigmaIEtaIEta_           .clear();
+   eleSigmaIPhiIPhi_           .clear();
+   eleSigmaIEtaIEtaFull5x5_    .clear();
+   eleSigmaIPhiIPhiFull5x5_    .clear();
+   eleConvVeto_                .clear();
+   eleMissHits_                .clear();
+   elePFChIso_                 .clear();
+   elePFPhoIso_                .clear();
+   elePFNeuIso_                .clear();
+   elePFPUIso_                 .clear();
+   elePFClusEcalIso_           .clear();
+   elePFClusHcalIso_           .clear();
+   elePFMiniIso_               .clear();
+   eleIDMVANonTrg_             .clear();
+   eleIDMVATrg_                .clear();
+   eledEtaseedAtVtx_           .clear();
+   eleE1x5_                    .clear();
+   eleE2x5_                    .clear();
+   eleE5x5_                    .clear();
+   eleE1x5Full5x5_             .clear();
+   eleE2x5Full5x5_             .clear();
+   eleE5x5Full5x5_             .clear();
+   eleR9Full5x5_               .clear();
+
+
+
+
+
 
    muPt_         .clear();
    muEn_         .clear();
@@ -649,7 +820,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         }
        std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
            {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
-       std::cout<<"TrackRef Copy begin"<<std::endl;
+       //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j1tracksRef.size()>1){
          j1trk1PT = j1tracksRef.at(0)->pt();
          j1trk1Eta = j1tracksRef.at(0)->eta();
@@ -667,8 +838,8 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
-       std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
-       std::cout<<"TrackRef copy contents end"<<std::endl;
+       //std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
+       //std::cout<<"TrackRef copy contents end"<<std::endl;
        }
        j1CMty = jet.chargedMultiplicity();
        j1NMty = jet.neutralMultiplicity();
@@ -792,37 +963,66 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jetPFLooseId_.push_back(jetID);
 
   }
-   //ID cuts stored in simple histos
-   PassVeto_ = 0;
-   PassLoose_ = 0;
-   PassMedium_ =0;
-   PassTight_ = 0;
-   PassHEEP_ = 0;
+
    for(uint32_t i = 0; i < electronHandle->size(); i++) {
      //const pat::Electron &electron = (*electronHandle)[i];
      const auto el = electronHandle->ptrAt(i);
      elePt_              .push_back(el->pt());
      eleEta_             .push_back(el->eta());
      elePhi_             .push_back(el->phi());
+
+     eleCharge_          .push_back(el->charge());
+     eleChargeConsistent_.push_back((Int_t)el->isGsfCtfScPixChargeConsistent());
+     eleEn_              .push_back(el->energy());
+     //     eleD0_              .push_back(el->gsfTrack()->dxy(pv));
+     //     eleDz_              .push_back(el->gsfTrack()->dz(pv));
+     eleR9_              .push_back(el->r9());
+     eleSCEn_            .push_back(el->superCluster()->energy());
+     eleSCEta_           .push_back(el->superCluster()->eta());
+     eleSCPhi_           .push_back(el->superCluster()->phi());
+     eleSCRawEn_         .push_back(el->superCluster()->rawEnergy());
+     eleSCEtaWidth_      .push_back(el->superCluster()->etaWidth());
+     eleSCPhiWidth_      .push_back(el->superCluster()->phiWidth());
+     eleHoverE_          .push_back(el->hcalOverEcal());
+     eleEoverP_          .push_back(el->eSuperClusterOverP());
+     eleEoverPout_       .push_back(el->eEleClusterOverPout());
+     eleBrem_            .push_back(el->fbrem());
+     eledEtaAtVtx_       .push_back(el->deltaEtaSuperClusterTrackAtVtx());
+     eledPhiAtVtx_       .push_back(el->deltaPhiSuperClusterTrackAtVtx());
+     eledEtaAtCalo_      .push_back(el->deltaEtaSeedClusterTrackAtCalo());
+     eleSigmaIEtaIEta_   .push_back(el->sigmaIetaIeta()); ///new sigmaietaieta
+     eleSigmaIPhiIPhi_   .push_back(el->sigmaIphiIphi());
+     //     eleConvVeto_        .push_back((Int_t)el->passConversionVeto()); // ConvVtxFit || missHit == 0
+     eleMissHits_        .push_back(el->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+
+
+     // VID calculation of (1/E - 1/p)
+     if (el->ecalEnergy() == 0)   eleEoverPInv_.push_back(1e30);
+     else if (!std::isfinite(el->ecalEnergy()))  eleEoverPInv_.push_back(1e30);
+     else  eleEoverPInv_.push_back((1.0 - el->eSuperClusterOverP())/el->ecalEnergy());
+
+     //eledEtaseedAtVtx_   .push_back(el->edEtaseedAtVtx);
+
+     eleE1x5_            .push_back(el->e1x5());
+     eleE2x5_            .push_back(el->e2x5Max());
+     eleE5x5_            .push_back(el->e5x5());
+
+     eleSigmaIEtaIEtaFull5x5_    .push_back(el->full5x5_sigmaIetaIeta());
+     eleSigmaIPhiIPhiFull5x5_    .push_back(el->full5x5_sigmaIphiIphi());
+     eleE1x5Full5x5_             .push_back(el->full5x5_e1x5());
+     eleE2x5Full5x5_             .push_back(el->full5x5_e2x5Max());
+     eleE5x5Full5x5_             .push_back(el->full5x5_e5x5());
+     eleR9Full5x5_               .push_back(el->full5x5_r9());
+
+     PassVeto_.push_back((*veto_id_decisions)[el]);
+     PassLoose_.push_back((*loose_id_decisions)[el]);
+     PassMedium_.push_back((*medium_id_decisions)[el]);
+     PassTight_.push_back((*tight_id_decisions)[el]);
+     PassHEEP_.push_back((*heep_id_decisions)[el]);
+
+
+
      nEle_++;
-   
-
-    // const auto el = electronHandle->ptrAt(nEle_);
-      
-     bool isPassVeto  = (*veto_id_decisions)[el];
-     if(isPassVeto) PassVeto_ = isPassVeto ? 1 : 0;
-
-     bool isPassLoose  = (*loose_id_decisions)[el];
-     if(isPassLoose) PassLoose_ = isPassLoose ? 1 : 0;
-   
-     bool isPassMedium = (*medium_id_decisions)[el];
-     if(isPassMedium) PassMedium_ = isPassMedium ? 1 : 0;
-
-     bool isPassTight  = (*tight_id_decisions)[el];
-     if(isPassTight) PassTight_ = isPassTight ? 1 : 0;
-   
-     bool isPassHEEP = (*heep_id_decisions)[el];
-     if(isPassHEEP) PassHEEP_ = isPassHEEP ? 1 : 0;
 
      } 
    int nMu50=0;
