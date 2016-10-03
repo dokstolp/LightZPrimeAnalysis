@@ -55,21 +55,21 @@ def submit(config):
 
 from CRABClient.UserUtilities import config
 config = config()
-name = 'Zprime_Ntuples'
-config.General.workArea = 'crab_workArea_'+name
+name = 'Zprime_Ntuples_Oct3'
+config.General.workArea = 'crab_'+name
 config.General.transferOutputs = True
 config.General.transferLogs = True
 config.JobType.pluginName = 'Analysis'
 config.Data.publication = False
 config.Site.storageSite = 'T2_US_Wisconsin'
-config.JobType.psetName = 'testJetAnalyzerMC.py'
+config.JobType.psetName = 'testJetAnalyzer.py'
 #config.JobType.inputFiles = ['Spring16_25nsV1_MC_L2Relative_AK8PFchs.txt','Spring16_25nsV1_MC_L3Absolute_AK8PFchs.txt']
 config.Data.inputDBS = 'global'
 config.Data.splitting = 'FileBased'
 #Already submitted:
-#listOfSamples = ['GJets_HT-40To100','GJets_HT-100To200','GJets_HT-200To400','GJets_HT-400To600','GJets_HT-600ToInf','TTJets','TTJets1','QCD_HT100to200','QCD_HT200to300','QCD_HT300to500','QCD_HT500to700','QCD_HT700to1000','QCD_HT1000to1500','QCD_HT1500to2000','QCD_HT2000toInf','WJetsFXFX','WJets','W1Jets','W2Jets','W3Jets','W4Jets','W5Jets','W6Jets','W7Jets','ZllG','WW','WZ','ZZ','DYJetsToLL_FXFX','DYJets_HT100to200','DYJets_HT200to400','DYJets_HT400to600','DYJets_HT600toInf','ST_s-channel_4f','ST_t-channel_top_4f','ST_t-channel_atop_4f','ST_tW_top_5f','ST_tW_atop_5f']
+listOfSamples = ['GJets_HT-40To100','GJets_HT-100To200','GJets_HT-200To400','GJets_HT-400To600','GJets_HT-600ToInf','TTJets','TTJets1','QCD_HT100to200','QCD_HT200to300','QCD_HT300to500','QCD_HT500to700','QCD_HT700to1000','QCD_HT1000to1500','QCD_HT1500to2000','QCD_HT2000toInf','WJetsFXFX','WJets','W1Jets','W2Jets','W3Jets','W4Jets','W5Jets','W6Jets','W7Jets','ZllG','WW','WZ','ZZ','DYJetsToLL_FXFX','DYJets_HT100to200','DYJets_HT200to400','DYJets_HT400to600','DYJets_HT600toInf','ST_s-channel_4f','ST_t-channel_top_4f','ST_t-channel_atop_4f','ST_tW_top_5f','ST_tW_atop_5f']
 #listOfSamples = ['Zvv100to200','Zvv200to400','Zvv400to600','Zvv600to800','Zvv800to1200','Zvv1200to2500','Zvv2500toInf']
-listOfSamples = ['W6Jets']
+#listOfSamples = ['W6Jets']
 for sample in listOfSamples:  
   config.General.requestName = sample
   config.Data.inputDataset = dataset[sample]

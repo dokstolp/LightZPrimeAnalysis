@@ -14,7 +14,7 @@ def submit(config):
 
 from CRABClient.UserUtilities import config
 config = config()
-name = 'Zprime_Ntuples_Sep20'
+name = 'Zprime_Ntuples_Oct3'
 config.General.workArea = 'crab_'+name
 config.General.transferOutputs = True
 config.General.transferLogs = True
