@@ -2,8 +2,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include <math.h>
-
-JetWidthCalculator::JetWidthCalculator(const pat::Jet& jet) {
+JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
   jet.pt();
   jet.eta();
   jet.phi();

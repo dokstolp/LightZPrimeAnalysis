@@ -1,0 +1,216 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 3
+TrackRef Copy begin
+Leading track Pt: 993.343
+Second leading track Pt: 1.03065
+SumPT of two leading Tracks: 994.374
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 12
+TrackRef Copy begin
+Leading track Pt: 31.9698
+Second leading track Pt: 2.84365
+SumPT of two leading Tracks: 34.8134
+TrackRef copy contents end
+ TotalMuons: 3; highPtMuons: 1
+TotalET = 1582.1; nJets = 62; HT = 1076.24; nGoodJets = 3; MET = (998.75, -2.0595); nPFCands = 1508
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 2
+TrackRef Copy begin
+Leading track Pt: 844.107
+Second leading track Pt: 0.768544
+SumPT of two leading Tracks: 844.875
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 9
+TrackRef Copy begin
+Leading track Pt: 10.1248
+Second leading track Pt: 3.2335
+SumPT of two leading Tracks: 13.3583
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1205.94; nJets = 40; HT = 846.271; nGoodJets = 1; MET = (855.546, 2.11382); nPFCands = 1255
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 3
+TrackRef Copy begin
+Leading track Pt: 796.984
+Second leading track Pt: 0.651935
+SumPT of two leading Tracks: 797.636
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 12
+TrackRef Copy begin
+Leading track Pt: 5.55773
+Second leading track Pt: 4.34135
+SumPT of two leading Tracks: 9.89908
+TrackRef copy contents end
+ TotalMuons: 2; highPtMuons: 1
+TotalET = 1067.57; nJets = 28; HT = 855.538; nGoodJets = 2; MET = (774.408, 1.17495); nPFCands = 1081
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 7
+TrackRef Copy begin
+Leading track Pt: 726.721
+Second leading track Pt: 2.25867
+SumPT of two leading Tracks: 728.98
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 9
+TrackRef Copy begin
+Leading track Pt: 18.9043
+Second leading track Pt: 9.76103
+SumPT of two leading Tracks: 28.6653
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1507.11; nJets = 79; HT = 871.307; nGoodJets = 4; MET = (742.633, 0.00901286); nPFCands = 1517
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 6
+TrackRef Copy begin
+Leading track Pt: 996.489
+Second leading track Pt: 1.55072
+SumPT of two leading Tracks: 998.04
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 9
+TrackRef Copy begin
+Leading track Pt: 11.5128
+Second leading track Pt: 4.75217
+SumPT of two leading Tracks: 16.265
+TrackRef copy contents end
+ TotalMuons: 3; highPtMuons: 1
+TotalET = 2138.14; nJets = 92; HT = 1167.12; nGoodJets = 5; MET = (965.418, 1.99565); nPFCands = 2072
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 4
+TrackRef Copy begin
+Leading track Pt: 847.703
+Second leading track Pt: 0.873008
+SumPT of two leading Tracks: 848.576
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 10
+TrackRef Copy begin
+Leading track Pt: 8.66911
+Second leading track Pt: 5.10848
+SumPT of two leading Tracks: 13.7776
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1407.15; nJets = 60; HT = 895.037; nGoodJets = 2; MET = (841.772, -3.01589); nPFCands = 1401
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 10
+TrackRef Copy begin
+Leading track Pt: 715.446
+Second leading track Pt: 0.77855
+SumPT of two leading Tracks: 716.225
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 17
+TrackRef Copy begin
+Leading track Pt: 18.9677
+Second leading track Pt: 18.6859
+SumPT of two leading Tracks: 37.6536
+TrackRef copy contents end
+ TotalMuons: 3; highPtMuons: 1
+TotalET = 1673.93; nJets = 78; HT = 872.745; nGoodJets = 3; MET = (740.221, -1.04351); nPFCands = 1791
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 14
+TrackRef Copy begin
+Leading track Pt: 745.811
+Second leading track Pt: 10.8238
+SumPT of two leading Tracks: 756.635
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1969.36; nJets = 101; HT = 865.669; nGoodJets = 2; MET = (715.381, 0.96879); nPFCands = 2085
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 5
+TrackRef Copy begin
+Leading track Pt: 874.651
+Second leading track Pt: 1.42058
+SumPT of two leading Tracks: 876.072
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1553.84; nJets = 65; HT = 932.522; nGoodJets = 2; MET = (905.366, -2.06143); nPFCands = 1658
+metFilters(badChCandidateFilter): 0
+metFilters(badPFMuonFilter): 0
+Number of tracks(Leading Jet): 6
+TrackRef Copy begin
+Leading track Pt: 694.214
+Second leading track Pt: 1.29982
+SumPT of two leading Tracks: 695.514
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 8
+TrackRef Copy begin
+Leading track Pt: 6.36673
+Second leading track Pt: 2.58265
+SumPT of two leading Tracks: 8.94938
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1301.28; nJets = 68; HT = 699.263; nGoodJets = 1; MET = (729.593, -2.67288); nPFCands = 1485
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 6
+TrackRef Copy begin
+Leading track Pt: 1082.59
+Second leading track Pt: 2.02054
+SumPT of two leading Tracks: 1084.61
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1470.44; nJets = 42; HT = 1171.58; nGoodJets = 3; MET = (1073.99, 2.84925); nPFCands = 1258
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 4
+TrackRef Copy begin
+Leading track Pt: 884.213
+Second leading track Pt: 0.434705
+SumPT of two leading Tracks: 884.648
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1300.98; nJets = 45; HT = 920.939; nGoodJets = 2; MET = (873.489, -0.891702); nPFCands = 1279
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 6
+TrackRef Copy begin
+Leading track Pt: 744.843
+Second leading track Pt: 1.38354
+SumPT of two leading Tracks: 746.227
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1545.05; nJets = 78; HT = 817.268; nGoodJets = 3; MET = (725.618, -1.67364); nPFCands = 1774
+found bad track!
+metFilters(badChCandidateFilter): 32
+metFilters(badPFMuonFilter): 32
+Number of tracks(Leading Jet): 1
+TrackRef Copy begin
+SumPT of two leading Tracks: 896.819
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1870.83; nJets = 87; HT = 962.627; nGoodJets = 2; MET = (926.804, 0.678939); nPFCands = 1819
+metFilters(badChCandidateFilter): 0
+metFilters(badPFMuonFilter): 0
+Number of tracks(Leading Jet): 5
+TrackRef Copy begin
+Leading track Pt: 877.662
+Second leading track Pt: 0.750143
+SumPT of two leading Tracks: 878.412
+TrackRef copy contents end
+Number of tracks(Second Leading Jet): 12
+TrackRef Copy begin
+Leading track Pt: 14.8791
+Second leading track Pt: 9.6649
+SumPT of two leading Tracks: 24.544
+TrackRef copy contents end
+ TotalMuons: 1; highPtMuons: 1
+TotalET = 1764.15; nJets = 79; HT = 980.26; nGoodJets = 3; MET = (846.753, -2.82187); nPFCands = 1804

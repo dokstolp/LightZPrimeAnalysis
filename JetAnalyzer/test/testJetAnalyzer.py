@@ -10,17 +10,29 @@ process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load("Configuration.Geometry.GeometryRecoDB_cff")
 
+
+process.load("RecoEgamma/PhotonIdentification/PhotonIDValueMapProducer_cfi")
+
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016B/MET/AOD/PromptReco-v2/000/274/968/00000/FABA80F3-2F32-E611-88CB-02163E013556.root'))
-
-#
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016C/SinglePhoton/AOD/23Sep2016-v1/90000/009435BC-1F86-E611-9241-0CC47A6C1034.root'))#
+#process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016D/MET/AOD/PromptReco-v2/000/276/315/00000/286DBB5B-F444-E611-AA93-02163E011B53.root'))#
 # Set up electron ID (VID framework)
+
+
+
+process.load( "PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff" )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+process.load( "PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff" )
+
+from PhysicsTools.PatAlgos.tools.coreTools import *
+runOnData( process, outputModules = [] )
+
 #
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
@@ -46,18 +58,7 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-#process.printTree = cms.EDAnalyzer("ParticleTreeDrawer",
-#    src = cms.InputTag("prunedGenParticles"),
-#    src = cms.InputTag("genParticles"),
-#    printP4 = cms.untracked.bool(False),
-#    printPtEtaPhi = cms.untracked.bool(True),
-#    printVertex = cms.untracked.bool(False),
-#    printStatus = cms.untracked.bool(True),
-#    printIndex  = cms.untracked.bool(True)
-#)
 
-#process.p = cms.Path(process.printTree+process.JetAnalyzer)
-
-process.p = cms.Path(process.egmGsfElectronIDSequence*process.ggMETFiltersSequence*process.JetAnalyzer)
-dump_file = open("dump_file_withfilter.py", "w")
-dump_file.write(process.dumpPython())
+process.p = cms.Path(process.egmGsfElectronIDSequence*process.photonIDValueMapProducer*process.ggMETFiltersSequence*process.JetAnalyzer)
+#dump_file = open("dump_file_withfilter.py", "w")
+#dump_file.write(process.dumpPython())

@@ -163,8 +163,8 @@ LightZPrimeAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    
    for(uint32_t j = 0; j < pfJets->size(); j++) {
      const pat::Jet &jet = (*pfJets)[j];
-     JetWidthCalculator jwc(jet);
-     std::cout << jwc.getEtaWidth() << std::endl;
+     //JetWidthCalculator jwc(jet);
+     //std::cout << jwc.getEtaWidth() << std::endl;
      if(jet.pt() > 30.) {
        HT += jet.pt();
        nJets++;
