@@ -45,7 +45,16 @@ dataset = {
   'Zvv800to1200':'/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
   'Zvv1200to2500':'/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
   'Zvv2500toInf':'/ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM'
-}
+  'QCD_Pt-80to120': '/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'QCD_Pt-120to170': '/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'QCD_Pt-170to300': '/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'QCD_Pt-300toInf': '/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'W1Jets': '/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'W2Jets': '/W2JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'W3Jets': '/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM',
+  'W4Jets': '/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16DR80-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/AODSIM'
+ }
+>>>>>>> 10b1b0dec2fb8810ae6daf3a6f126dff60933ece
 
 if __name__ == '__main__':
  from CRABAPI.RawCommand import crabCommand
@@ -70,7 +79,7 @@ config.Data.splitting = 'FileBased'
 listOfSamples = ['GJets_HT-40To100','GJets_HT-100To200','GJets_HT-200To400','GJets_HT-400To600','GJets_HT-600ToInf','TTJets','TTJets1','QCD_HT100to200','QCD_HT200to300','QCD_HT300to500','QCD_HT500to700','QCD_HT700to1000','QCD_HT1000to1500','QCD_HT1500to2000','QCD_HT2000toInf','WJetsFXFX','WJets','W1Jets','W2Jets','W3Jets','W4Jets','W5Jets','W6Jets','W7Jets','ZllG','WW','WZ','ZZ','DYJetsToLL_FXFX','DYJets_HT100to200','DYJets_HT200to400','DYJets_HT400to600','DYJets_HT600toInf','ST_s-channel_4f','ST_t-channel_top_4f','ST_t-channel_atop_4f','ST_tW_top_5f','ST_tW_atop_5f']
 #listOfSamples = ['Zvv100to200','Zvv200to400','Zvv400to600','Zvv600to800','Zvv800to1200','Zvv1200to2500','Zvv2500toInf']
 #listOfSamples = ['W6Jets']
-for sample in listOfSamples:  
+for sample in listOfSamples:
   config.General.requestName = sample
   config.Data.inputDataset = dataset[sample]
   config.Data.unitsPerJob = 1
