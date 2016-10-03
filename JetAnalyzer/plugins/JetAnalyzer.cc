@@ -25,6 +25,8 @@ using namespace std;
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/Common/interface/ValueMap.h"
+
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
@@ -41,6 +43,9 @@ using namespace std;
 #include "DataFormats/Common/interface/RefVector.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
 
 #include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
@@ -87,6 +92,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
 
+  edm::EDGetToken photonsToken_;
+
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
   edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
@@ -98,6 +105,11 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<edm::ValueMap<bool> > eleMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleTightIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleHEEPIdMapToken_;
+
+  edm::EDGetTokenT<edm::ValueMap<float> > phoChargedIsolationToken_; 
+  edm::EDGetTokenT<edm::ValueMap<float> > phoWorstChargedIsolationToken_; 
+  edm::EDGetTokenT<edm::ValueMap<float> > phoNeutralHadronIsolationToken_; 
+  edm::EDGetTokenT<edm::ValueMap<float> > phoPhotonIsolationToken_; 
 
   //some must have variables for tuples
   int     run_;
@@ -198,6 +210,22 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   std::vector<Float_t> eleisoPhotons_;
   std::vector<Float_t> eleisoChargedFromPU_;
 
+
+  Int_t nPhotons_;
+
+  std::vector<Float_t> phopt_;
+  std::vector<Float_t> phoeta_;
+  std::vector<Float_t> phophi_;
+
+  // Variables typically used for cut based photon ID
+  std::vector<Float_t>  phoSigmaIEtaIEtaFull5x5_ ;
+  std::vector<Float_t> phohOverE_;
+  std::vector<Int_t> phohasPixelSeed_;
+
+  std::vector<Float_t> phoisoChargedHadrons_;
+  std::vector<Float_t> phoWorstisoChargedHadrons_;
+  std::vector<Float_t> phoisoNeutralHadrons_;
+  std::vector<Float_t> phoisoPhotons_;
 
 
 
@@ -306,6 +334,15 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int j2MuMty;
   int HLTMET300_;
   int HLTMET170_HBHE;
+  int HLTPhoton165_HE10_;
+  int HLTPhoton175_;
+  int HLTPhoton75_;
+  int HLTPhoton90_;
+  int HLTPhoton120_;
+  int HLTPFJet40_;
+  int HLTPFJet60_;
+  int HLTPFJet80_;
+  
   TTree* tree;
 
 };
@@ -329,6 +366,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
   caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));  
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
+  photonsToken_ = mayConsume<edm::View<reco::Photon> >(edm::InputTag("gedPhotons"));
   muonToken = consumes< vector<reco::Muon> >(edm::InputTag("muons"));
   trackToken = consumes< vector<reco::Track> >(edm::InputTag("generalTracks"));  
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
@@ -349,7 +387,12 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   eleMediumIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-medium"));
   eleTightIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-tight")); 
   eleHEEPIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"));  
-  
+  phoChargedIsolationToken_ =consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoChargedIsolation"));
+  phoWorstChargedIsolationToken_ =consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoWorstChargedIsolation"));
+  phoNeutralHadronIsolationToken_ =consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"));
+  phoPhotonIsolationToken_= consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoPhotonIsolation"));
+    
+
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
@@ -468,6 +511,19 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleisoPhotons"             , &eleisoPhotons_);
   tree->Branch("eleisoChargedFromPU"       , &eleisoChargedFromPU_);
 
+  tree->Branch("nPhotons",                    &nPhotons_);
+  tree->Branch("phopt"  ,  &phopt_    );
+  tree->Branch("phoeta" ,  &phoeta_ );
+  tree->Branch("phophi" ,  &phophi_ );
+  tree->Branch("phoSigmaIEtaIEtaFull5x5"  , &phoSigmaIEtaIEtaFull5x5_);
+  tree->Branch("phohOverE"                 ,  &phohOverE_);
+  tree->Branch("phohasPixelSeed"           ,  &phohasPixelSeed_);
+
+  tree->Branch("phoisoChargedHadrons"      , &phoisoChargedHadrons_);
+  tree->Branch("phoWorstisoChargedHadrons"      , &phoWorstisoChargedHadrons_);
+  tree->Branch("phoisoNeutralHadrons"      , &phoisoNeutralHadrons_);
+  tree->Branch("phoisoPhotons"             , &phoisoPhotons_);
+
 
   tree->Branch("trackPt",&trkPt_);
   tree->Branch("trackEta",&trkEta_);
@@ -546,6 +602,14 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2phiWidthInHCal", &j2phiWidthInHCal);
   tree->Branch("HLTPFMET300",               &HLTMET300_);
   tree->Branch("HLTPFMET170_HBHECleaned", &HLTMET170_HBHE);
+  tree->Branch("HLTPhoton165_HE10",               &HLTPhoton165_HE10_);
+  tree->Branch("HLTPhoton175",               &HLTPhoton175_);
+  tree->Branch("HLTPhoton75",               &HLTPhoton75_);
+  tree->Branch("HLTPhoton90",               &HLTPhoton90_);
+  tree->Branch("HLTPhoton120",               &HLTPhoton120_);
+  tree->Branch("HLTPFJet40",               &HLTPFJet40_);
+  tree->Branch("HLTPFJet60",               &HLTPFJet60_);
+  tree->Branch("HLTPFJet80",               &HLTPFJet80_);
 }
 
 
@@ -695,14 +759,36 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<edm::ValueMap<bool> >  heep_id_decisions;
    iEvent.getByToken(eleHEEPIdMapToken_ ,         heep_id_decisions);
 
+   nPhotons_=0;
+
+   edm::Handle<edm::View<reco::Photon> > photons;
+   iEvent.getByToken(photonsToken_, photons);
+   edm::Handle<edm::ValueMap<float> > phoChargedIsolationMap;
+   iEvent.getByToken(phoChargedIsolationToken_, phoChargedIsolationMap);
+   edm::Handle<edm::ValueMap<float> > phoWorstChargedIsolationMap;
+   iEvent.getByToken(phoWorstChargedIsolationToken_, phoWorstChargedIsolationMap);
+   edm::Handle<edm::ValueMap<float> > phoNeutralHadronIsolationMap;
+   iEvent.getByToken(phoNeutralHadronIsolationToken_, phoNeutralHadronIsolationMap);
+   edm::Handle<edm::ValueMap<float> > phoPhotonIsolationMap;
+   iEvent.getByToken(phoPhotonIsolationToken_, phoPhotonIsolationMap);
+
+
    nMu_ = 0;
 
    Handle< vector<reco::Muon> > recoMuons;
    iEvent.getByToken(muonToken, recoMuons);
 
    //HLT treatment
-   HLTMET300_               = 0;
-   HLTMET170_HBHE =0;
+   HLTMET300_               = -99;
+   HLTMET170_HBHE =-99;
+   HLTPhoton165_HE10_ =-99;
+   HLTPhoton175_ =-99;
+   HLTPhoton75_ =-99;
+   HLTPhoton90_ =-99;
+   HLTPhoton120_ =-99;
+   HLTPFJet40_=-99;
+   HLTPFJet60_=-99;
+   HLTPFJet80_=-99;
 
    Handle<edm::TriggerResults> trgResultsHandle;
    iEvent.getByToken(trgResultsLabel_, trgResultsHandle);
@@ -716,6 +802,14 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
      if (name.find("HLT_PFMET300_v") != string::npos) {HLTMET300_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
      if (name.find("HLT_PFMET170_HBHECleaned_v") != string::npos) {HLTMET170_HBHE = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_Photon165_HE10_v") != string::npos) {HLTPhoton165_HE10_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_Photon175_v") != string::npos) {HLTPhoton175_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_Photon75_v") != string::npos) {HLTPhoton75_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_Photon90_v") != string::npos) {HLTPhoton90_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_Photon120_v") != string::npos) {HLTPhoton120_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFJet40_v") != string::npos) {HLTPFJet40_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFJet60_v") != string::npos) {HLTPFJet60_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
+     if (name.find("HLT_PFJet80_v") != string::npos) {HLTPFJet80_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    //Clear previous events
    jetPt_.clear();
@@ -816,6 +910,20 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    muIsHighPtID_ .clear();
 */
    // Set event level quantities
+
+   phopt_.clear();
+   phoeta_.clear();
+   phophi_.clear();
+   //
+   phoSigmaIEtaIEtaFull5x5_.clear();
+   phohOverE_.clear();
+   phohasPixelSeed_.clear();
+   //
+   phoisoChargedHadrons_.clear();
+   phoWorstisoChargedHadrons_.clear();
+   phoisoNeutralHadrons_.clear();
+   phoisoPhotons_.clear();
+
 
    totalET = 0;
    HT = 0;
@@ -1074,7 +1182,40 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
      nEle_++;
 
-     } 
+     }
+
+   //Loop over photon collection
+   for (size_t i = 0; i < photons->size(); ++i){
+     const auto pho = photons->ptrAt(i);
+     
+     if( pho->pt() < 15 ) 
+       continue;
+
+     nPhotons_++;
+
+     phopt_  .push_back( pho->pt() );
+     phoeta_ .push_back( pho->superCluster()->eta() );
+     phophi_ .push_back( pho->superCluster()->phi() );
+
+     phohOverE_                .push_back( pho->hadTowOverEm() );
+     phohasPixelSeed_          .push_back( (Int_t)pho->hasPixelSeed() );
+
+     float chIso =  (*phoChargedIsolationMap)[pho];
+     float worstchIso =  (*phoWorstChargedIsolationMap)[pho];
+     float nhIso =  (*phoNeutralHadronIsolationMap)[pho];
+     float phIso = (*phoPhotonIsolationMap)[pho];
+     phoisoChargedHadrons_ .push_back( chIso );
+     phoWorstisoChargedHadrons_ .push_back( worstchIso );
+     phoisoNeutralHadrons_ .push_back( nhIso );
+     phoisoPhotons_        .push_back( phIso );
+     
+     phoSigmaIEtaIEtaFull5x5_ .push_back(pho->full5x5_sigmaIetaIeta());
+     
+     
+   }
+
+
+ 
    int nMu50=0;
    //Loop over the recoMuon collection
    for(uint32_t i = 0; i < recoMuons->size(); i++) {
