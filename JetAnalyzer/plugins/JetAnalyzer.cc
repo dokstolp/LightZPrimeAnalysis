@@ -44,6 +44,7 @@ using namespace std;
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 
@@ -82,7 +83,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
   edm::EDGetTokenT< vector<reco::CaloMET> > caloMETToken;  
   edm::EDGetToken electronCollection_;
-  edm::EDGetTokenT<vector<reco::Muon> > muonToken;  
+  edm::EDGetTokenT<edm::View<pat::Muon> > muonToken;  
+  //edm::EDGetTokenT< vector<reco::Muon> > muonToken;  
   edm::EDGetTokenT<vector<reco::Track> > trackToken;  
   edm::EDGetTokenT<bool> globalHandle_;
   edm::EDGetTokenT<bool> hcalNoiseHandle_;
@@ -239,12 +241,38 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float>  muPhi_;
   vector<int>    muCharge_;
   vector<int>    muType_;
-/*  vector<Bool_t> muIsLooseID_;
+
+  vector<Bool_t> muIsLooseID_;
   vector<Bool_t> muIsMediumID_;
   vector<Bool_t> muIsTightID_;
   vector<Bool_t> muIsSoftID_;
   vector<Bool_t> muIsHighPtID_;
-*/
+  vector<float>  muD0_;
+  vector<float>  muDz_;
+  vector<float>  muChi2NDF_;
+  vector<float>  muInnerD0_;
+  vector<float>  muInnerDz_;
+  vector<int>    muTrkLayers_;
+  vector<int>    muPixelLayers_;
+  vector<int>    muPixelHits_;
+  vector<int>    muMuonHits_;
+  vector<int>    muStations_;
+  vector<int>    muMatches_;
+  vector<int>    muTrkQuality_;
+  vector<float>  muIsoTrk_;
+  vector<float>  muPFChIso_;
+  vector<float>  muPFPhoIso_;
+  vector<float>  muPFNeuIso_;
+  vector<float>  muPFPUIso_;
+  vector<float>  muInnervalidFraction_;
+  vector<float>  musegmentCompatibility_;
+  vector<float>  muchi2LocalPosition_;
+  vector<float>  mutrkKink_;
+  vector<float>  muBestTrkPtError_;
+  vector<float>  muBestTrkPt_;
+
+
+
   //track variables
   vector<float>  trkPt_;
   vector<float>  trkEta_;
@@ -354,7 +382,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // static data member definitions
 //
-reco::Vertex vtx_0;
+
 //
 // constructors and destructor
 //
@@ -367,7 +395,8 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));  
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
   photonsToken_ = mayConsume<edm::View<reco::Photon> >(edm::InputTag("gedPhotons"));
-  muonToken = consumes< vector<reco::Muon> >(edm::InputTag("muons"));
+  muonToken = consumes<edm::View<pat::Muon> >(edm::InputTag("selectedPatMuons"));
+  //muonToken = consumes< vector<reco::Muon> >(edm::InputTag("muons"));
   trackToken = consumes< vector<reco::Track> >(edm::InputTag("generalTracks"));  
   trgResultsLabel_ = consumes<edm::TriggerResults>  (edm::InputTag("TriggerResults", "", "HLT"));
   globalHandle_= consumes<bool>(edm::InputTag("globalTightHalo2016Filter", ""));  
@@ -449,12 +478,34 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("muPhi",         &muPhi_);
   tree->Branch("muCharge",      &muCharge_);
   tree->Branch("muType",        &muType_);
-/*  tree->Branch("muIsLooseID",   &muIsLooseID_);
+  tree->Branch("muIsLooseID",   &muIsLooseID_);
   tree->Branch("muIsMediumID",  &muIsMediumID_);
   tree->Branch("muIsTightID",   &muIsTightID_);
   tree->Branch("muIsSoftID",    &muIsSoftID_);
   tree->Branch("muIsHighPtID",  &muIsHighPtID_);
-*/  
+  tree->Branch("muD0",          &muD0_);
+  tree->Branch("muDz",          &muDz_);
+  tree->Branch("muChi2NDF",     &muChi2NDF_);
+  tree->Branch("muInnerD0",     &muInnerD0_);
+  tree->Branch("muInnerDz",     &muInnerDz_);
+  tree->Branch("muTrkLayers",   &muTrkLayers_);
+  tree->Branch("muPixelLayers", &muPixelLayers_);
+  tree->Branch("muPixelHits",   &muPixelHits_);
+  tree->Branch("muMuonHits",    &muMuonHits_);
+  tree->Branch("muStations",    &muStations_);
+  tree->Branch("muMatches",     &muMatches_);
+  tree->Branch("muTrkQuality",  &muTrkQuality_);
+  tree->Branch("muIsoTrk",      &muIsoTrk_);
+  tree->Branch("muPFChIso",     &muPFChIso_);
+  tree->Branch("muPFPhoIso",    &muPFPhoIso_);
+  tree->Branch("muPFNeuIso",    &muPFNeuIso_);
+  tree->Branch("muPFPUIso",     &muPFPUIso_);
+  tree->Branch("muInnervalidFraction",   &muInnervalidFraction_);
+  tree->Branch("musegmentCompatibility", &musegmentCompatibility_);
+  tree->Branch("muchi2LocalPosition",    &muchi2LocalPosition_);
+  tree->Branch("mutrkKink",              &mutrkKink_);
+  tree->Branch("muBestTrkPtError",       &muBestTrkPtError_);
+  tree->Branch("muBestTrkPt",            &muBestTrkPt_);
 
 
   tree->Branch("nEle",                    &nEle_);
@@ -717,6 +768,8 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    nTrksPV_ = pv.nTracks();
 
 
+
+
    edm::Handle<reco::ConversionCollection> conversions;
    iEvent.getByToken(conversionsToken_, conversions);
 
@@ -775,8 +828,15 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    nMu_ = 0;
 
-   Handle< vector<reco::Muon> > recoMuons;
+
+   edm::Handle<edm::View<pat::Muon> > recoMuons;
+   //edm::Handle<vector<reco::Muon> > recoMuons;
    iEvent.getByToken(muonToken, recoMuons);
+
+
+
+   //   Handle< vector<pat::Muon> > recoMuons;
+   //   iEvent.getByToken(muonToken, recoMuons);
 
    //HLT treatment
    HLTMET300_               = -99;
@@ -903,12 +963,43 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    muPhi_        .clear();
    muCharge_     .clear();
    muType_       .clear();
-/*   muIsLooseID_  .clear();
+   muPt_         .clear();
+   muEn_         .clear();
+   muEta_        .clear();
+   muPhi_        .clear();
+   muCharge_     .clear();
+   muType_       .clear();
+   muIsLooseID_  .clear();
    muIsMediumID_ .clear();
    muIsTightID_  .clear();
    muIsSoftID_   .clear();
    muIsHighPtID_ .clear();
-*/
+   muD0_         .clear();
+   muDz_         .clear();
+   muChi2NDF_    .clear();
+   muInnerD0_    .clear();
+   muInnerDz_    .clear();
+   muTrkLayers_  .clear();
+   muPixelLayers_.clear();
+   muPixelHits_  .clear();
+   muMuonHits_   .clear();
+   muStations_   .clear();
+   muMatches_    .clear();
+   muTrkQuality_ .clear();
+   muIsoTrk_     .clear();
+   muPFChIso_    .clear();
+   muPFPhoIso_   .clear();
+   muPFNeuIso_   .clear();
+   muPFPUIso_    .clear();
+   muInnervalidFraction_  .clear();
+   musegmentCompatibility_.clear();
+   muchi2LocalPosition_   .clear();
+   mutrkKink_             .clear();
+   muBestTrkPtError_      .clear();
+   muBestTrkPt_           .clear();
+
+
+
    // Set event level quantities
 
    phopt_.clear();
@@ -1216,33 +1307,80 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
  
-   int nMu50=0;
-   //Loop over the recoMuon collection
-   for(uint32_t i = 0; i < recoMuons->size(); i++) {
-     const reco::Muon& muon = (*recoMuons)[i];
-     if (muon.pt() < 3) continue;
-     if (! (muon.isPFMuon() || muon.isGlobalMuon() || muon.isTrackerMuon())) continue;
 
-     muPt_    .push_back(muon.pt());
-     muEn_    .push_back(muon.energy());
-     muEta_   .push_back(muon.eta());
-     muPhi_   .push_back(muon.phi());
-     muCharge_.push_back(muon.charge());
-     muType_.push_back(muon.type());
-     if (muon.pt()>50){
-     nMu50++;
-     //std::cout<<"HighMuonPt: "<<muon.pt()<<std::endl;
+
+   for (edm::View<pat::Muon>::const_iterator muon = recoMuons->begin(); muon != recoMuons->end(); ++muon) {
+     if (muon->pt() < 3) continue;
+     if (! (muon->isPFMuon() || muon->isGlobalMuon() || muon->isTrackerMuon())) continue;
+
+     muPt_    .push_back(muon->pt());
+     muEn_    .push_back(muon->energy());
+     muEta_   .push_back(muon->eta());
+     muPhi_   .push_back(muon->phi());
+     muCharge_.push_back(muon->charge());
+     muType_.push_back(muon->type());
+
+     muD0_    .push_back(muon->muonBestTrack()->dxy(pv.position()));
+     muDz_    .push_back(muon->muonBestTrack()->dz(pv.position()));
+
+     muIsLooseID_ .push_back(muon->isLooseMuon());;
+     muIsMediumID_.push_back(muon->isMediumMuon());
+     muIsTightID_ .push_back(muon->isTightMuon(pv));
+     muIsSoftID_  .push_back(muon->isSoftMuon(pv));
+     muIsHighPtID_.push_back(muon->isHighPtMuon(pv));
+
+
+     muBestTrkPtError_        .push_back(muon->muonBestTrack()->ptError());
+     muBestTrkPt_             .push_back(muon->muonBestTrack()->pt());
+     musegmentCompatibility_  .push_back(muon->segmentCompatibility());
+     muchi2LocalPosition_     .push_back(muon->combinedQuality().chi2LocalPosition);
+     mutrkKink_               .push_back(muon->combinedQuality().trkKink);
+
+     const reco::TrackRef glbmu = muon->globalTrack();
+     const reco::TrackRef innmu = muon->innerTrack();
+
+
+     if (glbmu.isNull()) {
+       muChi2NDF_ .push_back(-99.);
+       muMuonHits_.push_back(-99);
+     } else {
+       muChi2NDF_.push_back(glbmu->normalizedChi2());
+       muMuonHits_.push_back(glbmu->hitPattern().numberOfValidMuonHits());
      }
-     //std::cout<<"primaryvertex: ("<<vtx_0.x()<<", "<<vtx_0.y()<<", "<<vtx_0.z()<<")"<<std::endl;
-    // muIsLooseID_.push_back(muon::isLooseMuon(muon));
-    // muIsMediumID_.push_back(muon::isMediumMuon(muon));
-    // muIsTightID_.push_back(muon::isTightMuon(muon,vtx_0));
-    // muIsSoftID_.push_back(muon::isSoftMuon(muon,vtx_0));
-    // muIsHighPtID_.push_back(muon::isHighPtMuon(muon,vtx_0));
+
+
+     if (innmu.isNull()) {
+       muInnerD0_     .push_back(-99.);
+       muInnerDz_     .push_back(-99.);
+       muTrkLayers_   .push_back(-99);
+       muPixelLayers_ .push_back(-99);
+       muPixelHits_   .push_back(-99);
+       muTrkQuality_  .push_back(-99);
+
+       muInnervalidFraction_ .push_back(-99);
+     } else {
+       muInnerD0_     .push_back(innmu->dxy(pv.position()));
+       muInnerDz_     .push_back(innmu->dz(pv.position()));
+       muTrkLayers_   .push_back(innmu->hitPattern().trackerLayersWithMeasurement());
+       muPixelLayers_ .push_back(innmu->hitPattern().pixelLayersWithMeasurement());
+       muPixelHits_   .push_back(innmu->hitPattern().numberOfValidPixelHits());
+       muTrkQuality_  .push_back(innmu->quality(reco::TrackBase::highPurity));
+
+       muInnervalidFraction_ .push_back(innmu->validFraction());
+     }
+
+     muStations_ .push_back(muon->numberOfMatchedStations());
+     muMatches_  .push_back(muon->numberOfMatches());
+     muIsoTrk_   .push_back(muon->trackIso());
+     muPFChIso_  .push_back(muon->pfIsolationR04().sumChargedHadronPt);
+     muPFPhoIso_ .push_back(muon->pfIsolationR04().sumPhotonEt);
+     muPFNeuIso_ .push_back(muon->pfIsolationR04().sumNeutralHadronEt);
+     muPFPUIso_  .push_back(muon->pfIsolationR04().sumPUPt);
+
 
      nMu_++;
    }
-   std::cout<<" TotalMuons: "<< nMu_<<"; highPtMuons: "<<nMu50<<std::endl;
+
  
    pfMET = -99, pfMETPhi = -99, pfMETsumEt_ = -99, pfMETmEtSig_ = -99, pfMETSig_ = -99;
  

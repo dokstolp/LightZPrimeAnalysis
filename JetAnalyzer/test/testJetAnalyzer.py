@@ -23,6 +23,16 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016C/SinglePhoton/AOD/23Sep2016-v1/90000/009435BC-1F86-E611-9241-0CC47A6C1034.root'))#
 #process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016D/MET/AOD/PromptReco-v2/000/276/315/00000/286DBB5B-F444-E611-AA93-02163E011B53.root'))#
 # Set up electron ID (VID framework)
+
+
+
+process.load( "PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff" )
+process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )
+process.load( "PhysicsTools.PatAlgos.selectionLayer1.selectedPatCandidates_cff" )
+
+from PhysicsTools.PatAlgos.tools.coreTools import *
+runOnData( process, outputModules = [] )
+
 #
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
