@@ -3,18 +3,10 @@
 // Package:    LightZPrimeAnalysis/JetAnalyzer
 // Class:      JetAnalyzer
 // 
-/**\class JetAnalyzer JetAnalyzer.cc LightZPrimeAnalysis/JetAnalyzer/plugins/JetAnalyzer.cc
+//cclass JetAnalyzer JetAnalyzer.cc LightZPrimeAnalysis/JetAnalyzer/plugins/JetAnalyzer.cc
 
- Description: [one line class summary]
+// Description: [one line class summary]
 
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Sridhara Rao Dasu
-//         Created:  Tue, 23 Feb 2016 04:57:10 GMT
-// Second Author: Usama Hussain
-//
 
 
 // system include files
@@ -40,6 +32,7 @@ using namespace std;
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
@@ -49,6 +42,9 @@ using namespace std;
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
+#include "DataFormats/EgammaCandidates/interface/Conversion.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TTree.h"
 
 //
@@ -93,7 +89,9 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
   edm::EDGetTokenT<vector<reco::Vertex> > vtxToken_;
- 
+  edm::EDGetTokenT<reco::ConversionCollection> conversionsToken_;
+  edm::EDGetTokenT<double> rhoToken_; 
+  edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
   // elecontr ID decisions objects
   edm::EDGetTokenT<edm::ValueMap<bool> > eleVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > eleLooseIdMapToken_;
@@ -108,7 +106,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int npv_;
   int    nTrksPV_;
   int     nVtx_;
- 
+  Float_t rho_;  
   //jet variables
   vector<float> jetPt_;
   vector<float> jetEn_;
@@ -195,7 +193,10 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float>  eleE5x5Full5x5_;
   vector<float>  eleR9Full5x5_;
 
-
+  std::vector<Float_t> eleisoChargedHadrons_;
+  std::vector<Float_t> eleisoNeutralHadrons_;
+  std::vector<Float_t> eleisoPhotons_;
+  std::vector<Float_t> eleisoChargedFromPU_;
 
 
 
@@ -338,8 +339,11 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
   BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
   BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));  
+  //  vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
-  
+  beamSpotToken_    = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
+  rhoToken_    = consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
+  conversionsToken_ = mayConsume< reco::ConversionCollection>(edm::InputTag("allConversions"));
   eleVetoIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-veto"));
   eleLooseIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-loose"));
   eleMediumIdMapToken_ = consumes<edm::ValueMap<bool> >(edm::InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-50ns-V2-standalone-medium"));
@@ -356,6 +360,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("metFilters", &metFilters_);
   tree->Branch("npv",&npv_,"npv/I");
   tree->Branch("nTrksPV",&nTrksPV_);
+  tree->Branch("rho",&rho_);
 
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
@@ -458,6 +463,10 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleE2x5Full5x5",          &eleE2x5Full5x5_);
   tree->Branch("eleE5x5Full5x5",          &eleE5x5Full5x5_);
   tree->Branch("eleR9Full5x5",                &eleR9Full5x5_);
+  tree->Branch("eleisoChargedHadrons"      , &eleisoChargedHadrons_);
+  tree->Branch("eleisoNeutralHadrons"      , &eleisoNeutralHadrons_);
+  tree->Branch("eleisoPhotons"             , &eleisoPhotons_);
+  tree->Branch("eleisoChargedFromPU"       , &eleisoChargedFromPU_);
 
 
   tree->Branch("trackPt",&trkPt_);
@@ -637,20 +646,39 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(vtxToken_, vtxHandle);
 
    //number of primary vertices 
+
+   if (vtxHandle->empty()) return;
+   const reco::Vertex &pv = vtxHandle->front();
    npv_ = vtxHandle->size();    
-   if (vtxHandle.isValid()) {
-   nVtx_ = 0;
-   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
-   const reco::Vertex& vertex = (*vtxHandle)[v];
-   if (v == 0) {
-       vtx_0 = vertex;
-   } 
-   if (nVtx_ == 0) {
-       nTrksPV_ = vertex.nTracks();
-    }
-   }
-   }
-   
+   nTrksPV_ = pv.nTracks();
+
+
+   edm::Handle<reco::ConversionCollection> conversions;
+   iEvent.getByToken(conversionsToken_, conversions);
+
+   // Get rho value
+   edm::Handle< double > rhoH;
+   iEvent.getByToken(rhoToken_,rhoH);
+   rho_ = *rhoH;
+
+   // Get the beam spot
+   edm::Handle<reco::BeamSpot> theBeamSpot;
+   iEvent.getByToken(beamSpotToken_,theBeamSpot);  
+
+
+//   if (vtxHandle.isValid()) {
+//   nVtx_ = 0;
+//   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
+//   const reco::Vertex& vertex = (*vtxHandle)[v];
+//   if (v == 0) {
+//       vtx_0 = vertex;
+//   } 
+//   if (nVtx_ == 0) {
+//       nTrksPV_ = vertex.nTracks();
+//    }
+//   }
+//   }
+//   
    nEle_ = 0;
    
    Handle<edm::View<reco::GsfElectron> > electronHandle;
@@ -766,7 +794,10 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    eleE2x5Full5x5_             .clear();
    eleE5x5Full5x5_             .clear();
    eleR9Full5x5_               .clear();
-
+   eleisoChargedHadrons_.clear();
+   eleisoNeutralHadrons_.clear();
+   eleisoPhotons_.clear();
+   eleisoChargedFromPU_.clear();
 
 
 
@@ -974,8 +1005,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      eleCharge_          .push_back(el->charge());
      eleChargeConsistent_.push_back((Int_t)el->isGsfCtfScPixChargeConsistent());
      eleEn_              .push_back(el->energy());
-     //     eleD0_              .push_back(el->gsfTrack()->dxy(pv));
-     //     eleDz_              .push_back(el->gsfTrack()->dz(pv));
+
      eleR9_              .push_back(el->r9());
      eleSCEn_            .push_back(el->superCluster()->energy());
      eleSCEta_           .push_back(el->superCluster()->eta());
@@ -992,17 +1022,31 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      eledEtaAtCalo_      .push_back(el->deltaEtaSeedClusterTrackAtCalo());
      eleSigmaIEtaIEta_   .push_back(el->sigmaIetaIeta()); ///new sigmaietaieta
      eleSigmaIPhiIPhi_   .push_back(el->sigmaIphiIphi());
-     //     eleConvVeto_        .push_back((Int_t)el->passConversionVeto()); // ConvVtxFit || missHit == 0
      eleMissHits_        .push_back(el->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+
+     bool passConvVeto = !ConversionTools::hasMatchedConversion(*el,conversions,theBeamSpot->position());
+     eleConvVeto_.push_back( (int) passConvVeto );
+
+     reco::GsfTrackRef theTrack = el->gsfTrack();
+     eleD0_.push_back( (-1) * theTrack->dxy(pv.position() ) );
+     eleDz_.push_back( theTrack->dz( pv.position() ) );
+
 
 
      // VID calculation of (1/E - 1/p)
      if (el->ecalEnergy() == 0)   eleEoverPInv_.push_back(1e30);
      else if (!std::isfinite(el->ecalEnergy()))  eleEoverPInv_.push_back(1e30);
      else  eleEoverPInv_.push_back((1.0 - el->eSuperClusterOverP())/el->ecalEnergy());
-
-     //eledEtaseedAtVtx_   .push_back(el->edEtaseedAtVtx);
-
+     
+     float dEtaSeedValue = 
+       el->superCluster().isNonnull() && el->superCluster()->seed().isNonnull() 
+       ? 
+       el->deltaEtaSuperClusterTrackAtVtx() 
+       - el->superCluster()->eta() 
+       + el->superCluster()->seed()->eta() 
+       : std::numeric_limits<float>::max();
+     eledEtaseedAtVtx_   .push_back(dEtaSeedValue);
+     
      eleE1x5_            .push_back(el->e1x5());
      eleE2x5_            .push_back(el->e2x5Max());
      eleE5x5_            .push_back(el->e5x5());
@@ -1020,6 +1064,12 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      PassTight_.push_back((*tight_id_decisions)[el]);
      PassHEEP_.push_back((*heep_id_decisions)[el]);
 
+     reco::GsfElectron::PflowIsolationVariables pfIso = el->pfIsolationVariables();
+     eleisoChargedHadrons_.push_back( pfIso.sumChargedHadronPt );
+     eleisoNeutralHadrons_.push_back( pfIso.sumNeutralHadronEt );
+     eleisoPhotons_.push_back( pfIso.sumPhotonEt );
+     eleisoChargedFromPU_.push_back( pfIso.sumPUPt );
+     
 
 
      nEle_++;
