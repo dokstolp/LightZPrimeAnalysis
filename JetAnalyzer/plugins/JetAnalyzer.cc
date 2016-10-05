@@ -507,17 +507,12 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("muBestTrkPtError",       &muBestTrkPtError_);
   tree->Branch("muBestTrkPt",            &muBestTrkPt_);
 
-
-  tree->Branch("nEle",                    &nEle_);
   tree->Branch("eleCharge",               &eleCharge_);
   tree->Branch("eleChargeConsistent",     &eleChargeConsistent_);
   tree->Branch("eleEn",                   &eleEn_);
   tree->Branch("eleSCEn",                 &eleSCEn_);
   tree->Branch("eleD0",                   &eleD0_);
   tree->Branch("eleDz",                   &eleDz_);
-  tree->Branch("elePt",                   &elePt_);
-  tree->Branch("eleEta",                  &eleEta_);
-  tree->Branch("elePhi",                  &elePhi_);
   tree->Branch("eleR9",                   &eleR9_);
   tree->Branch("eleCalibPt",              &eleCalibPt_);
   tree->Branch("eleCalibEn",              &eleCalibEn_);
