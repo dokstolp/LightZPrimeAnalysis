@@ -111,32 +111,36 @@ void ZprimeJetsClass::Loop(Long64_t maxEvents, int reportEvery)
 	    	if (pfMET>320)
 	          {
 		    fillHistos(4);
-		    if (metcut<0.5)
+		    if(electron_veto_looseID(jetCand[0],10) &&  muon_veto_looseID(jetCand[0],10))
 		      {
-		        fillHistos(5);
-			double minDPhiJetMET = TMath::Pi();
-			double minDPhiJetMET_first4 = TMath::Pi();
-			for(int j = 0; j < jetCand.size(); j++)
-			  {
-			    if(DeltaPhi((*jetPhi)[j],pfMETPhi)<minDPhiJetMET)
+			fillHistos(5);
+		    	if (metcut<0.5)
+		      	  {
+		            fillHistos(6);
+			    double minDPhiJetMET = TMath::Pi();
+			    double minDPhiJetMET_first4 = TMath::Pi();
+			    for(int j = 0; j < jetCand.size(); j++)
+			  	{
+			    	  if(DeltaPhi((*jetPhi)[j],pfMETPhi)<minDPhiJetMET)
+			      	    {
+				      minDPhiJetMET = DeltaPhi((*jetPhi)[j],pfMETPhi);
+				      if(j < 4)
+				  	minDPhiJetMET_first4 = DeltaPhi((*jetPhi)[j],pfMETPhi);
+			      	    }
+			  	}
+			    h_dphimin->Fill(minDPhiJetMET_first4);
+			    if(dPhiJetMETcut(jetCand))
 			      {
-				minDPhiJetMET = DeltaPhi((*jetPhi)[j],pfMETPhi);
-				if(j < 4)
-				  minDPhiJetMET_first4 = DeltaPhi((*jetPhi)[j],pfMETPhi);
-			      }
-			  }
-			h_dphimin->Fill(minDPhiJetMET_first4);
-			if(dPhiJetMETcut(jetCand))
-			  {
-			    fillHistos(6);
-			    h_deltar->Fill(deltar);
-			    if (deltar<0.1)
-			      {
-				h_deltar_cut->Fill(deltar);
-				fillHistos(7);
-			      }
-			  }
-		      }
+			    	fillHistos(7);
+			    	h_deltar->Fill(deltar);
+			    	if (deltar<0.1)
+			      	  {
+				    h_deltar_cut->Fill(deltar);
+				    fillHistos(8);
+			      	   }
+			  	}
+				}
+		      	}
 		  }
 	      }
 	  }
@@ -169,7 +173,7 @@ void ZprimeJetsClass::BookHistos(const char* file2)
   h_dphimin = new TH1F("h_dphimin","h_dphimin; Minimum dPhiJetMET",50,0,3.2);h_dphimin->Sumw2();
   h_deltar  = new TH1F("h_deltar","h_deltar; #DeltaR for Leading Jet", 10,0,0.1);h_deltar->Sumw2();
   h_deltar_cut = new TH1F("h_deltar_cut","h_deltar_cut; #DeltaR for Leading Pencil Jet",10,0,0.1);h_deltar_cut->Sumw2();
-  for(int i=0; i<8; i++){
+  for(int i=0; i<9; i++){
 
      char ptbins[100];
      sprintf(ptbins, "_%d", i);
@@ -232,6 +236,15 @@ void ZprimeJetsClass::fillHistos(int histoNumber)
   h_j1NHF[histoNumber]->Fill(j1NHdFr);
 
   
+}
+
+//Function to calculate regular deltaR separate from jet width variable 'dR'
+double ZprimeJetsClass::deltaR(double eta1, double phi1, double eta2, double phi2)
+{
+  double deltaeta = abs(eta1 - eta2);
+  double deltaphi = DeltaPhi(phi1, phi2);
+  double deltar = sqrt(deltaeta*deltaeta + deltaphi*deltaphi);
+  return deltar;
 }
 
 //Gives the (minimum) separation in phi between the specified phi values
@@ -312,17 +325,114 @@ bool ZprimeJetsClass::dPhiJetMETcut(std::vector<int> jets)
 
   return passes;
   
+}
+
+bool ZprimeJetsClass::electron_veto_looseID(int jet_index, float elePtCut)
+{
+  bool veto_passed = true; //pass veto if no good electron found
+                                                                                                                                            
+  bool pass_SigmaIEtaIEtaFull5x5 = false;
+  bool pass_dEtaIn = false;
+  bool pass_dPhiIn = false;
+  bool pass_HoverE = false;
+  bool pass_iso = false;
+  bool pass_ooEmooP = false;
+  bool pass_d0 = false;
+  bool pass_dz = false;
+  bool pass_missingHits = false;
+  bool pass_convVeto = false;
+  //Explicitly stating types to avoid a TMath::Max conversion issue                                                                                                                 
+  Float_t EA = 0.0;
+  Float_t zero = 0.0;
+  Float_t EAcorrIso = 999.9;
+  for(int i = 0; i < nEle; i++)
+     {
+      pass_SigmaIEtaIEtaFull5x5 = false;
+      pass_dEtaIn = false;
+      pass_dPhiIn = false;
+      pass_HoverE = false;
+      pass_iso = false;
+      pass_ooEmooP = false;
+      pass_d0 = false;
+      pass_dz = false;
+      pass_missingHits = false;
+      pass_convVeto = false;
+      //Find EA for corrected relative iso.   	
+     
+      if(abs(eleSCEta->at(i)) <= 1.0)
+        EA = 0.1752;
+      else if(1.0 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) <= 1.479)
+        EA = 0.1862;
+      else if(1.479 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) <= 2.0)
+        EA = 0.1411;
+      else if(2.0 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) <= 2.2)
+        EA = 0.1534;
+      else if(2.2 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) <= 2.3)
+        EA = 0.1903;
+      else if(2.3 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) <= 2.4)
+        EA = 0.2243;
+      else if(2.4 < abs(eleSCEta->at(i)) && abs(eleSCEta->at(i)) < 2.5)
+        EA = 0.2687;
+      EAcorrIso = (elePFChIso->at(i) + TMath::Max(zero,elePFNeuIso->at(i) + elePFPhoIso->at(i) - rho*EA))/(elePt->at(i));
+
+      if(abs(eleSCEta->at(i)) <= 1.479)
+        {
+          pass_SigmaIEtaIEtaFull5x5 = eleSigmaIEtaIEtaFull5x5->at(i) < 0.0103;
+          pass_dEtaIn = abs(eledEtaAtVtx->at(i)) < 0.0105;
+          pass_dPhiIn = abs(eledPhiAtVtx->at(i)) < 0.115;
+          pass_HoverE = eleHoverE->at(i) < 0.104;
+          pass_iso = EAcorrIso < 0.0893;
+          pass_ooEmooP = eleEoverPInv->at(i) < 0.102;
+          pass_d0 = abs(eleD0->at(i)) < 0.0261;
+          pass_dz = abs(eleDz->at(i)) < 0.41;
+          pass_missingHits = eleMissHits->at(i) <= 2;
+          pass_convVeto = eleConvVeto->at(i) == 1;
+        }
+      else if(1.479 < abs(eleSCEta->at(i)) < 2.5)
+        {
+          pass_SigmaIEtaIEtaFull5x5 = eleSigmaIEtaIEtaFull5x5->at(i) < 0.0301;
+          pass_dEtaIn = abs(eledEtaAtVtx->at(i)) < 0.00814;
+          pass_dPhiIn = abs(eledPhiAtVtx->at(i)) < 0.182;
+          pass_HoverE = eleHoverE->at(i) < 0.0897;
+          pass_iso = EAcorrIso < 0.121;
+          pass_ooEmooP = eleEoverPInv->at(i) < 0.126;
+          pass_d0 = abs(eleD0->at(i)) < 0.118;
+          pass_dz = abs(eleDz->at(i)) < 0.822;
+          pass_missingHits = eleMissHits->at(i) <= 1;
+          pass_convVeto = eleConvVeto->at(i) == 1;
+        }
+      //Electron passes Loose Electron ID cuts  
+      if(pass_SigmaIEtaIEtaFull5x5 && pass_dEtaIn && pass_dPhiIn && pass_HoverE && pass_iso && pass_ooEmooP && pass_d0 && pass_dz && pass_missingHits && pass_convVeto)
+        {
+          //Electron passes pt cut                                                                                                                                                                                                                                                                             
+          if(elePt->at(i) > elePtCut)
+            {
+	      //Electron does not overlap with jet
+              if(deltaR(eleSCEta->at(i),eleSCPhi->at(i),jetEta->at(jet_index),jetPhi->at(jet_index)) > 0.5)
+                {
+                  veto_passed = false;
+                  break;
+                }
+            }
+        }
+    }
+  return veto_passed;
+}
+
+bool ZprimeJetsClass::muon_veto_looseID(int jet_index, float muPtCut)
+{
+  bool veto_passed = true; //pass veto if no good muon found    
+    for(int i = 0; i < nMu; i++)
+    	{
+	  if(muPt->at(i) > muPtCut)
+            {
+	      //Muon does not overlap jet  
+		if(deltaR(muEta->at(i),muPhi->at(i),jetEta->at(jet_index),jetPhi->at(jet_index)) > 0.5)
+                  {
+                  veto_passed = false;
+                  break;
+                   }
+		}
+	   }
+    return veto_passed;
 } 
-
-
-
-//bool ZprimeJetsClass::electron_veto(int jet_index)
-//{
-//  bool veto_passed = true;
-//  for(int i = 0; i < nEle; i++)
-//    {
-//      if (if(elePt->at(i)> 10 && eleEta->at(i) < 2.4 && )
-//    }
-//
-//
-//}
