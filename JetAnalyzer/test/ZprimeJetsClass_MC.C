@@ -416,8 +416,18 @@ bool ZprimeJetsClass_MC::electron_veto_looseID(int jet_index, float elePtCut)
 }                  
 bool ZprimeJetsClass_MC::muon_veto_looseID(int jet_index, float muPtCut)
 {
-  bool veto_passed = true; //pass veto if no good muon found    
-    for(int i = 0; i < nMu; i++)
+  bool veto_passed = true; //pass veto if no good muon found 
+  bool pass_iso = false;  
+                                                                                                                                                        
+  Float_t zero = 0.0;
+  Float_t muPhoPU = 999.9;
+  Float_t tightIso_combinedRelative = 999.9;  
+  for(int i = 0; i < nMu; i++)
+    {
+      muPhoPU = muPFNeuIso->at(i) + muPFPhoIso->at(i) - 0.5*muPFPUIso->at(i);
+      tightIso_combinedRelative = (muPFChIso->at(i) + TMath::Max(zero,muPhoPU))/(muPt->at(i));
+      pass_iso = tightIso_combinedRelative < 0.25;
+      if(pass_iso)
         {
           if(muPt->at(i) > muPtCut)
             {
@@ -429,6 +439,7 @@ bool ZprimeJetsClass_MC::muon_veto_looseID(int jet_index, float muPtCut)
                    }
                 }
            }
+	}
     return veto_passed;
 }                
   
