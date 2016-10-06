@@ -434,18 +434,18 @@ bool ZprimeJetsClass::muon_veto_looseID(int jet_index, float muPtCut)
       tightIso_combinedRelative = (muPFChIso->at(i) + TMath::Max(zero,muPhoPU))/(muPt->at(i));
       pass_iso = tightIso_combinedRelative < 0.25;
 
-      if(pass_iso)
-	{
-	  if(muPt->at(i) > muPtCut)
-            {
+      if(muPt->at(i) > muPtCut)
+    	{
+      	  if(pass_iso)
+	    {
 	      //Muon does not overlap jet  
-		if(deltaR(muEta->at(i),muPhi->at(i),jetEta->at(jet_index),jetPhi->at(jet_index)) > 0.5)
-                  {
-                  veto_passed = false;
-                  break;
-                   }
-		}
-	   }
-	}
+	      if(deltaR(muEta->at(i),muPhi->at(i),jetEta->at(jet_index),jetPhi->at(jet_index)) > 0.5)
+	 	{
+	   	  veto_passed = false;
+	          break;
+	   	}
+	    }
+   	}
+     }
     return veto_passed;
 } 
