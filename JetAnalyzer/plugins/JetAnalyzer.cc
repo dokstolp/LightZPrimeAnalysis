@@ -213,10 +213,6 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<int>    eleConvVeto_;
   vector<int>    eleMissHits_;
   vector<float>  eleESEffSigmaRR_;
-  vector<float>  elePFChIso_;
-  vector<float>  elePFPhoIso_;
-  vector<float>  elePFNeuIso_;
-  vector<float>  elePFPUIso_;
   vector<float>  elePFClusEcalIso_;
   vector<float>  elePFClusHcalIso_;
   vector<float>  elePFMiniIso_;
@@ -590,10 +586,6 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
   tree->Branch("eleConvVeto",             &eleConvVeto_);
   tree->Branch("eleMissHits",             &eleMissHits_);
-  tree->Branch("elePFChIso",              &elePFChIso_);
-  tree->Branch("elePFPhoIso",             &elePFPhoIso_);
-  tree->Branch("elePFNeuIso",             &elePFNeuIso_);
-  tree->Branch("elePFPUIso",              &elePFPUIso_);
   tree->Branch("elePFClusEcalIso",        &elePFClusEcalIso_);
   tree->Branch("elePFClusHcalIso",        &elePFClusHcalIso_);
   tree->Branch("elePFMiniIso",            &elePFMiniIso_);
@@ -977,9 +969,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jetN60_.clear();
    jetN90_.clear();
 
-   elePt_                      .clear();
-   eleEta_                     .clear();
-   elePhi_                     .clear();
    PassVeto_.clear();
    PassLoose_.clear();
    PassMedium_.clear();
@@ -1016,10 +1005,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    eleSigmaIPhiIPhiFull5x5_    .clear();
    eleConvVeto_                .clear();
    eleMissHits_                .clear();
-   elePFChIso_                 .clear();
-   elePFPhoIso_                .clear();
-   elePFNeuIso_                .clear();
-   elePFPUIso_                 .clear();
    elePFClusEcalIso_           .clear();
    elePFClusHcalIso_           .clear();
    elePFMiniIso_               .clear();
