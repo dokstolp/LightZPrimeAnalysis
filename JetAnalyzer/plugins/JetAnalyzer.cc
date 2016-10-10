@@ -516,15 +516,6 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("jetN60",&jetN60_);
   tree->Branch("jetN90",&jetN90_);
 
-  tree->Branch("nEle",                    &nEle_);
-  tree->Branch("elePt",                   &elePt_);
-  tree->Branch("eleEta",                  &eleEta_);
-  tree->Branch("elePhi",                  &elePhi_); 
-  tree->Branch("ElectronPassVetoID", &PassVeto_);
-  tree->Branch("ElectronPassLooseID", &PassLoose_);
-  tree->Branch("ElectronPassMediumID", &PassMedium_); 
-  tree->Branch("ElectronPassTightID", &PassTight_);
-  tree->Branch("ElectronPassHEEPID", &PassHEEP_);
   tree->Branch("nMu",           &nMu_);
   tree->Branch("muPt",          &muPt_);
   tree->Branch("muEn",          &muEn_);
@@ -563,15 +554,20 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
 
 
   tree->Branch("nEle",                    &nEle_);
+  tree->Branch("elePt",                   &elePt_);
+  tree->Branch("eleEta",                  &eleEta_);
+  tree->Branch("elePhi",                  &elePhi_); 
+  tree->Branch("ElectronPassVetoID", &PassVeto_);
+  tree->Branch("ElectronPassLooseID", &PassLoose_);
+  tree->Branch("ElectronPassMediumID", &PassMedium_); 
+  tree->Branch("ElectronPassTightID", &PassTight_);
+  tree->Branch("ElectronPassHEEPID", &PassHEEP_);
   tree->Branch("eleCharge",               &eleCharge_);
   tree->Branch("eleChargeConsistent",     &eleChargeConsistent_);
   tree->Branch("eleEn",                   &eleEn_);
   tree->Branch("eleSCEn",                 &eleSCEn_);
   tree->Branch("eleD0",                   &eleD0_);
   tree->Branch("eleDz",                   &eleDz_);
-  tree->Branch("elePt",                   &elePt_);
-  tree->Branch("eleEta",                  &eleEta_);
-  tree->Branch("elePhi",                  &elePhi_);
   tree->Branch("eleR9",                   &eleR9_);
   tree->Branch("eleCalibPt",              &eleCalibPt_);
   tree->Branch("eleCalibEn",              &eleCalibEn_);
@@ -617,23 +613,23 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleisoChargedFromPU"       , &eleisoChargedFromPU_);
 
   tree->Branch("nPhotons",                    &nPhotons_);
-  tree->Branch("phopt"  ,  &phopt_    );
-  tree->Branch("phoeta" ,  &phoeta_ );
-  tree->Branch("phophi" ,  &phophi_ );
-  tree->Branch("phoSigmaIEtaIEtaFull5x5"  , &phoSigmaIEtaIEtaFull5x5_);
-  tree->Branch("phohOverE"                 ,  &phohOverE_);
-  tree->Branch("phohasPixelSeed"           ,  &phohasPixelSeed_);
-
-  tree->Branch("phoisoChargedHadrons"      , &phoisoChargedHadrons_);
-  tree->Branch("phoWorstisoChargedHadrons"      , &phoWorstisoChargedHadrons_);
-  tree->Branch("phoisoNeutralHadrons"      , &phoisoNeutralHadrons_);
-  tree->Branch("phoisoPhotons"             , &phoisoPhotons_);
-
   tree->Branch("phopx",&phopx_);
   tree->Branch("phopy",&phopy_);
   tree->Branch("phopz",&phopz_);
   tree->Branch("phoE",&phoE_);
+  tree->Branch("phopt"  ,  &phopt_    );
+  tree->Branch("phoeta" ,  &phoeta_ );
+  tree->Branch("phophi" ,  &phophi_ );
   tree->Branch("phor9",&phor9_);
+  tree->Branch("phoSigmaIEtaIEtaFull5x5"   , &phoSigmaIEtaIEtaFull5x5_);
+  tree->Branch("phohOverE"                 ,  &phohOverE_);
+  tree->Branch("phohasPixelSeed"           ,  &phohasPixelSeed_);
+
+  tree->Branch("phoisoChargedHadrons"      , &phoisoChargedHadrons_);
+  tree->Branch("phoWorstisoChargedHadrons" , &phoWorstisoChargedHadrons_);
+  tree->Branch("phoisoNeutralHadrons"      , &phoisoNeutralHadrons_);
+  tree->Branch("phoisoPhotons"             , &phoisoPhotons_);
+
 
   tree->Branch("trackPt",&trkPt_);
   tree->Branch("trackEta",&trkEta_);
