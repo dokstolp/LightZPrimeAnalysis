@@ -1,0 +1,467 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+******************* RunOnData *******************
+************** MC dependence removal ************
+removing MC dependencies for photons
+removing MC dependencies for electrons
+removing MC dependencies for muons
+removing MC dependencies for taus
+removing MC dependencies for taus boosted 
+...skipped since taus boosted  are not part of process.
+removing MC dependencies for jets
+adding L2L3Residual JEC for: patJetCorrFactors
+1:19589:39647117
+Info starts about Leading Jet
+jet.nConstituents:31
+Number of tracks(Leading Jet): 20
+Leading track Pt: 51.6039
+Second leading track Pt: 24.253
+No. of pfCands/Constituents of a jet: 31
+1)PfCand constituent of Jet: 22
+2)PfCand constituent of Jet: 22
+3)PfCand constituent of Jet: -211
+4)PfCand constituent of Jet: -211
+5)PfCand constituent of Jet: 211
+6)PfCand constituent of Jet: -211
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: 211
+9)PfCand constituent of Jet: 211
+10)PfCand constituent of Jet: -211
+11)PfCand constituent of Jet: 211
+12)PfCand constituent of Jet: -211
+13)PfCand constituent of Jet: 211
+14)PfCand constituent of Jet: -211
+15)PfCand constituent of Jet: 22
+16)PfCand constituent of Jet: 211
+17)PfCand constituent of Jet: -211
+18)PfCand constituent of Jet: 211
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 211
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: -211
+26)PfCand constituent of Jet: -211
+27)PfCand constituent of Jet: 22
+28)PfCand constituent of Jet: 22
+29)PfCand constituent of Jet: 22
+30)PfCand constituent of Jet: 211
+31)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 11, nCHPions: 20, OtherMesons: 0
+etaSum: -146.312
+etSum: 304.621
+etaSqSum: 71.0254
+phiSum: -476.199
+phiSqSum: 745.742
+j1etaWidth: 0.0496367
+j1phiWidth: 0.0658471
+end of info about leading jet
+TotalET = 379.639; nJets = 6; HT = 337.754; nGoodJets = 2; pfMET = (366.942, 1.4957); nPFCands = 485
+1:45173:91428866
+Info starts about Leading Jet
+jet.nConstituents:27
+Number of tracks(Leading Jet): 16
+Leading track Pt: 65.6587
+Second leading track Pt: 29.4555
+No. of pfCands/Constituents of a jet: 27
+1)PfCand constituent of Jet: 22
+2)PfCand constituent of Jet: 211
+3)PfCand constituent of Jet: -211
+4)PfCand constituent of Jet: -211
+5)PfCand constituent of Jet: 211
+6)PfCand constituent of Jet: 22
+7)PfCand constituent of Jet: -211
+8)PfCand constituent of Jet: 130
+9)PfCand constituent of Jet: 211
+10)PfCand constituent of Jet: 211
+11)PfCand constituent of Jet: 211
+12)PfCand constituent of Jet: 22
+13)PfCand constituent of Jet: -211
+14)PfCand constituent of Jet: 22
+15)PfCand constituent of Jet: 211
+16)PfCand constituent of Jet: 22
+17)PfCand constituent of Jet: 211
+18)PfCand constituent of Jet: 211
+19)PfCand constituent of Jet: 211
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 22
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: -211
+26)PfCand constituent of Jet: 211
+27)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 10, nCHPions: 16, OtherMesons: 1
+etaSum: 294.54
+etSum: 368.543
+etaSqSum: 235.671
+phiSum: -468.362
+phiSqSum: 595.932
+j1etaWidth: 0.027298
+j1phiWidth: 0.0440907
+end of info about leading jet
+It is fine here
+It is fine here
+TotalET = 1163.34; nJets = 78; HT = 449.47; nGoodJets = 2; pfMET = (408.979, 1.60469); nPFCands = 1761
+1:45173:91430577
+Info starts about Leading Jet
+jet.nConstituents:23
+Number of tracks(Leading Jet): 9
+Leading track Pt: 50.0168
+Second leading track Pt: 16.678
+No. of pfCands/Constituents of a jet: 23
+1)PfCand constituent of Jet: 22
+2)PfCand constituent of Jet: 211
+3)PfCand constituent of Jet: 22
+4)PfCand constituent of Jet: -211
+5)PfCand constituent of Jet: -211
+6)PfCand constituent of Jet: 130
+7)PfCand constituent of Jet: 22
+8)PfCand constituent of Jet: 22
+9)PfCand constituent of Jet: 211
+10)PfCand constituent of Jet: -211
+11)PfCand constituent of Jet: 130
+12)PfCand constituent of Jet: 22
+13)PfCand constituent of Jet: 22
+14)PfCand constituent of Jet: 22
+15)PfCand constituent of Jet: 22
+16)PfCand constituent of Jet: 211
+17)PfCand constituent of Jet: -211
+18)PfCand constituent of Jet: 22
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 211
+23)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 12, nCHPions: 9, OtherMesons: 2
+etaSum: -27.0381
+etSum: 319.841
+etaSqSum: 2.94483
+phiSum: -454.145
+phiSqSum: 645.834
+j1etaWidth: 0.0453966
+j1phiWidth: 0.0556197
+end of info about leading jet
+TotalET = 826.307; nJets = 52; HT = 390.41; nGoodJets = 3; pfMET = (325.003, 1.88029); nPFCands = 1336
+1:58240:117876980
+Info starts about Leading Jet
+jet.nConstituents:31
+Number of tracks(Leading Jet): 22
+Leading track Pt: 109.141
+Second leading track Pt: 29.333
+No. of pfCands/Constituents of a jet: 31
+1)PfCand constituent of Jet: 22
+2)PfCand constituent of Jet: 211
+3)PfCand constituent of Jet: 211
+4)PfCand constituent of Jet: -211
+5)PfCand constituent of Jet: -211
+6)PfCand constituent of Jet: 211
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: 22
+9)PfCand constituent of Jet: 211
+10)PfCand constituent of Jet: 22
+11)PfCand constituent of Jet: -211
+12)PfCand constituent of Jet: -211
+13)PfCand constituent of Jet: -211
+14)PfCand constituent of Jet: -211
+15)PfCand constituent of Jet: 211
+16)PfCand constituent of Jet: -211
+17)PfCand constituent of Jet: -211
+18)PfCand constituent of Jet: 22
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 211
+22)PfCand constituent of Jet: -211
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: -211
+25)PfCand constituent of Jet: -211
+26)PfCand constituent of Jet: 211
+27)PfCand constituent of Jet: 211
+28)PfCand constituent of Jet: 211
+29)PfCand constituent of Jet: 22
+30)PfCand constituent of Jet: 22
+31)PfCand constituent of Jet: -211
+Type of pfCands/Constituents:
+nPhotons: 9, nCHPions: 22, OtherMesons: 0
+etaSum: -813.486
+etSum: 469.678
+etaSqSum: 1411.03
+phiSum: -25.9943
+phiSqSum: 3.57723
+j1etaWidth: 0.0662774
+j1phiWidth: 0.0674781
+end of info about leading jet
+It is fine here
+TotalET = 726.818; nJets = 33; HT = 468.599; nGoodJets = 1; pfMET = (513.61, 3.11445); nPFCands = 1260
+1:58345:118089392
+Info starts about Leading Jet
+jet.nConstituents:37
+Number of tracks(Leading Jet): 19
+Leading track Pt: 48.3388
+Second leading track Pt: 25.2263
+No. of pfCands/Constituents of a jet: 37
+1)PfCand constituent of Jet: -211
+2)PfCand constituent of Jet: 22
+3)PfCand constituent of Jet: 211
+4)PfCand constituent of Jet: 211
+5)PfCand constituent of Jet: 130
+6)PfCand constituent of Jet: 22
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: -211
+9)PfCand constituent of Jet: -211
+10)PfCand constituent of Jet: 22
+11)PfCand constituent of Jet: 22
+12)PfCand constituent of Jet: -211
+13)PfCand constituent of Jet: 211
+14)PfCand constituent of Jet: 130
+15)PfCand constituent of Jet: 211
+16)PfCand constituent of Jet: -211
+17)PfCand constituent of Jet: -211
+18)PfCand constituent of Jet: -211
+19)PfCand constituent of Jet: 211
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 211
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: -211
+25)PfCand constituent of Jet: 22
+26)PfCand constituent of Jet: 211
+27)PfCand constituent of Jet: 211
+28)PfCand constituent of Jet: 22
+29)PfCand constituent of Jet: 22
+30)PfCand constituent of Jet: -211
+31)PfCand constituent of Jet: 22
+32)PfCand constituent of Jet: 22
+33)PfCand constituent of Jet: 22
+34)PfCand constituent of Jet: 22
+35)PfCand constituent of Jet: 22
+36)PfCand constituent of Jet: 22
+37)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 16, nCHPions: 19, OtherMesons: 2
+etaSum: 246.393
+etSum: 252.817
+etaSqSum: 241.358
+phiSum: 233.295
+phiSqSum: 216.496
+j1etaWidth: 0.0696274
+j1phiWidth: 0.0693661
+end of info about leading jet
+It is fine here
+TotalET = 1414.9; nJets = 87; HT = 626.791; nGoodJets = 5; pfMET = (352.971, -1.40042); nPFCands = 1846
+1:58345:118089588
+Info starts about Leading Jet
+jet.nConstituents:28
+Number of tracks(Leading Jet): 20
+Leading track Pt: 156.3
+Second leading track Pt: 29.9239
+No. of pfCands/Constituents of a jet: 28
+1)PfCand constituent of Jet: 211
+2)PfCand constituent of Jet: 211
+3)PfCand constituent of Jet: -211
+4)PfCand constituent of Jet: -211
+5)PfCand constituent of Jet: 211
+6)PfCand constituent of Jet: 211
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: 22
+9)PfCand constituent of Jet: -211
+10)PfCand constituent of Jet: 130
+11)PfCand constituent of Jet: 130
+12)PfCand constituent of Jet: 211
+13)PfCand constituent of Jet: 211
+14)PfCand constituent of Jet: -211
+15)PfCand constituent of Jet: 211
+16)PfCand constituent of Jet: 211
+17)PfCand constituent of Jet: 130
+18)PfCand constituent of Jet: 22
+19)PfCand constituent of Jet: -211
+20)PfCand constituent of Jet: -211
+21)PfCand constituent of Jet: -211
+22)PfCand constituent of Jet: 211
+23)PfCand constituent of Jet: -211
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: 22
+26)PfCand constituent of Jet: -211
+27)PfCand constituent of Jet: 22
+28)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 5, nCHPions: 20, OtherMesons: 3
+etaSum: -285.314
+etSum: 324.947
+etaSqSum: 252.138
+phiSum: 272.295
+phiSqSum: 229.077
+j1etaWidth: 0.070656
+j1phiWidth: 0.0526963
+end of info about leading jet
+It is fine here
+TotalET = 469.808; nJets = 15; HT = 358.511; nGoodJets = 2; pfMET = (347.826, -2.58353); nPFCands = 872
+1:58345:118090489
+Info starts about Leading Jet
+jet.nConstituents:38
+Number of tracks(Leading Jet): 11
+Leading track Pt: 52.8348
+Second leading track Pt: 29.8468
+No. of pfCands/Constituents of a jet: 38
+1)PfCand constituent of Jet: -211
+2)PfCand constituent of Jet: 22
+3)PfCand constituent of Jet: 211
+4)PfCand constituent of Jet: 211
+5)PfCand constituent of Jet: 22
+6)PfCand constituent of Jet: -211
+7)PfCand constituent of Jet: 22
+8)PfCand constituent of Jet: 211
+9)PfCand constituent of Jet: 22
+10)PfCand constituent of Jet: 22
+11)PfCand constituent of Jet: 22
+12)PfCand constituent of Jet: -211
+13)PfCand constituent of Jet: 22
+14)PfCand constituent of Jet: 130
+15)PfCand constituent of Jet: 22
+16)PfCand constituent of Jet: 211
+17)PfCand constituent of Jet: 130
+18)PfCand constituent of Jet: 22
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 22
+21)PfCand constituent of Jet: 211
+22)PfCand constituent of Jet: 22
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: 22
+26)PfCand constituent of Jet: -211
+27)PfCand constituent of Jet: 22
+28)PfCand constituent of Jet: 22
+29)PfCand constituent of Jet: 22
+30)PfCand constituent of Jet: 130
+31)PfCand constituent of Jet: 22
+32)PfCand constituent of Jet: -211
+33)PfCand constituent of Jet: -211
+34)PfCand constituent of Jet: 22
+35)PfCand constituent of Jet: 22
+36)PfCand constituent of Jet: 22
+37)PfCand constituent of Jet: 22
+38)PfCand constituent of Jet: 22
+Type of pfCands/Constituents:
+nPhotons: 24, nCHPions: 11, OtherMesons: 3
+etaSum: 283.382
+etSum: 212.299
+etaSqSum: 378.86
+phiSum: -464.229
+phiSqSum: 1016.25
+j1etaWidth: 0.0529009
+j1phiWidth: 0.0730356
+end of info about leading jet
+TotalET = 574.567; nJets = 17; HT = 472.684; nGoodJets = 4; pfMET = (336.053, 0.710815); nPFCands = 901
+1:58285:117967111
+Info starts about Leading Jet
+jet.nConstituents:30
+Number of tracks(Leading Jet): 16
+Leading track Pt: 50.5612
+Second leading track Pt: 28.0297
+No. of pfCands/Constituents of a jet: 30
+1)PfCand constituent of Jet: 22
+2)PfCand constituent of Jet: 211
+3)PfCand constituent of Jet: -211
+4)PfCand constituent of Jet: 22
+5)PfCand constituent of Jet: -211
+6)PfCand constituent of Jet: 22
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: -211
+9)PfCand constituent of Jet: 22
+10)PfCand constituent of Jet: 211
+11)PfCand constituent of Jet: 211
+12)PfCand constituent of Jet: -211
+13)PfCand constituent of Jet: 211
+14)PfCand constituent of Jet: -211
+15)PfCand constituent of Jet: -211
+16)PfCand constituent of Jet: 22
+17)PfCand constituent of Jet: 22
+18)PfCand constituent of Jet: 211
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 211
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 22
+23)PfCand constituent of Jet: 22
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: 22
+26)PfCand constituent of Jet: 22
+27)PfCand constituent of Jet: 211
+28)PfCand constituent of Jet: 22
+29)PfCand constituent of Jet: -211
+30)PfCand constituent of Jet: 211
+Type of pfCands/Constituents:
+nPhotons: 14, nCHPions: 16, OtherMesons: 0
+etaSum: 125.487
+etSum: 253.282
+etaSqSum: 62.9811
+phiSum: 198.895
+phiSqSum: 157.899
+j1etaWidth: 0.0565434
+j1phiWidth: 0.0822332
+end of info about leading jet
+It is fine here
+TotalET = 1383.84; nJets = 89; HT = 499.437; nGoodJets = 5; pfMET = (370.789, -2.30864); nPFCands = 1934
+1:58285:117968472
+Info starts about Leading Jet
+jet.nConstituents:42
+Number of tracks(Leading Jet): 18
+Leading track Pt: 309.988
+Second leading track Pt: 34.9604
+No. of pfCands/Constituents of a jet: 42
+1)PfCand constituent of Jet: 211
+2)PfCand constituent of Jet: -211
+3)PfCand constituent of Jet: -211
+4)PfCand constituent of Jet: 211
+5)PfCand constituent of Jet: 130
+6)PfCand constituent of Jet: 22
+7)PfCand constituent of Jet: 211
+8)PfCand constituent of Jet: 130
+9)PfCand constituent of Jet: 211
+10)PfCand constituent of Jet: -211
+11)PfCand constituent of Jet: 22
+12)PfCand constituent of Jet: 22
+13)PfCand constituent of Jet: -211
+14)PfCand constituent of Jet: 130
+15)PfCand constituent of Jet: 22
+16)PfCand constituent of Jet: 22
+17)PfCand constituent of Jet: 22
+18)PfCand constituent of Jet: -211
+19)PfCand constituent of Jet: 22
+20)PfCand constituent of Jet: 211
+21)PfCand constituent of Jet: 22
+22)PfCand constituent of Jet: 22
+23)PfCand constituent of Jet: 211
+24)PfCand constituent of Jet: 22
+25)PfCand constituent of Jet: 22
+26)PfCand constituent of Jet: 22
+27)PfCand constituent of Jet: 211
+28)PfCand constituent of Jet: 211
+29)PfCand constituent of Jet: 22
+30)PfCand constituent of Jet: 211
+31)PfCand constituent of Jet: 211
+32)PfCand constituent of Jet: 211
+33)PfCand constituent of Jet: 22
+34)PfCand constituent of Jet: -211
+35)PfCand constituent of Jet: 22
+36)PfCand constituent of Jet: 22
+37)PfCand constituent of Jet: 22
+38)PfCand constituent of Jet: 22
+39)PfCand constituent of Jet: 22
+40)PfCand constituent of Jet: 22
+41)PfCand constituent of Jet: 22
+42)PfCand constituent of Jet: -211
+Type of pfCands/Constituents:
+nPhotons: 21, nCHPions: 18, OtherMesons: 3
+etaSum: 534.962
+etSum: 489.147
+etaSqSum: 587.03
+phiSum: -653.272
+phiSqSum: 873.883
+j1etaWidth: 0.0633184
+j1phiWidth: 0.0538086
+end of info about leading jet
+It is fine here
+TotalET = 1086.87; nJets = 64; HT = 488.37; nGoodJets = 1; pfMET = (476.129, 1.79953); nPFCands = 1683
