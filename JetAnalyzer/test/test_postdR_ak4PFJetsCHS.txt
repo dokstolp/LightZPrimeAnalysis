@@ -17,44 +17,28 @@ Number of tracks(Leading Jet): 20
 Leading track Pt: 51.6039
 Second leading track Pt: 24.253
 No. of pfCands/Constituents of a jet: 31
-1)PfCand constituent of Jet: 22
-2)PfCand constituent of Jet: 22
-3)PfCand constituent of Jet: -211
-4)PfCand constituent of Jet: -211
-5)PfCand constituent of Jet: 211
-6)PfCand constituent of Jet: -211
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: 211
-9)PfCand constituent of Jet: 211
-10)PfCand constituent of Jet: -211
-11)PfCand constituent of Jet: 211
-12)PfCand constituent of Jet: -211
-13)PfCand constituent of Jet: 211
-14)PfCand constituent of Jet: -211
-15)PfCand constituent of Jet: 22
-16)PfCand constituent of Jet: 211
-17)PfCand constituent of Jet: -211
-18)PfCand constituent of Jet: 211
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 211
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: -211
-26)PfCand constituent of Jet: -211
-27)PfCand constituent of Jet: 22
-28)PfCand constituent of Jet: 22
-29)PfCand constituent of Jet: 22
-30)PfCand constituent of Jet: 211
-31)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 11, nCHPions: 20, OtherMesons: 0
-etaSum: -146.312
+nPFCand carrying 90.8986 of jet energy: 12
+nPFCand carrying 92.3268 of jet energy: 13
+nPFCand carrying 93.3387 of jet energy: 14
+nPFCand carrying 94.2849 of jet energy: 15
+nPFCand carrying 95.0972 of jet energy: 16
+nPFCand carrying 95.8283 of jet energy: 17
+nPFCand carrying 96.3753 of jet energy: 18
+nPFCand carrying 96.9186 of jet energy: 19
+nPFCand carrying 97.4558 of jet energy: 20
+nPFCand carrying 97.8961 of jet energy: 21
+nPFCand carrying 98.2163 of jet energy: 22
+nPFCand carrying 98.4322 of jet energy: 23
+nPFCand carrying 98.6426 of jet energy: 24
+nPFCand carrying 98.8489 of jet energy: 25
+nPFCand carrying 99.0471 of jet energy: 26
+nPFCand carrying 99.2329 of jet energy: 27
+nPFCand carrying 99.4164 of jet energy: 28
+nPFCand carrying 99.5992 of jet energy: 29
+nPFCand carrying 99.7807 of jet energy: 30
+nPFCand carrying 99.9462 of jet energy: 31
 etSum: 304.621
-etaSqSum: 71.0254
-phiSum: -476.199
-phiSqSum: 745.742
+jet Et: 304.785
 j1etaWidth: 0.0496367
 j1phiWidth: 0.0658471
 end of info about leading jet
@@ -67,40 +51,29 @@ Number of tracks(Leading Jet): 16
 Leading track Pt: 65.6587
 Second leading track Pt: 29.4555
 No. of pfCands/Constituents of a jet: 27
-1)PfCand constituent of Jet: 22
-2)PfCand constituent of Jet: 211
-3)PfCand constituent of Jet: -211
-4)PfCand constituent of Jet: -211
-5)PfCand constituent of Jet: 211
-6)PfCand constituent of Jet: 22
-7)PfCand constituent of Jet: -211
-8)PfCand constituent of Jet: 130
-9)PfCand constituent of Jet: 211
-10)PfCand constituent of Jet: 211
-11)PfCand constituent of Jet: 211
-12)PfCand constituent of Jet: 22
-13)PfCand constituent of Jet: -211
-14)PfCand constituent of Jet: 22
-15)PfCand constituent of Jet: 211
-16)PfCand constituent of Jet: 22
-17)PfCand constituent of Jet: 211
-18)PfCand constituent of Jet: 211
-19)PfCand constituent of Jet: 211
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 22
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: -211
-26)PfCand constituent of Jet: 211
-27)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 10, nCHPions: 16, OtherMesons: 1
-etaSum: 294.54
+nPFCand carrying 90.8008 of jet energy: 7
+nPFCand carrying 92.6854 of jet energy: 8
+nPFCand carrying 94.1884 of jet energy: 9
+nPFCand carrying 95.4176 of jet energy: 10
+nPFCand carrying 96.3064 of jet energy: 11
+nPFCand carrying 97.042 of jet energy: 12
+nPFCand carrying 97.6066 of jet energy: 13
+nPFCand carrying 97.9137 of jet energy: 14
+nPFCand carrying 98.2036 of jet energy: 15
+nPFCand carrying 98.4632 of jet energy: 16
+nPFCand carrying 98.7162 of jet energy: 17
+nPFCand carrying 98.9253 of jet energy: 18
+nPFCand carrying 99.1097 of jet energy: 19
+nPFCand carrying 99.2856 of jet energy: 20
+nPFCand carrying 99.4193 of jet energy: 21
+nPFCand carrying 99.5479 of jet energy: 22
+nPFCand carrying 99.6609 of jet energy: 23
+nPFCand carrying 99.7723 of jet energy: 24
+nPFCand carrying 99.8698 of jet energy: 25
+nPFCand carrying 99.9627 of jet energy: 26
+nPFCand carrying 100.02 of jet energy: 27
 etSum: 368.543
-etaSqSum: 235.671
-phiSum: -468.362
-phiSqSum: 595.932
+jet Et: 368.468
 j1etaWidth: 0.027298
 j1phiWidth: 0.0440907
 end of info about leading jet
@@ -115,36 +88,25 @@ Number of tracks(Leading Jet): 9
 Leading track Pt: 50.0168
 Second leading track Pt: 16.678
 No. of pfCands/Constituents of a jet: 23
-1)PfCand constituent of Jet: 22
-2)PfCand constituent of Jet: 211
-3)PfCand constituent of Jet: 22
-4)PfCand constituent of Jet: -211
-5)PfCand constituent of Jet: -211
-6)PfCand constituent of Jet: 130
-7)PfCand constituent of Jet: 22
-8)PfCand constituent of Jet: 22
-9)PfCand constituent of Jet: 211
-10)PfCand constituent of Jet: -211
-11)PfCand constituent of Jet: 130
-12)PfCand constituent of Jet: 22
-13)PfCand constituent of Jet: 22
-14)PfCand constituent of Jet: 22
-15)PfCand constituent of Jet: 22
-16)PfCand constituent of Jet: 211
-17)PfCand constituent of Jet: -211
-18)PfCand constituent of Jet: 22
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 211
-23)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 12, nCHPions: 9, OtherMesons: 2
-etaSum: -27.0381
+nPFCand carrying 90.4368 of jet energy: 7
+nPFCand carrying 92.0695 of jet energy: 8
+nPFCand carrying 93.5313 of jet energy: 9
+nPFCand carrying 94.547 of jet energy: 10
+nPFCand carrying 95.5034 of jet energy: 11
+nPFCand carrying 96.3649 of jet energy: 12
+nPFCand carrying 97.0308 of jet energy: 13
+nPFCand carrying 97.6832 of jet energy: 14
+nPFCand carrying 98.3163 of jet energy: 15
+nPFCand carrying 98.7552 of jet energy: 16
+nPFCand carrying 99.0503 of jet energy: 17
+nPFCand carrying 99.2831 of jet energy: 18
+nPFCand carrying 99.4805 of jet energy: 19
+nPFCand carrying 99.6048 of jet energy: 20
+nPFCand carrying 99.7161 of jet energy: 21
+nPFCand carrying 99.8305 of jet energy: 22
+nPFCand carrying 99.898 of jet energy: 23
 etSum: 319.841
-etaSqSum: 2.94483
-phiSum: -454.145
-phiSqSum: 645.834
+jet Et: 320.168
 j1etaWidth: 0.0453966
 j1phiWidth: 0.0556197
 end of info about leading jet
@@ -157,44 +119,31 @@ Number of tracks(Leading Jet): 22
 Leading track Pt: 109.141
 Second leading track Pt: 29.333
 No. of pfCands/Constituents of a jet: 31
-1)PfCand constituent of Jet: 22
-2)PfCand constituent of Jet: 211
-3)PfCand constituent of Jet: 211
-4)PfCand constituent of Jet: -211
-5)PfCand constituent of Jet: -211
-6)PfCand constituent of Jet: 211
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: 22
-9)PfCand constituent of Jet: 211
-10)PfCand constituent of Jet: 22
-11)PfCand constituent of Jet: -211
-12)PfCand constituent of Jet: -211
-13)PfCand constituent of Jet: -211
-14)PfCand constituent of Jet: -211
-15)PfCand constituent of Jet: 211
-16)PfCand constituent of Jet: -211
-17)PfCand constituent of Jet: -211
-18)PfCand constituent of Jet: 22
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 211
-22)PfCand constituent of Jet: -211
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: -211
-25)PfCand constituent of Jet: -211
-26)PfCand constituent of Jet: 211
-27)PfCand constituent of Jet: 211
-28)PfCand constituent of Jet: 211
-29)PfCand constituent of Jet: 22
-30)PfCand constituent of Jet: 22
-31)PfCand constituent of Jet: -211
-Type of pfCands/Constituents:
-nPhotons: 9, nCHPions: 22, OtherMesons: 0
-etaSum: -813.486
+nPFCand carrying 90.6972 of jet energy: 9
+nPFCand carrying 91.7236 of jet energy: 10
+nPFCand carrying 92.6873 of jet energy: 11
+nPFCand carrying 93.6154 of jet energy: 12
+nPFCand carrying 94.5017 of jet energy: 13
+nPFCand carrying 95.2424 of jet energy: 14
+nPFCand carrying 95.9411 of jet energy: 15
+nPFCand carrying 96.5609 of jet energy: 16
+nPFCand carrying 97.0655 of jet energy: 17
+nPFCand carrying 97.5306 of jet energy: 18
+nPFCand carrying 97.9856 of jet energy: 19
+nPFCand carrying 98.371 of jet energy: 20
+nPFCand carrying 98.7329 of jet energy: 21
+nPFCand carrying 99.0529 of jet energy: 22
+nPFCand carrying 99.3618 of jet energy: 23
+nPFCand carrying 99.5122 of jet energy: 24
+nPFCand carrying 99.657 of jet energy: 25
+nPFCand carrying 99.7698 of jet energy: 26
+nPFCand carrying 99.8739 of jet energy: 27
+nPFCand carrying 99.9666 of jet energy: 28
+nPFCand carrying 100.043 of jet energy: 29
+nPFCand carrying 100.111 of jet energy: 30
+nPFCand carrying 100.174 of jet energy: 31
 etSum: 469.678
-etaSqSum: 1411.03
-phiSum: -25.9943
-phiSqSum: 3.57723
+jet Et: 468.863
 j1etaWidth: 0.0662774
 j1phiWidth: 0.0674781
 end of info about leading jet
@@ -208,50 +157,31 @@ Number of tracks(Leading Jet): 19
 Leading track Pt: 48.3388
 Second leading track Pt: 25.2263
 No. of pfCands/Constituents of a jet: 37
-1)PfCand constituent of Jet: -211
-2)PfCand constituent of Jet: 22
-3)PfCand constituent of Jet: 211
-4)PfCand constituent of Jet: 211
-5)PfCand constituent of Jet: 130
-6)PfCand constituent of Jet: 22
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: -211
-9)PfCand constituent of Jet: -211
-10)PfCand constituent of Jet: 22
-11)PfCand constituent of Jet: 22
-12)PfCand constituent of Jet: -211
-13)PfCand constituent of Jet: 211
-14)PfCand constituent of Jet: 130
-15)PfCand constituent of Jet: 211
-16)PfCand constituent of Jet: -211
-17)PfCand constituent of Jet: -211
-18)PfCand constituent of Jet: -211
-19)PfCand constituent of Jet: 211
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 211
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: -211
-25)PfCand constituent of Jet: 22
-26)PfCand constituent of Jet: 211
-27)PfCand constituent of Jet: 211
-28)PfCand constituent of Jet: 22
-29)PfCand constituent of Jet: 22
-30)PfCand constituent of Jet: -211
-31)PfCand constituent of Jet: 22
-32)PfCand constituent of Jet: 22
-33)PfCand constituent of Jet: 22
-34)PfCand constituent of Jet: 22
-35)PfCand constituent of Jet: 22
-36)PfCand constituent of Jet: 22
-37)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 16, nCHPions: 19, OtherMesons: 2
-etaSum: 246.393
+nPFCand carrying 90.6743 of jet energy: 15
+nPFCand carrying 91.9963 of jet energy: 16
+nPFCand carrying 93.1843 of jet energy: 17
+nPFCand carrying 94.1983 of jet energy: 18
+nPFCand carrying 95.0472 of jet energy: 19
+nPFCand carrying 95.6936 of jet energy: 20
+nPFCand carrying 96.2009 of jet energy: 21
+nPFCand carrying 96.7046 of jet energy: 22
+nPFCand carrying 97.1308 of jet energy: 23
+nPFCand carrying 97.5466 of jet energy: 24
+nPFCand carrying 97.9492 of jet energy: 25
+nPFCand carrying 98.3348 of jet energy: 26
+nPFCand carrying 98.5607 of jet energy: 27
+nPFCand carrying 98.7719 of jet energy: 28
+nPFCand carrying 98.9595 of jet energy: 29
+nPFCand carrying 99.1495 of jet energy: 30
+nPFCand carrying 99.3284 of jet energy: 31
+nPFCand carrying 99.4824 of jet energy: 32
+nPFCand carrying 99.6324 of jet energy: 33
+nPFCand carrying 99.7615 of jet energy: 34
+nPFCand carrying 99.8747 of jet energy: 35
+nPFCand carrying 99.9528 of jet energy: 36
+nPFCand carrying 100.029 of jet energy: 37
 etSum: 252.817
-etaSqSum: 241.358
-phiSum: 233.295
-phiSqSum: 216.496
+jet Et: 252.743
 j1etaWidth: 0.0696274
 j1phiWidth: 0.0693661
 end of info about leading jet
@@ -265,41 +195,27 @@ Number of tracks(Leading Jet): 20
 Leading track Pt: 156.3
 Second leading track Pt: 29.9239
 No. of pfCands/Constituents of a jet: 28
-1)PfCand constituent of Jet: 211
-2)PfCand constituent of Jet: 211
-3)PfCand constituent of Jet: -211
-4)PfCand constituent of Jet: -211
-5)PfCand constituent of Jet: 211
-6)PfCand constituent of Jet: 211
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: 22
-9)PfCand constituent of Jet: -211
-10)PfCand constituent of Jet: 130
-11)PfCand constituent of Jet: 130
-12)PfCand constituent of Jet: 211
-13)PfCand constituent of Jet: 211
-14)PfCand constituent of Jet: -211
-15)PfCand constituent of Jet: 211
-16)PfCand constituent of Jet: 211
-17)PfCand constituent of Jet: 130
-18)PfCand constituent of Jet: 22
-19)PfCand constituent of Jet: -211
-20)PfCand constituent of Jet: -211
-21)PfCand constituent of Jet: -211
-22)PfCand constituent of Jet: 211
-23)PfCand constituent of Jet: -211
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: 22
-26)PfCand constituent of Jet: -211
-27)PfCand constituent of Jet: 22
-28)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 5, nCHPions: 20, OtherMesons: 3
-etaSum: -285.314
+nPFCand carrying 91.0853 of jet energy: 10
+nPFCand carrying 92.4107 of jet energy: 11
+nPFCand carrying 93.7001 of jet energy: 12
+nPFCand carrying 94.9758 of jet energy: 13
+nPFCand carrying 95.6329 of jet energy: 14
+nPFCand carrying 96.2665 of jet energy: 15
+nPFCand carrying 96.7848 of jet energy: 16
+nPFCand carrying 97.2543 of jet energy: 17
+nPFCand carrying 97.6722 of jet energy: 18
+nPFCand carrying 98.072 of jet energy: 19
+nPFCand carrying 98.4126 of jet energy: 20
+nPFCand carrying 98.7394 of jet energy: 21
+nPFCand carrying 99.0564 of jet energy: 22
+nPFCand carrying 99.314 of jet energy: 23
+nPFCand carrying 99.5554 of jet energy: 24
+nPFCand carrying 99.6582 of jet energy: 25
+nPFCand carrying 99.7613 of jet energy: 26
+nPFCand carrying 99.8543 of jet energy: 27
+nPFCand carrying 99.944 of jet energy: 28
 etSum: 324.947
-etaSqSum: 252.138
-phiSum: 272.295
-phiSqSum: 229.077
+jet Et: 325.129
 j1etaWidth: 0.070656
 j1phiWidth: 0.0526963
 end of info about leading jet
@@ -313,51 +229,31 @@ Number of tracks(Leading Jet): 11
 Leading track Pt: 52.8348
 Second leading track Pt: 29.8468
 No. of pfCands/Constituents of a jet: 38
-1)PfCand constituent of Jet: -211
-2)PfCand constituent of Jet: 22
-3)PfCand constituent of Jet: 211
-4)PfCand constituent of Jet: 211
-5)PfCand constituent of Jet: 22
-6)PfCand constituent of Jet: -211
-7)PfCand constituent of Jet: 22
-8)PfCand constituent of Jet: 211
-9)PfCand constituent of Jet: 22
-10)PfCand constituent of Jet: 22
-11)PfCand constituent of Jet: 22
-12)PfCand constituent of Jet: -211
-13)PfCand constituent of Jet: 22
-14)PfCand constituent of Jet: 130
-15)PfCand constituent of Jet: 22
-16)PfCand constituent of Jet: 211
-17)PfCand constituent of Jet: 130
-18)PfCand constituent of Jet: 22
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 22
-21)PfCand constituent of Jet: 211
-22)PfCand constituent of Jet: 22
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: 22
-26)PfCand constituent of Jet: -211
-27)PfCand constituent of Jet: 22
-28)PfCand constituent of Jet: 22
-29)PfCand constituent of Jet: 22
-30)PfCand constituent of Jet: 130
-31)PfCand constituent of Jet: 22
-32)PfCand constituent of Jet: -211
-33)PfCand constituent of Jet: -211
-34)PfCand constituent of Jet: 22
-35)PfCand constituent of Jet: 22
-36)PfCand constituent of Jet: 22
-37)PfCand constituent of Jet: 22
-38)PfCand constituent of Jet: 22
-Type of pfCands/Constituents:
-nPhotons: 24, nCHPions: 11, OtherMesons: 3
-etaSum: 283.382
+nPFCand carrying 90.5733 of jet energy: 16
+nPFCand carrying 91.4825 of jet energy: 17
+nPFCand carrying 92.3076 of jet energy: 18
+nPFCand carrying 93.0422 of jet energy: 19
+nPFCand carrying 93.7457 of jet energy: 20
+nPFCand carrying 94.4151 of jet energy: 21
+nPFCand carrying 94.9885 of jet energy: 22
+nPFCand carrying 95.5504 of jet energy: 23
+nPFCand carrying 96.0996 of jet energy: 24
+nPFCand carrying 96.5957 of jet energy: 25
+nPFCand carrying 97.0739 of jet energy: 26
+nPFCand carrying 97.5359 of jet energy: 27
+nPFCand carrying 97.9422 of jet energy: 28
+nPFCand carrying 98.3039 of jet energy: 29
+nPFCand carrying 98.6394 of jet energy: 30
+nPFCand carrying 98.9552 of jet energy: 31
+nPFCand carrying 99.2124 of jet energy: 32
+nPFCand carrying 99.441 of jet energy: 33
+nPFCand carrying 99.6211 of jet energy: 34
+nPFCand carrying 99.7861 of jet energy: 35
+nPFCand carrying 99.9473 of jet energy: 36
+nPFCand carrying 100.098 of jet energy: 37
+nPFCand carrying 100.167 of jet energy: 38
 etSum: 212.299
-etaSqSum: 378.86
-phiSum: -464.229
-phiSqSum: 1016.25
+jet Et: 211.944
 j1etaWidth: 0.0529009
 j1phiWidth: 0.0730356
 end of info about leading jet
@@ -370,43 +266,28 @@ Number of tracks(Leading Jet): 16
 Leading track Pt: 50.5612
 Second leading track Pt: 28.0297
 No. of pfCands/Constituents of a jet: 30
-1)PfCand constituent of Jet: 22
-2)PfCand constituent of Jet: 211
-3)PfCand constituent of Jet: -211
-4)PfCand constituent of Jet: 22
-5)PfCand constituent of Jet: -211
-6)PfCand constituent of Jet: 22
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: -211
-9)PfCand constituent of Jet: 22
-10)PfCand constituent of Jet: 211
-11)PfCand constituent of Jet: 211
-12)PfCand constituent of Jet: -211
-13)PfCand constituent of Jet: 211
-14)PfCand constituent of Jet: -211
-15)PfCand constituent of Jet: -211
-16)PfCand constituent of Jet: 22
-17)PfCand constituent of Jet: 22
-18)PfCand constituent of Jet: 211
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 211
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 22
-23)PfCand constituent of Jet: 22
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: 22
-26)PfCand constituent of Jet: 22
-27)PfCand constituent of Jet: 211
-28)PfCand constituent of Jet: 22
-29)PfCand constituent of Jet: -211
-30)PfCand constituent of Jet: 211
-Type of pfCands/Constituents:
-nPhotons: 14, nCHPions: 16, OtherMesons: 0
-etaSum: 125.487
+nPFCand carrying 90.8696 of jet energy: 11
+nPFCand carrying 92.1562 of jet energy: 12
+nPFCand carrying 93.4034 of jet energy: 13
+nPFCand carrying 94.6089 of jet energy: 14
+nPFCand carrying 95.5959 of jet energy: 15
+nPFCand carrying 96.2108 of jet energy: 16
+nPFCand carrying 96.6673 of jet energy: 17
+nPFCand carrying 97.1014 of jet energy: 18
+nPFCand carrying 97.4797 of jet energy: 19
+nPFCand carrying 97.8151 of jet energy: 20
+nPFCand carrying 98.1438 of jet energy: 21
+nPFCand carrying 98.433 of jet energy: 22
+nPFCand carrying 98.7096 of jet energy: 23
+nPFCand carrying 98.9442 of jet energy: 24
+nPFCand carrying 99.1699 of jet energy: 25
+nPFCand carrying 99.3871 of jet energy: 26
+nPFCand carrying 99.5998 of jet energy: 27
+nPFCand carrying 99.7354 of jet energy: 28
+nPFCand carrying 99.8501 of jet energy: 29
+nPFCand carrying 99.9425 of jet energy: 30
 etSum: 253.282
-etaSqSum: 62.9811
-phiSum: 198.895
-phiSqSum: 157.899
+jet Et: 253.428
 j1etaWidth: 0.0565434
 j1phiWidth: 0.0822332
 end of info about leading jet
@@ -420,55 +301,43 @@ Number of tracks(Leading Jet): 18
 Leading track Pt: 309.988
 Second leading track Pt: 34.9604
 No. of pfCands/Constituents of a jet: 42
-1)PfCand constituent of Jet: 211
-2)PfCand constituent of Jet: -211
-3)PfCand constituent of Jet: -211
-4)PfCand constituent of Jet: 211
-5)PfCand constituent of Jet: 130
-6)PfCand constituent of Jet: 22
-7)PfCand constituent of Jet: 211
-8)PfCand constituent of Jet: 130
-9)PfCand constituent of Jet: 211
-10)PfCand constituent of Jet: -211
-11)PfCand constituent of Jet: 22
-12)PfCand constituent of Jet: 22
-13)PfCand constituent of Jet: -211
-14)PfCand constituent of Jet: 130
-15)PfCand constituent of Jet: 22
-16)PfCand constituent of Jet: 22
-17)PfCand constituent of Jet: 22
-18)PfCand constituent of Jet: -211
-19)PfCand constituent of Jet: 22
-20)PfCand constituent of Jet: 211
-21)PfCand constituent of Jet: 22
-22)PfCand constituent of Jet: 22
-23)PfCand constituent of Jet: 211
-24)PfCand constituent of Jet: 22
-25)PfCand constituent of Jet: 22
-26)PfCand constituent of Jet: 22
-27)PfCand constituent of Jet: 211
-28)PfCand constituent of Jet: 211
-29)PfCand constituent of Jet: 22
-30)PfCand constituent of Jet: 211
-31)PfCand constituent of Jet: 211
-32)PfCand constituent of Jet: 211
-33)PfCand constituent of Jet: 22
-34)PfCand constituent of Jet: -211
-35)PfCand constituent of Jet: 22
-36)PfCand constituent of Jet: 22
-37)PfCand constituent of Jet: 22
-38)PfCand constituent of Jet: 22
-39)PfCand constituent of Jet: 22
-40)PfCand constituent of Jet: 22
-41)PfCand constituent of Jet: 22
-42)PfCand constituent of Jet: -211
-Type of pfCands/Constituents:
-nPhotons: 21, nCHPions: 18, OtherMesons: 3
-etaSum: 534.962
+nPFCand carrying 92.0174 of jet energy: 8
+nPFCand carrying 93.0823 of jet energy: 9
+nPFCand carrying 93.7985 of jet energy: 10
+nPFCand carrying 94.4502 of jet energy: 11
+nPFCand carrying 94.9641 of jet energy: 12
+nPFCand carrying 95.4776 of jet energy: 13
+nPFCand carrying 95.812 of jet energy: 14
+nPFCand carrying 96.1115 of jet energy: 15
+nPFCand carrying 96.3935 of jet energy: 16
+nPFCand carrying 96.6746 of jet energy: 17
+nPFCand carrying 96.9475 of jet energy: 18
+nPFCand carrying 97.2159 of jet energy: 19
+nPFCand carrying 97.4518 of jet energy: 20
+nPFCand carrying 97.673 of jet energy: 21
+nPFCand carrying 97.8917 of jet energy: 22
+nPFCand carrying 98.0978 of jet energy: 23
+nPFCand carrying 98.2867 of jet energy: 24
+nPFCand carrying 98.4755 of jet energy: 25
+nPFCand carrying 98.6509 of jet energy: 26
+nPFCand carrying 98.81 of jet energy: 27
+nPFCand carrying 98.9498 of jet energy: 28
+nPFCand carrying 99.0822 of jet energy: 29
+nPFCand carrying 99.2114 of jet energy: 30
+nPFCand carrying 99.3221 of jet energy: 31
+nPFCand carrying 99.4326 of jet energy: 32
+nPFCand carrying 99.5175 of jet energy: 33
+nPFCand carrying 99.5918 of jet energy: 34
+nPFCand carrying 99.6541 of jet energy: 35
+nPFCand carrying 99.715 of jet energy: 36
+nPFCand carrying 99.7718 of jet energy: 37
+nPFCand carrying 99.8268 of jet energy: 38
+nPFCand carrying 99.8794 of jet energy: 39
+nPFCand carrying 99.9297 of jet energy: 40
+nPFCand carrying 99.9781 of jet energy: 41
+nPFCand carrying 100.02 of jet energy: 42
 etSum: 489.147
-etaSqSum: 587.03
-phiSum: -653.272
-phiSqSum: 873.883
+jet Et: 489.051
 j1etaWidth: 0.0633184
 j1phiWidth: 0.0538086
 end of info about leading jet
