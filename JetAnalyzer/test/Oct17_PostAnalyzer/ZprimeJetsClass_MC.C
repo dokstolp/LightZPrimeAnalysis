@@ -70,6 +70,9 @@ void ZprimeJetsClass_MC::Loop(Long64_t maxEvents, int reportEvery)
   std::vector<int> jetCand;
   jetCand.clear();
 
+  std::vector<int> jetveto;
+  jetveto.clear();
+
   //jetCandidate that passes dPhiJetMET cut out of the above jetCand
   std::vector<int> jetCand1;
   jetCand1.clear();
@@ -110,26 +113,27 @@ void ZprimeJetsClass_MC::Loop(Long64_t maxEvents, int reportEvery)
 	    if (jetCand.size()>0)
 	       {
 		 fillHistos(3);
+                 jetveto = JetVetoDecision(jetCand[0]);
 		 if(pfMET>320)
 		   {
 		     fillHistos(4);
-		     //std::cout<<"Before electron veto:jetCand.size(): "<<jetCand.size()<<std::endl;
+		    std::cout<<"Before electron veto:jetveto.size(): "<<jetveto.size()<<std::endl;
                     if(metcut<0.5)
                       {
                         fillHistos(5);
                         double minDPhiJetMET = TMath::Pi();
                         double minDPhiJetMET_first4 = TMath::Pi();
-                        for(int j = 0; j < jetCand.size(); j++)
-                           {
-                             if(DeltaPhi((*jetPhi)[j],pfMETPhi)<minDPhiJetMET)
-                                {
-                                  minDPhiJetMET = DeltaPhi((*jetPhi)[j],pfMETPhi);
-                                  if(j < 4)
-                                   minDPhiJetMET_first4 = DeltaPhi((*jetPhi)[j],pfMETPhi);
-                                }
-                            }
+		        for(int j = 0; j < jetveto.size(); j++)
+			   {
+			    if(DeltaPhi(jetPhi->at(jetveto[j]),pfMETPhi) < minDPhiJetMET)
+			       {
+			      	minDPhiJetMET = DeltaPhi(jetPhi->at(jetveto[j]),pfMETPhi);
+			      	if(j < 4)
+				  minDPhiJetMET_first4 = DeltaPhi(jetPhi->at(jetveto[j]),pfMETPhi);
+			       }
+		      	   }
                         h_dphimin->Fill(minDPhiJetMET_first4);
-                        if(dPhiJetMETcut(jetCand))
+                        if(dPhiJetMETcut(jetveto))
                           {
                             fillHistos(6);
                             if(electron_veto_looseID(jetCand[0],10) &&  muon_veto_looseID(jetCand[0],10))
@@ -138,17 +142,22 @@ void ZprimeJetsClass_MC::Loop(Long64_t maxEvents, int reportEvery)
                                 h_deltar->Fill(deltar);
 				pfMET_prof->Fill(deltar,pfMET,1);
 				h_trk12ptratio->Fill(j1trk12PT/j1PT);
-                                if (deltar<0.1)
+			        std::cout<<"events before etawidth cut"<<std::endl;
+				std::cout<<run<<":"<<lumis<<":"<<event<<std::endl;
+                                if (j1etaWidth<0.04)
                                   {
+  				    std::cout<<"events after j1etaWidth cut"<<std::endl;
+				    std::cout<<run<<":"<<lumis<<":"<<event<<std::endl;
                                     h_deltar_cut->Fill(deltar);
 				    pfMET_prof_after->Fill(deltar,pfMET,1);
 				    h_trk12ptratio_afterdR->Fill(j1trk12PT/j1PT);
                                     fillHistos(8); 
                                     jet1pT = (*jetPt)[jetCand[0]];
                                     h_jet1pt->Fill(jet1pT);
-                                    if (j1nTracks <=6){
+                                    if (j1nCons <=20){
                                        fillHistos(9);
-                                       if (j1NEmFr<0.6 && j1CHdFr > 0.4){
+				       h_j1nCons_1->Fill(j1nCons);
+                                       if (j1nTracks<=6){
                                           fillHistos(10);
                                           }
                                        }
@@ -189,11 +198,12 @@ void ZprimeJetsClass_MC::BookHistos(const char* file2)
   h_jet1pt = new TH1F("h_jet1pt","h_jet1pt; Leading Jet pT",50,100,1000);h_jet1pt->Sumw2();  
   h_dphimin = new TH1F("h_dphimin","h_dphimin; Minimum dPhiJetMET",50,0,3.2);h_dphimin->Sumw2();
   h_deltar  = new TH1F("h_deltar","h_deltar; #DeltaR for Leading Jet", 50,0,0.5);h_deltar->Sumw2();
-  h_deltar_cut = new TH1F("h_deltar_cut","h_deltar_cut; #DeltaR for Leading Pencil Jet",10,0,0.1);h_deltar_cut->Sumw2();
-  pfMET_prof = new TProfile("pfMET_prof","pfMET_prof;#DeltaR for Leading Pencil Jet",10,0,0.5);pfMET_prof->Sumw2();
-  pfMET_prof_after = new TProfile("pfMET_prof_after","pfMET_prof_after;#DeltaR for Leading Pencil Jet",10,0,0.1);pfMET_prof_after->Sumw2();
-  h_trk12ptratio = new TH1F("h_trk12ptratio","h_trk12ptratio;j1Trk12pT/j1pT",10,0,1.0);h_trk12ptratio->Sumw2();
-  h_trk12ptratio_afterdR = new TH1F("h_trk12ptratio_afterdR","h_trk12ptratio_afterdR;j1Trk12pT/j1pT",10,0,1.0);h_trk12ptratio_afterdR->Sumw2();  
+  h_j1nCons_1 = new TH1F("h_j1nCons_1","h_j1nCons_1; #Number of Constituents of Leading Jet", 10,0,20);h_j1nCons_1->Sumw2();
+  h_deltar_cut = new TH1F("h_deltar_cut","h_deltar_cut; #DeltaR for Leading Pencil Jet",25,0,0.1);h_deltar_cut->Sumw2();
+  pfMET_prof = new TProfile("pfMET_prof","pfMET_prof;#DeltaR for Leading Pencil Jet",50,0,0.5);pfMET_prof->Sumw2();
+  pfMET_prof_after = new TProfile("pfMET_prof_after","pfMET_prof_after;#DeltaR for Leading Pencil Jet",25,0,0.1);pfMET_prof_after->Sumw2();
+  h_trk12ptratio = new TH1F("h_trk12ptratio","h_trk12ptratio;j1Trk12pT/j1pT",25,0,1.0);h_trk12ptratio->Sumw2();
+  h_trk12ptratio_afterdR = new TH1F("h_trk12ptratio_afterdR","h_trk12ptratio_afterdR;j1Trk12pT/j1pT",25,0,1.0);h_trk12ptratio_afterdR->Sumw2();  
   for(int i=0; i<11; i++){
 
      char ptbins[100];
@@ -208,13 +218,13 @@ void ZprimeJetsClass_MC::BookHistos(const char* file2)
      h_j1Pt[i]  = new TH1F(("j1pT"+histname).c_str(), "j1pT;p_{T} of Leading Jet [GeV]", 50, 100, 1000);h_j1Pt[i]->Sumw2();
      h_j1Eta[i] = new TH1F(("j1Eta"+histname).c_str(), "j1Eta; #eta of Leading Jet", 100, -3.0, 3.0);h_j1Eta[i]->Sumw2();
      h_j1Phi[i] = new TH1F(("j1Phi"+histname).c_str(), "j1Phi; #phi of Leading Jet", 100, -4, 4);h_j1Phi[i]->Sumw2();
-     h_j1etaWidth[i] = new TH1F(("j1etaWidth"+histname).c_str(),"j1etaWidh; #eta width of Leading Jet", 50,0,0.1);h_j1etaWidth[i] ->Sumw2();
-     h_j1phiWidth[i] = new TH1F(("j1phiWidth"+histname).c_str(),"j1phiWidth; #phi width of Leading Jet", 50, 0,0.1);h_j1phiWidth[i]->Sumw2();
-     h_j1etaWidthInECal[i] = new TH1F(("j1etaWidthInECal"+histname).c_str(),"j1etaWidthInECal; #eta width in ECAL of Leading Jet", 40,0,0.2); h_j1etaWidthInECal[i]->Sumw2();
-     h_j1etaWidthInHCal[i] = new TH1F(("j1etaWidthInHCal"+histname).c_str(),"j1etaWidthInHCal; #eta width in HCAL of Leading Jet", 40,0,0.2);h_j1etaWidthInHCal[i]->Sumw2();
-     h_j1phiWidthInECal[i] = new TH1F(("j1phiWidthInECal"+histname).c_str(),"j1phiWidthInECal; #phi width in ECAL of Leading Jet", 40,0,0.2);h_j1phiWidthInECal[i]->Sumw2(); 
-     h_j1phiWidthInHCal[i] = new TH1F(("j1phiWidthInHCal"+histname).c_str(),"j1phiWidthInHCal; #phi width in HCAL of Leading Jet", 40,0,0.2);h_j1phiWidthInHCal[i]->Sumw2(); 
-     h_j1nCons[i] = new TH1F (("j1nCons"+histname).c_str(),"j1NConstituents; Number of Constituents of Leading Jet",100, 0, 100);h_j1nCons[i]->Sumw2();
+     h_j1etaWidth[i] = new TH1F(("j1etaWidth"+histname).c_str(),"j1etaWidh; #eta width of Leading Jet", 50,0,0.5);h_j1etaWidth[i] ->Sumw2();
+     h_j1phiWidth[i] = new TH1F(("j1phiWidth"+histname).c_str(),"j1phiWidth; #phi width of Leading Jet", 50, 0,0.5);h_j1phiWidth[i]->Sumw2();
+     h_j1etaWidthInECal[i] = new TH1F(("j1etaWidthInECal"+histname).c_str(),"j1etaWidthInECal; #eta width in ECAL of Leading Jet", 50,0,0.5); h_j1etaWidthInECal[i]->Sumw2();
+     h_j1etaWidthInHCal[i] = new TH1F(("j1etaWidthInHCal"+histname).c_str(),"j1etaWidthInHCal; #eta width in HCAL of Leading Jet", 50,0,0.5);h_j1etaWidthInHCal[i]->Sumw2();
+     h_j1phiWidthInECal[i] = new TH1F(("j1phiWidthInECal"+histname).c_str(),"j1phiWidthInECal; #phi width in ECAL of Leading Jet", 50,0,0.5);h_j1phiWidthInECal[i]->Sumw2(); 
+     h_j1phiWidthInHCal[i] = new TH1F(("j1phiWidthInHCal"+histname).c_str(),"j1phiWidthInHCal; #phi width in HCAL of Leading Jet", 50,0,0.5);h_j1phiWidthInHCal[i]->Sumw2(); 
+     h_j1nCons[i] = new TH1F (("j1nCons"+histname).c_str(),"j1NConstituents; Number of Constituents of Leading Jet",25, 0, 50);h_j1nCons[i]->Sumw2();
      h_j1CEF[i] = new TH1F(("j1CEF"+histname).c_str(), "j1CEF; Charged Electromagnetic Energy Fraction of leading Jet",50, 0, 1.0);h_j1CEF[i]->Sumw2();
      h_j1NEF[i] = new TH1F(("j1NEF"+histname).c_str(), "j1NEF; Neutral Electromagnetic Energy Fraction of leading Jet",30, 0, 0.6);h_j1NEF[i]->Sumw2();
      h_j1CHF[i] = new TH1F(("j1CHF"+histname).c_str(), "j1CHF; Charged Hadron Energy Fraction of leading Jet",30, 0.4, 1.0);h_j1CHF[i]->Sumw2();
@@ -289,7 +299,7 @@ float ZprimeJetsClass_MC::dPhiJetMETmin(std::vector<int> jets)
   for(int j=0;j< njetsMax; j++)
     {
       float dPhi = DeltaPhi((*jetPhi)[j],pfMETPhi);
-      std::cout<<"DeltaPhi: "<<dPhi<<std::endl;
+      //std::cout<<"DeltaPhi: "<<dPhi<<std::endl;
       if(dPhi < dPhimin){
         dPhimin = dPhi;
      }
@@ -327,6 +337,30 @@ std::vector<int> ZprimeJetsClass_MC::getJetCand(double jetPtCut, double jetEtaCu
 
 }
 
+std::vector<int> ZprimeJetsClass_MC::JetVetoDecision(int jet_index) {
+
+  bool jetVeto=true;
+  std::vector<int> jetindex;
+  float value =0.0;
+
+  for(int i = 0; i < nJets; i++)
+    {
+      double deltar = 0.0 ;
+      if(jet_index>=0){
+        deltar= deltaR(jetEta->at(i),jetPhi->at(i),jetEta->at(jet_index),jetPhi->at(jet_index));
+      }
+      if(deltar>0.4 && jetPt->at(i) >30.0 && jetPFLooseId->at(i)==1)
+        {
+          jetindex.push_back(i);
+        }
+
+
+    }
+
+  return jetindex;
+
+}
+
 bool ZprimeJetsClass_MC::dPhiJetMETcut(std::vector<int> jets)
 {
   //reject jet if it is found within DeltaPhi(jet,MET) < 0.5                                                                                              \
@@ -334,12 +368,14 @@ bool ZprimeJetsClass_MC::dPhiJetMETcut(std::vector<int> jets)
   bool passes = false;
 
   int njetsMax = jets.size();
+  std::cout<<"njets: "<<njetsMax<<std::endl;
   //Only look at first four jets (because that's what monojet analysis do)
   if(njetsMax > 4)
     njetsMax = 4;
   int j=0;
   for(;j< njetsMax; j++){
-
+    std::cout<<"DeltaPhi b/w Jet and MET"<<std::endl;
+    std::cout<<"jet "<<j<<":"<<DeltaPhi((*jetPhi)[j],pfMETPhi)<<std::endl;
     if(DeltaPhi((*jetPhi)[j],pfMETPhi) < 0.5)
       break;
   }

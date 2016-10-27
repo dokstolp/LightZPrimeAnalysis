@@ -51,7 +51,7 @@ public :
    TFile *fileName;
    TTree *tree;
 
-   TH1F *h_trk12ptratio, *h_trk12ptratio_afterdR, *h_jet1pt, *h_dphimin, *h_deltar_cut, *h_deltar, *h_HT[11], *h_nJets[11], *h_nGoodJets[11], *h_pfMET[11], *h_pfMETPhi[11], *h_j1Pt[11], *h_j1Eta[11], *h_j1Phi[11], *h_j1etaWidth[11], *h_j1phiWidth[11], *h_j1etaWidthInECal[11], *h_j1etaWidthInHCal[11], *h_j1phiWidthInECal[11], *h_j1phiWidthInHCal[11], *h_j1nCons[11], *h_j1CEF[11], *h_j1NEF[11], *h_j1CHF[11], *h_j1NHF[11], *h_j1ntracks[11],*h_j2ntracks[11],*h_j1trk12pt[11];
+   TH1F *h_j1nCons_1, *h_trk12ptratio, *h_trk12ptratio_afterdR, *h_jet1pt, *h_dphimin, *h_deltar_cut, *h_deltar, *h_HT[11], *h_nJets[11], *h_nGoodJets[11], *h_pfMET[11], *h_pfMETPhi[11], *h_j1Pt[11], *h_j1Eta[11], *h_j1Phi[11], *h_j1etaWidth[11], *h_j1phiWidth[11], *h_j1etaWidthInECal[11], *h_j1etaWidthInHCal[11], *h_j1phiWidthInECal[11], *h_j1phiWidthInHCal[11], *h_j1nCons[11], *h_j1CEF[11], *h_j1NEF[11], *h_j1CHF[11], *h_j1NHF[11], *h_j1ntracks[11],*h_j2ntracks[11],*h_j1trk12pt[11];
 
    TProfile *pfMET_prof,*pfMET_prof_after;
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -519,6 +519,7 @@ public :
    virtual float DeltaPhi(float phi1, float phi2);
    virtual bool HighPtMuonVeto(double muonPtCut);
    virtual vector<int> getJetCand(double jetPtCut, double jetEtaCut, double jetNHFCut, double jetCHFCut);
+   virtual vector<int> JetVetoDecision(int jet_index);
    virtual bool  dPhiJetMETcut(std::vector<int> jets);
    virtual float dPhiJetMETmin(std::vector<int> jets);
    virtual bool electron_veto_looseID(int jet_index, float elePtCut);
