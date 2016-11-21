@@ -1,0 +1,125 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+******************* RunOnData *******************
+************** MC dependence removal ************
+removing MC dependencies for photons
+removing MC dependencies for electrons
+removing MC dependencies for muons
+removing MC dependencies for taus
+removing MC dependencies for taus boosted 
+...skipped since taus boosted  are not part of process.
+removing MC dependencies for jets
+adding L2L3Residual JEC for: patJetCorrFactors
+1:34393:69611056
+Number of tracks(Leading Jet): 32
+Leading track Pt: 367.367
+Leading track quality:highPurity 
+Second leading track Pt: 29.4315
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 396.799
+PT of the Leading Jet: 359.4
+Trk12PT/j1PT: 1.10406
+No. of pfCands/Constituents of a jet: 50
+pfCand1pt(211): 66.2902
+pfCand2pt(-211): 29.4315
+ptSum: 360.243
+pt12Sum: 95.7217
+pt12ratio: 0.265715
+TotalET = 608.364; nJets = 22; HT = 430.248; nGoodJets = 2; pfMET = (274.413, 1.18696); nPFCands = 1046
+1:34393:69611620
+Number of tracks(Leading Jet): 8
+Leading track Pt: 123.193
+Leading track quality:highPurity 
+Second leading track Pt: 51.8237
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 175.017
+PT of the Leading Jet: 172.068
+Trk12PT/j1PT: 1.01714
+No. of pfCands/Constituents of a jet: 11
+pfCand1pt(211): 123.193
+pfCand2pt(-211): 28.7716
+ptSum: 172.163
+pt12Sum: 151.965
+pt12ratio: 0.882677
+TotalET = 495.062; nJets = 19; HT = 395.297; nGoodJets = 5; pfMET = (29.2337, 2.60108); nPFCands = 854
+1:34401:69626240
+Number of tracks(Leading Jet): 21
+Leading track Pt: 171.335
+Leading track quality:highPurity 
+Second leading track Pt: 13.4082
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 184.743
+PT of the Leading Jet: 181.803
+Trk12PT/j1PT: 1.01617
+No. of pfCands/Constituents of a jet: 38
+pfCand1pt(-211): 71.4612
+pfCand2pt(211): 13.4082
+ptSum: 182.225
+pt12Sum: 84.8694
+pt12ratio: 0.46574
+TotalET = 1206.39; nJets = 85; HT = 396.878; nGoodJets = 4; pfMET = (56.4561, 0.265185); nPFCands = 1766
+1:34402:69629263
+Number of tracks(Leading Jet): 21
+Leading track Pt: 3513.55
+Leading track quality:highPurity 
+Second leading track Pt: 35.8514
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 3549.4
+PT of the Leading Jet: 236.189
+Trk12PT/j1PT: 15.0278
+No. of pfCands/Constituents of a jet: 35
+pfCand1pt(-211): 53.1928
+pfCand2pt(-211): 35.8514
+ptSum: 236.924
+pt12Sum: 89.0442
+pt12ratio: 0.375834
+It is fine here
+TotalET = 1502.82; nJets = 98; HT = 435.192; nGoodJets = 2; pfMET = (19.7912, -2.73057); nPFCands = 2020
+1:30643:62019564
+Number of tracks(Leading Jet): 17
+Leading track Pt: 312.086
+Leading track quality:highPurity 
+Second leading track Pt: 65.4031
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 377.49
+PT of the Leading Jet: 342.276
+Trk12PT/j1PT: 1.10288
+No. of pfCands/Constituents of a jet: 25
+pfCand1pt(-211): 229.154
+pfCand2pt(211): 65.4031
+ptSum: 342.779
+pt12Sum: 294.557
+pt12ratio: 0.859322
+TotalET = 973.616; nJets = 66; HT = 402.798; nGoodJets = 2; pfMET = (348.667, -2.46603); nPFCands = 1446
+1:30643:62020020
+Number of tracks(Leading Jet): 18
+Leading track Pt: 245.594
+Leading track quality:highPurity 
+Second leading track Pt: 32.8458
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 278.44
+PT of the Leading Jet: 220.561
+Trk12PT/j1PT: 1.26241
+No. of pfCands/Constituents of a jet: 20
+pfCand1pt(-211): 148.881
+pfCand2pt(-211): 32.8458
+ptSum: 220.857
+pt12Sum: 181.727
+pt12ratio: 0.822826
+It is fine here
+TotalET = 710.788; nJets = 31; HT = 526.363; nGoodJets = 4; pfMET = (6.6457, -1.35778); nPFCands = 1053
+1:30643:62020523
+Number of tracks(Leading Jet): 5
+Leading track Pt: 199.201
+Leading track quality:highPurity 
+Second leading track Pt: 29.2243
+Second Leading track quality: highPurity
+SumPT of two leading Tracks: 228.425
+PT of the Leading Jet: 219.259
+Trk12PT/j1PT: 1.04181
+No. of pfCands/Constituents of a jet: 10
+pfCand1pt(211): 161.9
+pfCand2pt(-211): 29.2243
+ptSum: 219.518
+pt12Sum: 191.124
+pt12ratio: 0.870653
+TotalET = 720.424; nJets = 46; HT = 330.481; nGoodJets = 3; pfMET = (270.666, 2.94953); nPFCands = 1271
