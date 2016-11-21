@@ -39,7 +39,8 @@ using namespace std;
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "LightZPrimeAnalysis/JetWidthCalculator/interface/JetWidthCalculator.hh"
-#include <DataFormats/TrackReco/interface/Track.h>
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackBase.h"
 #include "DataFormats/Common/interface/RefVector.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -47,7 +48,7 @@ using namespace std;
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
-
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
@@ -93,7 +94,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> bADSCHandle_;
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
-
+  edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;//we need this to store genHT which is required to stitch inclusive samples with HT-binned samples
   edm::EDGetToken photonsToken_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
@@ -112,6 +113,12 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<edm::ValueMap<float> > phoWorstChargedIsolationToken_; 
   edm::EDGetTokenT<edm::ValueMap<float> > phoNeutralHadronIsolationToken_; 
   edm::EDGetTokenT<edm::ValueMap<float> > phoPhotonIsolationToken_; 
+
+  //some genlevel variables
+  int   nup_;  
+  int   numGenJets_; 
+  float genHT_; 
+
 
   //some must have variables for tuples
   int     run_;
@@ -306,6 +313,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j1phiWidthInHCal;
   //tracks associated with leading Jet
   uint32_t j1nTracks;
+  bool j1trk1Quality;
+  bool j1trk2Quality;
   double j1trk12PT;
   double j1trk1PT;
   double j1trk1Eta;
@@ -345,6 +354,11 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   uint32_t nGoodJets;
 
   uint32_t j1nCons;
+  int j1nCarrying90;
+  int j1nCarrying92;
+  int j1nCarrying94;
+  int j1nCarrying96;
+  int j1nCarrying98;
   uint32_t j2nCons;
   int j1CMty;
   int j1NMty;
@@ -407,6 +421,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
   BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));  
   //  vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
+  lheEventProductToken_ = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
   vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   beamSpotToken_    = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
   rhoToken_    = consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
@@ -433,6 +448,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("npv",&npv_,"npv/I");
   tree->Branch("nTrksPV",&nTrksPV_);
   tree->Branch("rho",&rho_);
+  tree->Branch("NUP", &nup_, "NUP/I");
+  tree->Branch("numGenJets", &numGenJets_, "numGenJets/I");
+  tree->Branch("genHT", &genHT_, "genHT/F");
 
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
@@ -596,6 +614,11 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2trk2Phi", &j2trk2Phi);
  
   tree->Branch("nGoodJets", &nGoodJets);
+  tree->Branch("j1nCarrying90",&j1nCarrying90); //nConstituents of Leading Jet carrying 90% of jet energy
+  tree->Branch("j1nCarrying92",&j1nCarrying92); //nConstituents of Leading Jet carrying 92%
+  tree->Branch("j1nCarrying94",&j1nCarrying94); //nConstituents of Leading Jet carrying 94%
+  tree->Branch("j1nCarrying96",&j1nCarrying96); //nConstituents of Leading Jet carrying 96%
+  tree->Branch("j1nCarrying98",&j1nCarrying98); //nConstituents of Leading Jet carrying 98%  
   tree->Branch("j1PT", &j1PT);
   tree->Branch("j1Eta", &j1Eta);
   tree->Branch("j1Phi", &j1Phi);
@@ -717,9 +740,9 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    if ( !EEBadSCResult_        ) metFilters_ += 8;
    if ( !EcalDeadCellTFResult_ ) metFilters_ += 16;
    if ( !filterbadChCandidate) metFilters_ += 32;
-   std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
+   //std::cout<<"metFilters(badChCandidateFilter): "<<metFilters_<<std::endl;
    if ( !filterbadPFMuon) metFilters_ += 64;
-   std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;   
+   //std::cout<<"metFilters(badPFMuonFilter): "<<metFilters_<<std::endl;   
    }
 
    Handle< vector<reco::PFCandidate> > pfCands;
@@ -776,8 +799,27 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    // Get the beam spot
    edm::Handle<reco::BeamSpot> theBeamSpot;
    iEvent.getByToken(beamSpotToken_,theBeamSpot);  
+  
+   nup_ = 0;
+   numGenJets_ = 0; //number of outgoing partons
+   genHT_ = 0;
 
+   Handle<LHEEventProduct> lheEventProduct;
+   iEvent.getByToken( lheEventProductToken_, lheEventProduct);
 
+   if (lheEventProduct.isValid()){
+        const lhef::HEPEUP& lheEvent = lheEventProduct->hepeup();
+        std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
+        nup_ = lheEvent.NUP;
+        for ( int idxParticle = 0; idxParticle < nup_; ++idxParticle ) {
+                int absPdgId = TMath::Abs(lheEvent.IDUP[idxParticle]);
+                int status = lheEvent.ISTUP[idxParticle];
+                if ( status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21) ) { // quarks and gluons
+                        genHT_+= TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.)); // first entry is px, second py
+                        ++numGenJets_;
+                }
+        }
+}
 //   if (vtxHandle.isValid()) {
 //   nVtx_ = 0;
 //   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
@@ -1017,7 +1059,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    nGoodJets = 0;
 
    // Compute HT
-   
+   std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
    for(uint32_t j = 0; j < pfJets->size(); j++) {
      const reco::PFJet &jet = (*pfJets)[j];
      if(j == 0) {
@@ -1033,6 +1075,14 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j1MuEFr = jet.muonEnergyFraction();
        j1CMuEFr = jet.chargedMuEnergyFraction();
        j1nCons = jet.nConstituents();
+       j1nCarrying90 = jet.nCarrying(0.90); //return # of consitutents carrying 90% of energy
+       j1nCarrying92 = jet.nCarrying(0.92);
+       j1nCarrying94 = jet.nCarrying(0.94);
+       j1nCarrying96 = jet.nCarrying(0.96);
+       j1nCarrying98 = jet.nCarrying(0.98);
+       //std::cout<<"Info starts about Leading Jet"<<std::endl;
+       //std::cout<<"jet.nConstituents:"<<j1nCons<<std::endl;
+       //std::cout<<"nConsituents carrying 90% of energy: "<< j1nCarrying<<std::endl;
        //get all tracks in the jets. All PFCandidates hold a reference to a track.
        const reco::TrackRefVector j1tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j1tracksRef;//make a copy of RefVector to sort it
@@ -1043,18 +1093,24 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         reco::Track trk = *trkRef;
         j1tracksRef.push_back(trkRef);
         }
-       std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
-           {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
+       //std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
+       //    {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
        //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j1tracksRef.size()>1){
+	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
          j1trk1PT = j1tracksRef.at(0)->pt();
          j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
+         j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
+         if(j1trk1Quality){ 
+	 std::cout<<"Leading track quality:highPurity "<<std::endl;}
          j1trk2PT = j1tracksRef.at(1)->pt();
          j1trk2Eta = j1tracksRef.at(1)->eta();
          j1trk2Phi = j1tracksRef.at(1)->phi();
          std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
+	 if(j1trk2Quality){
+         std::cout<<"Second Leading track quality: highPurity"<<std::endl;}
          j1trk12PT = j1trk1PT+j1trk2PT;//access pt of the first and second track in list
          }
        else{
@@ -1063,7 +1119,9 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
-       //std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
+        std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
+        std::cout<<"PT of the Leading Jet: " << j1PT << std::endl;
+	std::cout<<"Trk12PT/j1PT: "<< (j1trk12PT/j1PT)<<std::endl;
        //std::cout<<"TrackRef copy contents end"<<std::endl;
        }
        j1CMty = jet.chargedMultiplicity();
@@ -1076,12 +1134,16 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        JetWidthCalculator jwc(jet);
        j1etaWidth = jwc.getEtaWidth();
        j1phiWidth = jwc.getPhiWidth();
+       //std::cout<<"j1etaWidth: "<<j1etaWidth<<std::endl;
+       //std::cout<<"j1phiWidth: "<<j1phiWidth<<std::endl;
        j1etaWidthInECal = jwc.getEtaWidthInECal();
        j1phiWidthInECal = jwc.getPhiWidthInECal();
        j1etaWidthInHCal = jwc.getEtaWidthInHCal();
        j1phiWidthInHCal = jwc.getPhiWidthInHCal();
+       //std::cout<<"end of info about leading jet"<<std::endl;
      }
      else if(j == 1) {
+       //std::cout<<"start of info about second leading jet"<<std::endl;	
        j2PT = jet.pt();
        j2Eta = jet.eta();
        j2Phi = jet.phi();
@@ -1094,28 +1156,29 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2MuEFr = jet.muonEnergyFraction();
        j2CMuEFr = jet.chargedMuEnergyFraction();
        j2nCons = jet.nConstituents();
+       if(!jet.getTrackRefs().isNull()){
        //get all tracks associated with second leading Jet. All PFCandidates hold a reference to a track.
        const reco::TrackRefVector j2tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j2tracksRef;//make a copy of RefVector to sort it
        j2nTracks = j2tracks.size();
        if(j2nTracks >0){
-       std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
+      // std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
        for (const auto &trkRef : j2tracks){
         reco::Track trk = *trkRef;
         j2tracksRef.push_back(trkRef);
         }
        std::sort(j2tracksRef.begin(),j2tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
            {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
-       std::cout<<"TrackRef Copy begin"<<std::endl;
+       //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j2tracksRef.size()>1){
          j2trk1PT = j2tracksRef.at(0)->pt();
          j2trk1Eta = j2tracksRef.at(0)->eta();
          j2trk1Phi = j2tracksRef.at(0)->phi();
-         std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
+         //std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
          j2trk2PT = j2tracksRef.at(1)->pt();
          j2trk2Eta = j2tracksRef.at(1)->eta();
          j2trk2Phi = j2tracksRef.at(1)->phi();
-         std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
+         //std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
          j2trk12PT = j2trk1PT+j2trk2PT;//access pt of the first and second track in list
          }
        else{
@@ -1124,8 +1187,8 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j2trk1Phi = j2tracksRef.at(0)->phi();
          j2trk12PT = j2trk1PT;
         }
-       std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
-       std::cout<<"TrackRef copy contents end"<<std::endl;
+       //std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
+       //std::cout<<"TrackRef copy contents end"<<std::endl;
        }
        j2CMty = jet.chargedMultiplicity();
        j2NMty = jet.neutralMultiplicity();
@@ -1134,13 +1197,15 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2PhoMty = jet.photonMultiplicity();
        j2EleMty = jet.electronMultiplicity();
        j2MuMty = jet.muonMultiplicity();
-       JetWidthCalculator jwc(jet);
+       /*JetWidthCalculator jwc(jet);
        j2etaWidth = jwc.getEtaWidth();
        j2phiWidth = jwc.getPhiWidth();
        j2etaWidthInECal = jwc.getEtaWidthInECal();
        j2phiWidthInECal = jwc.getPhiWidthInECal();
        j2etaWidthInHCal = jwc.getEtaWidthInHCal();
-       j2phiWidthInHCal = jwc.getPhiWidthInHCal();
+       j2phiWidthInHCal = jwc.getPhiWidthInHCal();*/
+     }
+      // std::cout<<"end of info about second leading jet"<<std::endl; 
      }
      if(jet.pt() > 30.) { // Good jets have high pt
        HT += jet.pt();
@@ -1159,13 +1224,13 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      jetHFHAE_.push_back( jet.HFHadronEnergy());
      jetHFEME_.push_back( jet.HFEMEnergy());
      jetNConstituents_.push_back(jet.numberOfDaughters());
-     JetWidthCalculator jwc(jet);
+     /*JetWidthCalculator jwc(jet);
      jetEtaWidth_.push_back(jwc.getEtaWidth());     
      jetPhiWidth_.push_back(jwc.getPhiWidth());
      jetEtaWidthInECal_.push_back(jwc.getEtaWidthInECal());
      jetPhiWidthInECal_.push_back(jwc.getPhiWidthInECal());
      jetEtaWidthInHCal_.push_back(jwc.getEtaWidthInHCal());
-     jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());
+     jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());*/
      totalET += jet.pt(); // Use all jets
      nJets++;
    
@@ -1224,7 +1289,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      reco::GsfTrackRef theTrack = el->gsfTrack();
      eleD0_.push_back( (-1) * theTrack->dxy(pv.position() ) );
      eleDz_.push_back( theTrack->dz( pv.position() ) );
-
 
 
      // VID calculation of (1/E - 1/p)
@@ -1303,7 +1367,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
  
 
-
    for (edm::View<pat::Muon>::const_iterator muon = recoMuons->begin(); muon != recoMuons->end(); ++muon) {
      if (muon->pt() < 3) continue;
      if (! (muon->isPFMuon() || muon->isGlobalMuon() || muon->isTrackerMuon())) continue;
@@ -1314,23 +1377,20 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      muPhi_   .push_back(muon->phi());
      muCharge_.push_back(muon->charge());
      muType_.push_back(muon->type());
-
      muD0_    .push_back(muon->muonBestTrack()->dxy(pv.position()));
      muDz_    .push_back(muon->muonBestTrack()->dz(pv.position()));
-
+     //std::cout<<"It is fine here"<<std::endl;
      muIsLooseID_ .push_back(muon->isLooseMuon());;
      muIsMediumID_.push_back(muon->isMediumMuon());
      muIsTightID_ .push_back(muon->isTightMuon(pv));
      muIsSoftID_  .push_back(muon->isSoftMuon(pv));
      muIsHighPtID_.push_back(muon->isHighPtMuon(pv));
-
-
+     std::cout<<"It is fine here"<<std::endl;
      muBestTrkPtError_        .push_back(muon->muonBestTrack()->ptError());
      muBestTrkPt_             .push_back(muon->muonBestTrack()->pt());
      musegmentCompatibility_  .push_back(muon->segmentCompatibility());
      muchi2LocalPosition_     .push_back(muon->combinedQuality().chi2LocalPosition);
      mutrkKink_               .push_back(muon->combinedQuality().trkKink);
-
      const reco::TrackRef glbmu = muon->globalTrack();
      const reco::TrackRef innmu = muon->innerTrack();
 
