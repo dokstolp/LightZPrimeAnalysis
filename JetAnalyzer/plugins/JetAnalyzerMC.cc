@@ -82,6 +82,7 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
+  edm::EDGetTokenT< vector<reco::CaloJet> > caloJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
   edm::EDGetTokenT< vector<reco::CaloMET> > caloMETToken;
   edm::EDGetToken electronCollection_;
@@ -124,6 +125,17 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int    nTrksPV_;
   int     nVtx_;
   //jet variables
+
+  vector<float> calojetPt_;
+  vector<float> calojetEn_;
+  vector<float> calojetEta_;
+  vector<float> calojetPhi_;
+  vector<float> calojetEEF_;
+  vector<float> calojetHEF_;
+  vector<float> calojetTowersArea_;
+  vector<float> calojetMaxEInEmTowers_;
+  vector<float> calojetMaxEInHadTowers_;
+
   vector<float> jetPt_;
   vector<float> jetEn_;
   vector<float> jetEta_;
@@ -142,8 +154,19 @@ class JetAnalyzerMC : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> jetEtaWidthInHCal_;
   vector<float> jetPhiWidthInECal_;
   vector<float> jetPhiWidthInHCal_;
+
+  vector<float> jetPhotonEnergyFraction_;
+  vector<float> jetJetArea_;
+  vector<float> jetMaxDistance_;
+  vector<float> jetPhiPhiMoment_;
+  vector<float> jetConstituentEtaPhiSpread_;
+  vector<float> jetConstituentPtDistribution_;
+  vector<float> jetPileup_;
+  vector<int> jetN60_;
+  vector<int> jetN90_;
   
   vector<bool>  jetPFLooseId_;
+
  
   //electron variables
   Int_t          nEle_;
@@ -281,6 +304,7 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   genEventInfoToken_ = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
+  caloJetsToken = consumes< vector<reco::CaloJet> >(edm::InputTag("ak4CaloJets"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
   caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
@@ -332,6 +356,17 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("pfMETmEtSig",      &pfMETmEtSig_);
   tree->Branch("pfMETSig",         &pfMETSig_);
   tree->Branch("caloMET", &caloMET);
+
+  tree->Branch("calojetPt", &calojetPt_);
+  tree->Branch("calojetEn", &calojetEn_);
+  tree->Branch("calojetEta",&calojetEta_);
+  tree->Branch("calojetPhi",&calojetPhi_);
+  tree->Branch("calojetEEF",&calojetEEF_);
+  tree->Branch("calojetHEF",&calojetHEF_);
+  tree->Branch("calojetTowersArea",&calojetTowersArea_);
+  tree->Branch("calojetMaxEInEmTowers",&calojetMaxEInEmTowers_);
+  tree->Branch("calojetMaxEInHadTowers",&calojetMaxEInHadTowers_);
+
   tree->Branch("nJets", &nJets);
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
@@ -352,6 +387,17 @@ JetAnalyzerMC::JetAnalyzerMC(const edm::ParameterSet& iConfig)
   tree->Branch("jetEtaWidthInHCal", &jetEtaWidthInHCal_);
   tree->Branch("jetPhiWidthInECal", &jetPhiWidthInECal_);
   tree->Branch("jetPhiWidthInHCal", &jetPhiWidthInHCal_); 
+
+  tree->Branch("jetPhotonEnergyFraction",&jetPhotonEnergyFraction_);
+  tree->Branch("jetJetArea",&jetJetArea_);
+  tree->Branch("jetMaxDistance",&jetMaxDistance_);
+  tree->Branch("jetPhiPhiMoment",&jetPhiPhiMoment_);
+  tree->Branch("jetConstituentEtaPhiSpread",&jetConstituentEtaPhiSpread_);
+  tree->Branch("jetConstituentPtDistribution",&jetConstituentPtDistribution_);
+  tree->Branch("jetPileup",&jetPileup_);
+  tree->Branch("jetN60",&jetN60_);
+  tree->Branch("jetN90",&jetN90_);
+
   tree->Branch("nEle",                    &nEle_);
   tree->Branch("elePt",                   &elePt_);
   tree->Branch("eleEta",                  &eleEta_);
@@ -518,6 +564,9 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::PFJet> > pfJets;
    iEvent.getByToken(pfJetsToken, pfJets);
 
+   Handle< vector<reco::CaloJet> > caloJets;
+   iEvent.getByToken(caloJetsToken, caloJets);
+
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
 
@@ -598,6 +647,17 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    iEvent.getByToken(muonToken, recoMuons);   
 
    //Clear previous events
+
+   calojetPt_ .clear();
+   calojetEn_ .clear();
+   calojetEta_.clear();
+   calojetPhi_.clear();
+   calojetEEF_.clear();
+   calojetHEF_.clear();
+   calojetTowersArea_.clear();
+   calojetMaxEInEmTowers_.clear();
+   calojetMaxEInHadTowers_.clear();
+
    jetPt_.clear();
    jetEn_.clear();
    jetEta_.clear();
@@ -617,6 +677,16 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jetPhiWidthInECal_.clear();
    jetEtaWidthInHCal_.clear();
    jetPhiWidthInHCal_.clear();
+
+   jetPhotonEnergyFraction_.clear();
+   jetJetArea_.clear();
+   jetMaxDistance_.clear();
+   jetPhiPhiMoment_.clear();
+   jetConstituentEtaPhiSpread_.clear();
+   jetConstituentPtDistribution_.clear();
+   jetPileup_.clear();
+   jetN60_.clear();
+   jetN90_.clear();
    
    elePt_                      .clear();
    eleEta_                     .clear();
@@ -685,6 +755,20 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    HT = 0;
    nJets = 0;
    nGoodJets = 0;
+
+   for(uint32_t j = 0; j < caloJets->size(); j++) {
+     const reco::CaloJet &jet = (*caloJets)[j];
+     calojetPt_.push_back( jet.pt());
+     calojetEn_.push_back( jet.energy());
+     calojetEta_.push_back(jet.eta());
+     calojetPhi_.push_back(jet.phi());
+     calojetEEF_.push_back(   jet.emEnergyFraction());
+     calojetHEF_.push_back(   jet.energyFractionHadronic());
+     calojetTowersArea_.push_back(     jet.towersArea());
+     calojetMaxEInEmTowers_.push_back( jet.maxEInEmTowers());
+     calojetMaxEInHadTowers_.push_back(jet.maxEInHadTowers());
+   }
+
 
    // Compute HT
    
@@ -835,6 +919,17 @@ JetAnalyzerMC::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      jetPhiWidthInECal_.push_back(jwc.getPhiWidthInECal());
      jetEtaWidthInHCal_.push_back(jwc.getEtaWidthInHCal());
      jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());     
+
+     jetPhotonEnergyFraction_.push_back(jet.photonEnergyFraction());
+     jetJetArea_.push_back(jet.jetArea());
+     jetMaxDistance_.push_back(jet.maxDistance());
+     jetPhiPhiMoment_.push_back(jet.phiphiMoment());
+     jetConstituentEtaPhiSpread_.push_back(jet.constituentEtaPhiSpread());
+     jetConstituentPtDistribution_.push_back(jet.constituentPtDistribution());
+     jetPileup_.push_back(jet.pileup());
+     jetN60_.push_back(jet.nCarrying(0.6));
+     jetN90_.push_back(jet.nCarrying(0.9));
+
      totalET += jet.pt(); // Use all jets
      nJets++;
    
