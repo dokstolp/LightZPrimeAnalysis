@@ -1,4 +1,4 @@
-# LightZPrimeAnalysis
+# Dark Photon Analysis and LightZPrimeAnalysis
 
 Yang Bai and collaborators have a model in which there exists a 
 light Z', which only has enough mass to decay to a small number of
@@ -40,13 +40,13 @@ cmsRun testJetAnalyzer.py
 
 Instructions (in order to apply all recommended MET Filters):
 ```bash
-cmsrel CMSSW_8_0_X
+cmsrel CMSSW_8_0_18_patch1
 cmsenv
 git cms-init
 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
-git clone -b usamabranch https://github.com/gomber/LightZPrimeAnalysis.git
+git clone -b darphoton https://github.com/gomber/LightZPrimeAnalysis.git
 scram b
-cd CMSSW_8_0_X/src/LightZPrimeAnalysis/JetAnalyzer/test
+cd CMSSW_8_0_18_patch1/src/LightZPrimeAnalysis/JetAnalyzer/test
 cmsRun testJetAnalyzer.py
 ```
 https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Details about the application of the filters:

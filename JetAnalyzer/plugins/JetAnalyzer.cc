@@ -29,6 +29,7 @@ using namespace std;
 
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/METReco/interface/CaloMET.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -81,6 +82,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   edm::EDGetTokenT< vector<reco::PFCandidate> > pfCandsToken;
   edm::EDGetTokenT< vector<reco::PFJet> > pfJetsToken;
+  edm::EDGetTokenT< vector<pat::Jet> > JetsToken;
+  edm::EDGetTokenT< vector<reco::CaloJet> > caloJetsToken;
   edm::EDGetTokenT< vector<reco::PFMET> > pfMETsToken;
   edm::EDGetTokenT< vector<reco::CaloMET> > caloMETToken;  
   edm::EDGetToken electronCollection_;
@@ -129,6 +132,17 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int     nVtx_;
   Float_t rho_;  
   //jet variables
+ 
+  vector<float> calojetPt_;
+  vector<float> calojetEn_;
+  vector<float> calojetEta_;
+  vector<float> calojetPhi_;
+  vector<float> calojetEEF_;
+  vector<float> calojetHEF_;
+  vector<float> calojetTowersArea_;
+  vector<float> calojetMaxEInEmTowers_;
+  vector<float> calojetMaxEInHadTowers_;
+ 
   vector<float> jetPt_;
   vector<float> jetEn_;
   vector<float> jetEta_;
@@ -147,6 +161,16 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> jetEtaWidthInHCal_;
   vector<float> jetPhiWidthInECal_;
   vector<float> jetPhiWidthInHCal_;
+
+  vector<float> jetPhotonEnergyFraction_;
+  vector<float> jetJetArea_;
+  vector<float> jetMaxDistance_;
+  vector<float> jetPhiPhiMoment_;
+  vector<float> jetConstituentEtaPhiSpread_;
+  vector<float> jetConstituentPtDistribution_;
+  vector<float> jetPileup_;
+  vector<int> jetN60_;
+  vector<int> jetN90_;
 
   vector<bool>  jetPFLooseId_;
  
@@ -196,10 +220,6 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<int>    eleConvVeto_;
   vector<int>    eleMissHits_;
   vector<float>  eleESEffSigmaRR_;
-  vector<float>  elePFChIso_;
-  vector<float>  elePFPhoIso_;
-  vector<float>  elePFNeuIso_;
-  vector<float>  elePFPUIso_;
   vector<float>  elePFClusEcalIso_;
   vector<float>  elePFClusHcalIso_;
   vector<float>  elePFMiniIso_;
@@ -225,6 +245,12 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   std::vector<Float_t> phopt_;
   std::vector<Float_t> phoeta_;
   std::vector<Float_t> phophi_;
+
+  std::vector<Float_t> phopx_;
+  std::vector<Float_t> phopy_;
+  std::vector<Float_t> phopz_;
+  std::vector<Float_t> phoE_;
+  std::vector<Float_t> phor9_;
 
   // Variables typically used for cut based photon ID
   std::vector<Float_t>  phoSigmaIEtaIEtaFull5x5_ ;
@@ -405,6 +431,8 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
 
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
   pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
+  JetsToken = consumes< vector<pat::Jet> >(edm::InputTag("selectedPatJets"));
+  caloJetsToken = consumes< vector<reco::CaloJet> >(edm::InputTag("ak4CaloJets"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
   caloMETToken = consumes< vector<reco::CaloMET> >(edm::InputTag("caloMet"));  
   electronCollection_ = mayConsume<edm::View<reco::GsfElectron> >(edm::InputTag("gedGsfElectrons"));
@@ -459,7 +487,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("pfMETsumEt",       &pfMETsumEt_);
   tree->Branch("pfMETmEtSig",      &pfMETmEtSig_);
   tree->Branch("pfMETSig",         &pfMETSig_);
-  tree->Branch("caloMET", &caloMET);  
+  tree->Branch("caloMET", &caloMET);
+
+  tree->Branch("calojetPt", &calojetPt_);
+  tree->Branch("calojetEn", &calojetEn_);
+  tree->Branch("calojetEta",&calojetEta_);
+  tree->Branch("calojetPhi",&calojetPhi_);
+  tree->Branch("calojetEEF",&calojetEEF_);
+  tree->Branch("calojetHEF",&calojetHEF_);
+  tree->Branch("calojetTowersArea",&calojetTowersArea_);
+  tree->Branch("calojetMaxEInEmTowers",&calojetMaxEInEmTowers_);
+  tree->Branch("calojetMaxEInHadTowers",&calojetMaxEInHadTowers_);
+
   tree->Branch("nJets", &nJets);
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
@@ -480,15 +519,17 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("jetEtaWidthInHCal", &jetEtaWidthInHCal_);
   tree->Branch("jetPhiWidthInECal", &jetPhiWidthInECal_);  
   tree->Branch("jetPhiWidthInHCal", &jetPhiWidthInHCal_);
-  tree->Branch("nEle",                    &nEle_);
-  tree->Branch("elePt",                   &elePt_);
-  tree->Branch("eleEta",                  &eleEta_);
-  tree->Branch("elePhi",                  &elePhi_); 
-  tree->Branch("ElectronPassVetoID", &PassVeto_);
-  tree->Branch("ElectronPassLooseID", &PassLoose_);
-  tree->Branch("ElectronPassMediumID", &PassMedium_); 
-  tree->Branch("ElectronPassTightID", &PassTight_);
-  tree->Branch("ElectronPassHEEPID", &PassHEEP_);
+
+  tree->Branch("jetPhotonEnergyFraction",&jetPhotonEnergyFraction_);
+  tree->Branch("jetJetArea",&jetJetArea_);
+  tree->Branch("jetMaxDistance",&jetMaxDistance_);
+  tree->Branch("jetPhiPhiMoment",&jetPhiPhiMoment_);
+  tree->Branch("jetConstituentEtaPhiSpread",&jetConstituentEtaPhiSpread_);
+  tree->Branch("jetConstituentPtDistribution",&jetConstituentPtDistribution_);
+  tree->Branch("jetPileup",&jetPileup_);
+  tree->Branch("jetN60",&jetN60_);
+  tree->Branch("jetN90",&jetN90_);
+
   tree->Branch("nMu",           &nMu_);
   tree->Branch("muPt",          &muPt_);
   tree->Branch("muEn",          &muEn_);
@@ -525,6 +566,16 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("muBestTrkPtError",       &muBestTrkPtError_);
   tree->Branch("muBestTrkPt",            &muBestTrkPt_);
 
+
+  tree->Branch("nEle",                    &nEle_);
+  tree->Branch("elePt",                   &elePt_);
+  tree->Branch("eleEta",                  &eleEta_);
+  tree->Branch("elePhi",                  &elePhi_); 
+  tree->Branch("ElectronPassVetoID", &PassVeto_);
+  tree->Branch("ElectronPassLooseID", &PassLoose_);
+  tree->Branch("ElectronPassMediumID", &PassMedium_); 
+  tree->Branch("ElectronPassTightID", &PassTight_);
+  tree->Branch("ElectronPassHEEPID", &PassHEEP_);
   tree->Branch("eleCharge",               &eleCharge_);
   tree->Branch("eleChargeConsistent",     &eleChargeConsistent_);
   tree->Branch("eleEn",                   &eleEn_);
@@ -553,10 +604,6 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5_);
   tree->Branch("eleConvVeto",             &eleConvVeto_);
   tree->Branch("eleMissHits",             &eleMissHits_);
-  tree->Branch("elePFChIso",              &elePFChIso_);
-  tree->Branch("elePFPhoIso",             &elePFPhoIso_);
-  tree->Branch("elePFNeuIso",             &elePFNeuIso_);
-  tree->Branch("elePFPUIso",              &elePFPUIso_);
   tree->Branch("elePFClusEcalIso",        &elePFClusEcalIso_);
   tree->Branch("elePFClusHcalIso",        &elePFClusHcalIso_);
   tree->Branch("elePFMiniIso",            &elePFMiniIso_);
@@ -576,15 +623,20 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("eleisoChargedFromPU"       , &eleisoChargedFromPU_);
 
   tree->Branch("nPhotons",                    &nPhotons_);
+  tree->Branch("phopx",&phopx_);
+  tree->Branch("phopy",&phopy_);
+  tree->Branch("phopz",&phopz_);
+  tree->Branch("phoE",&phoE_);
   tree->Branch("phopt"  ,  &phopt_    );
   tree->Branch("phoeta" ,  &phoeta_ );
   tree->Branch("phophi" ,  &phophi_ );
-  tree->Branch("phoSigmaIEtaIEtaFull5x5"  , &phoSigmaIEtaIEtaFull5x5_);
+  tree->Branch("phor9",&phor9_);
+  tree->Branch("phoSigmaIEtaIEtaFull5x5"   , &phoSigmaIEtaIEtaFull5x5_);
   tree->Branch("phohOverE"                 ,  &phohOverE_);
   tree->Branch("phohasPixelSeed"           ,  &phohasPixelSeed_);
 
   tree->Branch("phoisoChargedHadrons"      , &phoisoChargedHadrons_);
-  tree->Branch("phoWorstisoChargedHadrons"      , &phoWorstisoChargedHadrons_);
+  tree->Branch("phoWorstisoChargedHadrons" , &phoWorstisoChargedHadrons_);
   tree->Branch("phoisoNeutralHadrons"      , &phoisoNeutralHadrons_);
   tree->Branch("phoisoPhotons"             , &phoisoPhotons_);
 
@@ -751,6 +803,12 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::PFJet> > pfJets;
    iEvent.getByToken(pfJetsToken, pfJets);
 
+   Handle< vector<reco::CaloJet> > caloJets;
+   iEvent.getByToken(caloJetsToken, caloJets);
+
+   Handle< vector<pat::Jet> > Jets;
+   iEvent.getByToken(JetsToken, Jets);
+
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
 
@@ -909,6 +967,20 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      if (name.find("HLT_PFJet80_v") != string::npos) {HLTPFJet80_ = (trgResultsHandle->accept(i)) ? 1 : 0;}
    }
    //Clear previous events
+   
+   
+   
+   calojetPt_ .clear();
+   calojetEn_ .clear();
+   calojetEta_.clear();
+   calojetPhi_.clear();
+   calojetEEF_.clear();
+   calojetHEF_.clear();
+   calojetTowersArea_.clear();
+   calojetMaxEInEmTowers_.clear();
+   calojetMaxEInHadTowers_.clear();
+
+
    jetPt_.clear();
    jetEn_.clear();
    jetEta_.clear();
@@ -929,9 +1001,16 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jetEtaWidthInHCal_.clear();
    jetPhiWidthInHCal_.clear(); 
 
-   elePt_                      .clear();
-   eleEta_                     .clear();
-   elePhi_                     .clear();
+   jetPhotonEnergyFraction_.clear();
+   jetJetArea_.clear();
+   jetMaxDistance_.clear();
+   jetPhiPhiMoment_.clear();
+   jetConstituentEtaPhiSpread_.clear();
+   jetConstituentPtDistribution_.clear();
+   jetPileup_.clear();
+   jetN60_.clear();
+   jetN90_.clear();
+
    PassVeto_.clear();
    PassLoose_.clear();
    PassMedium_.clear();
@@ -968,10 +1047,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    eleSigmaIPhiIPhiFull5x5_    .clear();
    eleConvVeto_                .clear();
    eleMissHits_                .clear();
-   elePFChIso_                 .clear();
-   elePFPhoIso_                .clear();
-   elePFNeuIso_                .clear();
-   elePFPUIso_                 .clear();
    elePFClusEcalIso_           .clear();
    elePFClusHcalIso_           .clear();
    elePFMiniIso_               .clear();
@@ -1051,12 +1126,33 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    phoWorstisoChargedHadrons_.clear();
    phoisoNeutralHadrons_.clear();
    phoisoPhotons_.clear();
+   
+   phopx_.clear();
+   phopy_.clear();
+   phopz_.clear();
+   phoE_ .clear();
+   phor9_.clear();
 
 
    totalET = 0;
    HT = 0;
    nJets = 0;
    nGoodJets = 0;
+
+
+   for(uint32_t j = 0; j < caloJets->size(); j++) {
+     const reco::CaloJet &jet = (*caloJets)[j];
+     calojetPt_.push_back( jet.pt());
+     calojetEn_.push_back( jet.energy());
+     calojetEta_.push_back(jet.eta());
+     calojetPhi_.push_back(jet.phi());
+     calojetEEF_.push_back(   jet.emEnergyFraction());
+     calojetHEF_.push_back(   jet.energyFractionHadronic());
+     calojetTowersArea_.push_back(     jet.towersArea());
+     calojetMaxEInEmTowers_.push_back( jet.maxEInEmTowers());
+     calojetMaxEInHadTowers_.push_back(jet.maxEInHadTowers());
+   }
+
 
    // Compute HT
    std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
@@ -1231,9 +1327,20 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      jetPhiWidthInECal_.push_back(jwc.getPhiWidthInECal());
      jetEtaWidthInHCal_.push_back(jwc.getEtaWidthInHCal());
      jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());*/
+
+     jetPhotonEnergyFraction_.push_back(jet.photonEnergyFraction());
+     jetJetArea_.push_back(jet.jetArea());
+     jetMaxDistance_.push_back(jet.maxDistance());
+     jetPhiPhiMoment_.push_back(jet.phiphiMoment());
+     jetConstituentEtaPhiSpread_.push_back(jet.constituentEtaPhiSpread());
+     jetConstituentPtDistribution_.push_back(jet.constituentPtDistribution());
+     jetPileup_.push_back(jet.pileup());
+     jetN60_.push_back(jet.nCarrying(0.6));
+     jetN90_.push_back(jet.nCarrying(0.9));
+
      totalET += jet.pt(); // Use all jets
      nJets++;
-   
+
      //jet PF Loose ID
      bool jetID = true;
      if (fabs(jet.eta()) <= 3.0) {
@@ -1361,7 +1468,12 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      
      phoSigmaIEtaIEtaFull5x5_ .push_back(pho->full5x5_sigmaIetaIeta());
      
-     
+     phopx_.push_back(pho->px());
+     phopy_.push_back(pho->py());
+     phopz_.push_back(pho->pz());
+     phoE_ .push_back(pho->energy());
+     phor9_.push_back(pho->r9());
+
    }
 
 
