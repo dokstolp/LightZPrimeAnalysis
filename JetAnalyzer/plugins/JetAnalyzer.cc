@@ -24,7 +24,7 @@ using namespace std;
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
@@ -43,6 +43,7 @@ using namespace std;
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackBase.h"
 #include "DataFormats/Common/interface/RefVector.h"
+#include "DataFormats/Math/interface/deltaR.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
@@ -50,6 +51,7 @@ using namespace std;
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
@@ -98,6 +100,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   edm::EDGetTokenT<bool> BadChCandFilterToken_;
   edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
   edm::EDGetTokenT<LHEEventProduct> lheEventProductToken_;//we need this to store genHT which is required to stitch inclusive samples with HT-binned samples
+  edm::EDGetTokenT<vector<PileupSummaryInfo> > puCollection_; //Required for Pileup reweighting
+  edm::EDGetTokenT<vector<reco::GenParticle> > genParticlesCollection_; //genParticles info required for boson Pt reweighting
   edm::EDGetToken photonsToken_;
 
   edm::EDGetTokenT<edm::TriggerResults>            trgResultsLabel_;
@@ -121,8 +125,21 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int   nup_;  
   int   numGenJets_; 
   float genHT_; 
-
-
+  int nPUInfo_;
+  vector<int>      nPU_;
+  vector<int>      puBX_;
+  vector<float>    puTrue_;
+  vector<int>      BosonPID;
+  vector<float>    BosonVtx;
+  vector<float>    BosonVty;
+  vector<float>    BosonVtz;
+  vector<float>    BosonPt;
+  vector<float>    BosonMass;
+  vector<float>    BosonEta;
+  vector<float>    BosonPhi;
+  vector<float>    BosonE;
+  vector<float>    BosonEt;
+  vector<int>      BosonStatus;
   //some must have variables for tuples
   int     run_;
   int  event_;
@@ -341,6 +358,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   uint32_t j1nTracks;
   bool j1trk1Quality;
   bool j1trk2Quality;
+  double j1trk1PtError;
+  double j1trk2PtError;
   double j1trk12PT;
   double j1trk1PT;
   double j1trk1Eta;
@@ -412,7 +431,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   int HLTPFJet80_;
   
   TTree* tree;
-
+  TH1F    *hPU_;
+  TH1F    *hPUTrue_;
 };
 
 //
@@ -448,8 +468,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   bADSCHandle_ = consumes<bool>(edm::InputTag("eeBadScFilter", ""));
   BadChCandFilterToken_= consumes<bool>(edm::InputTag("BadChargedCandidateFilter"));
   BadPFMuonFilterToken_= consumes<bool>(edm::InputTag("BadPFMuonFilter"));  
-  //  vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   lheEventProductToken_ = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
+  puCollection_ = consumes<vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"));
+  genParticlesCollection_ = consumes<vector<reco::GenParticle> >(edm::InputTag("genParticles")); 
   vtxToken_ = consumes< vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
   beamSpotToken_    = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
   rhoToken_    = consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
@@ -464,7 +485,6 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   phoNeutralHadronIsolationToken_ =consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoNeutralHadronIsolation"));
   phoPhotonIsolationToken_= consumes <edm::ValueMap<float> >(edm::InputTag("photonIDValueMapProducer:phoPhotonIsolation"));
     
-
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   tree = fs->make<TTree>("JetTree", "Jet data for analysis");
@@ -479,6 +499,26 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("NUP", &nup_, "NUP/I");
   tree->Branch("numGenJets", &numGenJets_, "numGenJets/I");
   tree->Branch("genHT", &genHT_, "genHT/F");
+  tree->Branch("nPUInfo",       &nPUInfo_);
+  tree->Branch("nPU",           &nPU_);
+  tree->Branch("puBX",          &puBX_);
+  tree->Branch("puTrue",        &puTrue_);
+  //tree->Branch("genParticleStatus", &status);//status of genParticle
+  hPU_        = fs->make<TH1F>("hPU",        "number of pileup",      200,  0, 200);
+  hPUTrue_    = fs->make<TH1F>("hPUTrue",    "number of true pilepu", 1000, 0, 200);
+
+  //genlevel info about W/Z boson
+  tree->Branch("BosonPID",        &BosonPID);
+  tree->Branch("BosonVtx",        &BosonVtx);
+  tree->Branch("BosonVty",        &BosonVty);
+  tree->Branch("BosonVtz",        &BosonVtz);
+  tree->Branch("BosonPt",         &BosonPt);
+  tree->Branch("BosonMass",       &BosonMass);
+  tree->Branch("BosonEta",        &BosonEta);
+  tree->Branch("BosonPhi",        &BosonPhi);
+  tree->Branch("BosonE",          &BosonE);
+  tree->Branch("BosonEt",         &BosonEt);
+  tree->Branch("BosonStatus",         &BosonStatus);
 
   tree->Branch("totalET", &totalET);
   tree->Branch("HT", &HT);
@@ -858,9 +898,25 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<reco::BeamSpot> theBeamSpot;
    iEvent.getByToken(beamSpotToken_,theBeamSpot);  
   
+   //gen level variables cleared from last execution
    nup_ = 0;
    numGenJets_ = 0; //number of outgoing partons
    genHT_ = 0;
+   nPUInfo_ =0;
+   nPU_          .clear();
+   puBX_         .clear();
+   puTrue_       .clear();
+   BosonPID       .clear();
+   BosonVtx       .clear();
+   BosonVty       .clear();
+   BosonVtz       .clear();
+   BosonPt        .clear();
+   BosonMass      .clear();
+   BosonEta       .clear();
+   BosonPhi       .clear();
+   BosonE         .clear();
+   BosonEt        .clear();
+   BosonStatus    .clear();
 
    Handle<LHEEventProduct> lheEventProduct;
    iEvent.getByToken( lheEventProductToken_, lheEventProduct);
@@ -877,7 +933,65 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                         ++numGenJets_;
                 }
         }
-}
+     }
+   Handle<vector<PileupSummaryInfo> > genPileupHandle;
+   iEvent.getByToken(puCollection_, genPileupHandle);
+
+   if (genPileupHandle.isValid()) {
+    for (vector<PileupSummaryInfo>::const_iterator pu = genPileupHandle->begin(); pu != genPileupHandle->end(); ++pu) {
+      if (pu->getBunchCrossing() == 0) {
+        hPU_->Fill(pu->getPU_NumInteractions());
+        hPUTrue_->Fill(pu->getTrueNumInteractions());
+      }
+
+      nPU_   .push_back(pu->getPU_NumInteractions());
+      puTrue_.push_back(pu->getTrueNumInteractions());
+      puBX_  .push_back(pu->getBunchCrossing());
+
+      nPUInfo_++;
+    }
+  }
+   else
+     edm::LogWarning("JetAnalyzer") << "no PileupSummaryInfo in event";
+
+   Handle<vector<reco::GenParticle> > genParticlesHandle;
+   iEvent.getByToken(genParticlesCollection_, genParticlesHandle);
+
+   if (!genParticlesHandle.isValid()) {
+    edm::LogWarning("JetAnalyzer") << "no reco::GenParticles in event";
+    return;
+    }
+
+   int genIndex = 0;
+
+   for (vector<reco::GenParticle>::const_iterator ip = genParticlesHandle->begin(); ip != genParticlesHandle->end(); ++ip) {
+     genIndex++;
+
+     //int status = ip->status();
+ 
+    //select Z/W boson
+    bool boson =
+      ((    ip->pdgId()  == 23 && ip->isHardProcess()) || 
+       (abs(ip->pdgId()) == 24 && ip->isHardProcess()));
+
+    if (boson) {
+      
+      const reco::Candidate *p = (const reco::Candidate*)&(*ip);
+      if (!p->mother()) continue;
+
+      BosonPID    .push_back(ip->pdgId());
+      BosonVtx    .push_back(ip->vx());
+      BosonVty    .push_back(ip->vy());
+      BosonVtz    .push_back(ip->vz());
+      BosonPt     .push_back(ip->pt());
+      BosonMass   .push_back(ip->mass());
+      BosonEta    .push_back(ip->eta());
+      BosonPhi    .push_back(ip->phi());
+      BosonE      .push_back(ip->energy());
+      BosonEt     .push_back(ip->et());
+      BosonStatus .push_back(ip->status());    
+       }
+     }
 //   if (vtxHandle.isValid()) {
 //   nVtx_ = 0;
 //   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
@@ -1066,9 +1180,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    eleisoChargedFromPU_.clear();
 
 
-
-
-
    muPt_         .clear();
    muEn_         .clear();
    muEta_        .clear();
@@ -1177,8 +1288,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j1nCarrying96 = jet.nCarrying(0.96);
        j1nCarrying98 = jet.nCarrying(0.98);
        //std::cout<<"Info starts about Leading Jet"<<std::endl;
-       //std::cout<<"jet.nConstituents:"<<j1nCons<<std::endl;
-       //std::cout<<"nConsituents carrying 90% of energy: "<< j1nCarrying<<std::endl;
        //get all tracks in the jets. All PFCandidates hold a reference to a track.
        const reco::TrackRefVector j1tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j1tracksRef;//make a copy of RefVector to sort it
@@ -1189,29 +1298,54 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         reco::Track trk = *trkRef;
         j1tracksRef.push_back(trkRef);
         }
-       //std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
-       //    {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
+       const std::vector<reco::PFCandidatePtr> pfCands = jet.getPFConstituents(); //get pfCands to match with tracks 
+       std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
+           {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
        //std::cout<<"TrackRef Copy begin"<<std::endl;
+       double j1ptTrk1Ratio;
+       double j1ptTrk2Ratio;
        if(j1tracksRef.size()>1){
-	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
+	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::confirmed);//determining the quality of track
          j1trk1PT = j1tracksRef.at(0)->pt();
-         j1trk1Eta = j1tracksRef.at(0)->eta();
+	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
+         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
+ 	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
-         j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
+         j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::confirmed);
          if(j1trk1Quality){ 
-	 std::cout<<"Leading track quality:highPurity "<<std::endl;}
+	 std::cout<<"Leading track quality: confirmed "<<std::endl;}
+	 else{std::cout<<"Leading track quality: highPurity "<<std::endl;}
+	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
+	 //matching leading track candidate with PF-Candidate
+	 float drCand1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
+	 if (drCand1 < 0.01){std::cout<<"Leading Track associated with jet matches (dR <0.01)  with leading PFCandidate"<<std::endl;}
          j1trk2PT = j1tracksRef.at(1)->pt();
-         j1trk2Eta = j1tracksRef.at(1)->eta();
+         j1trk2PtError = j1tracksRef.at(1)->ptError();//ptError of second leading track
+	 j1ptTrk2Ratio = (j1trk2PtError/j1trk2PT);
+	 j1trk2Eta = j1tracksRef.at(1)->eta();
          j1trk2Phi = j1tracksRef.at(1)->phi();
          std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
 	 if(j1trk2Quality){
-         std::cout<<"Second Leading track quality: highPurity"<<std::endl;}
-         j1trk12PT = j1trk1PT+j1trk2PT;//access pt of the first and second track in list
+         std::cout<<"Second Leading track quality: confirmed"<<std::endl;}
+	 else{std::cout<<"Second Leading track quality: highPurity "<<std::endl;}
+	 std::cout<<"DPt/Pt: "<<j1ptTrk2Ratio<<std::endl;
+         float drCand2 = deltaR((*j1tracksRef.at(1)),(*pfCands[1]));
+         if (drCand2 < 0.01){std::cout<<"Second Leading Track associated with jet matches (dR <0.01)  with second leading PFCandidate"<<std::endl;}         
+	 j1trk12PT = j1trk1PT+j1trk2PT;//access pt of the first and second track in list
          }
        else{
-         j1trk1PT = j1tracksRef.at(0)->pt();
-         j1trk1Eta = j1tracksRef.at(0)->eta();
+	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::confirmed);
+         if(j1trk1Quality){
+         std::cout<<"Leading track quality: confirmed "<<std::endl;}
+	 else{std::cout<<"Leading track quality: highPurity "<<std::endl;}
+	 j1trk1PT = j1tracksRef.at(0)->pt();
+	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
+         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
+	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
+         float drCand1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
+	 if (drCand1 < 0.01){std::cout<<"Leading Track associated with jet matches (dR <0.01) with leading PFCandidate"<<std::endl;}        
+	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
