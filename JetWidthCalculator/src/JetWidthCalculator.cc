@@ -6,6 +6,9 @@ JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
   jet.pt();
   jet.eta();
   jet.phi();
+  //float jetet = jet.et();
+  double pfCand1pt = 0;
+  double pfCand2pt = 0;  
   double etSum = 0;
   double etaSum = 0;
   double etaSqSum = 0;
@@ -22,9 +25,28 @@ JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
   double phiSumInHCal = 0;
   double phiSqSumInHCal = 0;
   const std::vector<reco::PFCandidatePtr> pfCands = jet.getPFConstituents();
+  std::cout<<"No. of pfCands/Constituents of a jet: "<<pfCands.size()<<std::endl;
+ // double nPhotons = 0;
+ // double nCHPions = 0;
+ // double nMiscParticles=0;
   for(uint32_t i = 0; i < pfCands.size(); i++) {
     const edm::Ptr<reco::PFCandidate> pfCand = pfCands[i];
+    //std::cout<<i+1<<")"<<"PfCand constituent of Jet: "<< pfCand->pdgId()<<std::endl;
+  /*  if (pfCand->pdgId() == 211 || pfCand->pdgId() == -211){
+    nCHPions++;
+    }
+    else if (pfCand->pdgId() == 22){
+    nPhotons++;
+    }
+    else{
+    nMiscParticles++;
+    }*/
+    ptSum +=pfCand->pt();
     etSum += pfCand->et();
+    //float frac = (etSum/jetet);
+    //if (frac >= 0.90){
+    //std::cout<<"nPFCand carrying "<< frac*100 <<" of jet energy: "<<i+1<<std::endl;
+    //}
     etaSum += (pfCand->eta() * pfCand->et());
     etaSqSum += (pfCand->eta() * pfCand->eta() * pfCand->et());
     phiSum += (pfCand->phi() * pfCand->et());
@@ -40,6 +62,21 @@ JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
     phiSumInHCal += (pfCand->phi() * pfCand->hcalEnergy());
     phiSqSumInHCal += (pfCand->phi() * pfCand->phi() * pfCand->hcalEnergy());
   }
+  if (pfCands.size()>1){
+      pfCand1pt = pfCands[0]->pt();
+      pfCand2pt = pfCands[1]->pt();
+      std::cout<<"pfCand1pt("<<pfCands[0]->pdgId()<<"): " <<pfCand1pt<<std::endl;
+      std::cout<<"pfCand2pt("<<pfCands[1]->pdgId()<<"): " <<pfCand2pt<<std::endl;
+      }
+  else{
+      pfCand1pt = pfCands[0]->pt();
+      std::cout<<"pfCand1pt("<<pfCands[0]->pdgId()<<"): " <<pfCand1pt<<std::endl;
+      }
+  pfCand12PtSum = pfCand1pt + pfCand2pt;
+  std::cout<<"ptSum: " <<ptSum<<std::endl;
+  std::cout<<"pfCand12PtSum: "<<pfCand12PtSum<<std::endl;
+  pt12ratio = (pfCand12PtSum/ptSum);
+  std::cout<<"pt12ratio: "<<pt12ratio<<std::endl; 
   if(etSum < 0.000001) etSum = 0.000001; // To avoid NaNs
   double etaAve = etaSum / etSum;
   double etaSqAve = etaSqSum / etSum;
@@ -61,6 +98,14 @@ JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
   double phiAveInHCal = phiSumInHCal / etSumInHCal;
   double phiSqAveInHCal = phiSqSumInHCal / etSumInHCal;
   phiWidthInHCal = sqrt(phiSqAveInHCal - phiAveInHCal * phiAveInHCal);
+  //std::cout<<"Type of pfCands/Constituents:"<<std::endl;
+  //std::cout <<"nPhotons: " <<nPhotons<<","<<" nCHPions: "<<nCHPions<<","<<" OtherMesons: "<<nMiscParticles<<std::endl;
+ // std::cout<<"etaSum: "<<etaSum<<std::endl;
+  //std::cout<<"etSum: "<<etSum<<std::endl;
+  //std::cout<<"jet Et: "<<jetet<<std::endl;
+  //std::cout<<"etaSqSum: "<<etaSqSum<<std::endl;
+ // std::cout<<"phiSum: "<<phiSum<<std::endl;
+ // std::cout<<"phiSqSum: "<<phiSqSum<<std::endl;
 }
 
 JetWidthCalculator::~JetWidthCalculator() {;}

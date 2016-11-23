@@ -5,7 +5,7 @@
 // widths of a jet.  Width in ECal and HCal are available 
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
-
+using namespace std;
 class JetWidthCalculator {
 
 public:
@@ -22,6 +22,9 @@ public:
   double getPhiWidthInECal() {return phiWidthInECal;}
   double getPhiWidthInHCal() {return phiWidthInHCal;}
 
+  double getPFCand12PtSum() {return pfCand12PtSum;}
+  double getPFCandsPtSum() {return ptSum;}
+  double getPFCand12Ratio() {return pt12ratio;} 
 private:
 
   // No default constructor is possible
@@ -43,7 +46,10 @@ private:
   double phiWidth;
   double phiWidthInECal;
   double phiWidthInHCal;
-
+  
+  double pfCand12PtSum;
+  double ptSum;
+  double pt12ratio;
 };
 
 #endif

@@ -354,22 +354,43 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j1phiWidthInECal;
   double j1etaWidthInHCal;
   double j1phiWidthInHCal;
-  //tracks associated with leading Jet
+  double j1PFCand12PtSum;
+  double j1PFCandsPtSum;
+  double j1PFCand12Ratio;
+  //track variables associated with leading Jet
   uint32_t j1nTracks;
   bool j1trk1Quality;
+  double j1dRCand1Trk1;
+  int j1Trk1PFCand1Match;
   bool j1trk2Quality;
+  double j1dRCand2Trk2;
+  int j1Trk2PFCand2Match;
   double j1trk1PtError;
   double j1trk2PtError;
+  double j1ptTrk1Ratio;//j1trk1PtError/j1trk1PT
+  double j1ptTrk2Ratio;
   double j1trk12PT;
+  double j1trk12Ratio;//(j1trk12PT/j1pT)
   double j1trk1PT;
   double j1trk1Eta;
   double j1trk1Phi;
   double j1trk2PT;
   double j1trk2Eta;
   double j1trk2Phi;
-  //tracks associated with second leading Jet
+  //track variables associated with second leading Jet
   uint32_t j2nTracks;
+  bool j2trk1Quality;
+  double j2dRCand1Trk1;
+  int j2Trk1PFCand1Match;
+  bool j2trk2Quality;
+  double j2dRCand2Trk2;
+  int j2Trk2PFCand2Match;
+  double j2trk1PtError;
+  double j2trk2PtError;
+  double j2ptTrk1Ratio;//j2trk1PtError/j2trk1PT
+  double j2ptTrk2Ratio;
   double j2trk12PT;
+  double j2trk12Ratio;//(j2trk12PT/j1pT)
   double j2trk1PT;
   double j2trk1Eta;
   double j2trk1Phi;
@@ -394,17 +415,27 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   double j2phiWidthInECal;
   double j2etaWidthInHCal;
   double j2phiWidthInHCal;
+  double j2PFCand12PtSum;
+  double j2PFCandsPtSum;
+  double j2PFCand12Ratio;
 
   uint32_t nJets;
   uint32_t nGoodJets;
 
   uint32_t j1nCons;
+  int j1nCarrying60;
   int j1nCarrying90;
   int j1nCarrying92;
   int j1nCarrying94;
   int j1nCarrying96;
   int j1nCarrying98;
   uint32_t j2nCons;
+  int j2nCarrying60;
+  int j2nCarrying90;
+  int j2nCarrying92;
+  int j2nCarrying94;
+  int j2nCarrying96;
+  int j2nCarrying98;
   int j1CMty;
   int j1NMty;
   int j1CHdMty;
@@ -687,7 +718,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   //Two Leading Tracks Associated with the leading Jet
   //
   tree->Branch("j1nTracks",&j1nTracks);
+  tree->Branch("j1trk1Quality",&j1trk1Quality);
+  tree->Branch("j1dRCand1Trk1",&j1dRCand1Trk1);
+  tree->Branch("j1Trk1PFCand1Match",&j1Trk1PFCand1Match);
+  tree->Branch("j1trk2Quality",&j1trk2Quality);
+  tree->Branch("j1dRCand2Trk2",&j1dRCand2Trk2);
+  tree->Branch("j1Trk2PFCand2Match",&j1Trk2PFCand2Match);
+  tree->Branch("j1trk1PtError",&j1trk1PtError);
+  tree->Branch("j1trk2PtError",&j1trk1PtError);
+  tree->Branch("j1ptTrk1Ratio",&j1ptTrk1Ratio);
+  tree->Branch("j1ptTrk2Ratio",&j1ptTrk2Ratio);
   tree->Branch("j1trk12PT", &j1trk12PT);
+  tree->Branch("j1trk12Ratio",&j1trk12Ratio);
   tree->Branch("j1trk1PT", &j1trk1PT);
   tree->Branch("j1trk1Eta", &j1trk1Eta);
   tree->Branch("j1trk1Phi", &j1trk1Phi);
@@ -697,7 +739,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
 
   //Two leading Tracks associated with the second leading Jet
   tree->Branch("j2nTracks",&j2nTracks);
+  tree->Branch("j2trk1Quality",&j2trk1Quality);
+  tree->Branch("j2dRCand1Trk1",&j2dRCand1Trk1);
+  tree->Branch("j2Trk1PFCand1Match",&j2Trk1PFCand1Match);
+  tree->Branch("j2trk2Quality",&j2trk2Quality);
+  tree->Branch("j2dRCand2Trk2",&j2dRCand2Trk2);
+  tree->Branch("j2Trk2PFCand2Match",&j2Trk2PFCand2Match);
+  tree->Branch("j2trk1PtError",&j2trk1PtError);
+  tree->Branch("j2trk2PtError",&j2trk1PtError); 
+  tree->Branch("j2ptTrk1Ratio",&j2ptTrk1Ratio);
+  tree->Branch("j2ptTrk2Ratio",&j2ptTrk2Ratio);
   tree->Branch("j2trk12PT", &j2trk12PT);
+  tree->Branch("j2trk12Ratio",&j2trk12Ratio);
   tree->Branch("j2trk1PT", &j2trk1PT);
   tree->Branch("j2trk1Eta", &j2trk1Eta);
   tree->Branch("j2trk1Phi", &j2trk1Phi);
@@ -706,6 +759,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2trk2Phi", &j2trk2Phi);
  
   tree->Branch("nGoodJets", &nGoodJets);
+  tree->Branch("j1nCarrying60",&j1nCarrying60);
   tree->Branch("j1nCarrying90",&j1nCarrying90); //nConstituents of Leading Jet carrying 90% of jet energy
   tree->Branch("j1nCarrying92",&j1nCarrying92); //nConstituents of Leading Jet carrying 92%
   tree->Branch("j1nCarrying94",&j1nCarrying94); //nConstituents of Leading Jet carrying 94%
@@ -736,6 +790,18 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j1phiWidthInECal", &j1phiWidthInECal);
   tree->Branch("j1etaWidthInHCal", &j1etaWidthInHCal);
   tree->Branch("j1phiWidthInHCal", &j1phiWidthInHCal);
+
+  //PFCandidate Info associated with leading Jet 
+  tree->Branch("j1PFCand12PtSum", &j1PFCand12PtSum);
+  tree->Branch("j1PFCandsPtSum", &j1PFCandsPtSum);   
+  tree->Branch("j1PFCand12Ratio",&j1PFCand12Ratio);
+
+  tree->Branch("j2nCarrying60",&j2nCarrying60);
+  tree->Branch("j2nCarrying90",&j2nCarrying90); //nConstituents of Leading Jet carrying 90% of jet energy
+  tree->Branch("j2nCarrying92",&j2nCarrying92); //nConstituents of Leading Jet carrying 92%
+  tree->Branch("j2nCarrying94",&j2nCarrying94); //nConstituents of Leading Jet carrying 94%
+  tree->Branch("j2nCarrying96",&j2nCarrying96); //nConstituents of Leading Jet carrying 96%
+  tree->Branch("j2nCarrying98",&j2nCarrying98); //nConstituents of Leading Jet carrying 98%  
   tree->Branch("j2PT", &j2PT);
   tree->Branch("j2Eta", &j2Eta);
   tree->Branch("j2Phi", &j2Phi);
@@ -761,6 +827,11 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("j2phiWidthInECal", &j2phiWidthInECal);
   tree->Branch("j2etaWidthInHCal", &j2etaWidthInHCal);
   tree->Branch("j2phiWidthInHCal", &j2phiWidthInHCal);
+ //PFCandidate Info associated with Second leading Jet
+  tree->Branch("j2PFCand12PtSum", &j2PFCand12PtSum);
+  tree->Branch("j2PFCandsPtSum", &j2PFCandsPtSum);
+  tree->Branch("j2PFCand12Ratio",&j2PFCand12Ratio);
+
   tree->Branch("HLTPFMET300",               &HLTMET300_);
   tree->Branch("HLTPFMET170_HBHECleaned", &HLTMET170_HBHE);
   tree->Branch("HLTPhoton165_HE10",               &HLTPhoton165_HE10_);
@@ -1249,7 +1320,10 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    HT = 0;
    nJets = 0;
    nGoodJets = 0;
-
+   j1Trk1PFCand1Match = 0;
+   j1Trk2PFCand2Match = 0;
+   j2Trk1PFCand1Match = 0;
+   j2Trk2PFCand2Match = 0;
 
    for(uint32_t j = 0; j < caloJets->size(); j++) {
      const reco::CaloJet &jet = (*caloJets)[j];
@@ -1282,6 +1356,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j1MuEFr = jet.muonEnergyFraction();
        j1CMuEFr = jet.chargedMuEnergyFraction();
        j1nCons = jet.nConstituents();
+       j1nCarrying60 = jet.nCarrying(0.60);
        j1nCarrying90 = jet.nCarrying(0.90); //return # of consitutents carrying 90% of energy
        j1nCarrying92 = jet.nCarrying(0.92);
        j1nCarrying94 = jet.nCarrying(0.94);
@@ -1302,57 +1377,46 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        std::sort(j1tracksRef.begin(),j1tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
            {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
        //std::cout<<"TrackRef Copy begin"<<std::endl;
-       double j1ptTrk1Ratio;
-       double j1ptTrk2Ratio;
        if(j1tracksRef.size()>1){
-	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::confirmed);//determining the quality of track
+	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);//determining the quality of track
          j1trk1PT = j1tracksRef.at(0)->pt();
 	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
          j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
  	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
-         j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::confirmed);
-         if(j1trk1Quality){ 
-	 std::cout<<"Leading track quality: confirmed "<<std::endl;}
-	 else{std::cout<<"Leading track quality: highPurity "<<std::endl;}
+         j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
 	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
 	 //matching leading track candidate with PF-Candidate
-	 float drCand1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
-	 if (drCand1 < 0.01){std::cout<<"Leading Track associated with jet matches (dR <0.01)  with leading PFCandidate"<<std::endl;}
+	 j1dRCand1Trk1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
+	 if (j1dRCand1Trk1 < 0.1){j1Trk1PFCand1Match = 1;}
          j1trk2PT = j1tracksRef.at(1)->pt();
          j1trk2PtError = j1tracksRef.at(1)->ptError();//ptError of second leading track
 	 j1ptTrk2Ratio = (j1trk2PtError/j1trk2PT);
 	 j1trk2Eta = j1tracksRef.at(1)->eta();
          j1trk2Phi = j1tracksRef.at(1)->phi();
          std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
-	 if(j1trk2Quality){
-         std::cout<<"Second Leading track quality: confirmed"<<std::endl;}
-	 else{std::cout<<"Second Leading track quality: highPurity "<<std::endl;}
 	 std::cout<<"DPt/Pt: "<<j1ptTrk2Ratio<<std::endl;
-         float drCand2 = deltaR((*j1tracksRef.at(1)),(*pfCands[1]));
-         if (drCand2 < 0.01){std::cout<<"Second Leading Track associated with jet matches (dR <0.01)  with second leading PFCandidate"<<std::endl;}         
+         j1dRCand2Trk2 = deltaR((*j1tracksRef.at(1)),(*pfCands[1]));
+         if (j1dRCand2Trk2 < 0.1){j1Trk2PFCand2Match = 1;}         
 	 j1trk12PT = j1trk1PT+j1trk2PT;//access pt of the first and second track in list
          }
        else{
-	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::confirmed);
-         if(j1trk1Quality){
-         std::cout<<"Leading track quality: confirmed "<<std::endl;}
-	 else{std::cout<<"Leading track quality: highPurity "<<std::endl;}
+	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
 	 j1trk1PT = j1tracksRef.at(0)->pt();
 	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
          j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
 	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
-         float drCand1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
-	 if (drCand1 < 0.01){std::cout<<"Leading Track associated with jet matches (dR <0.01) with leading PFCandidate"<<std::endl;}        
-	 j1trk1Eta = j1tracksRef.at(0)->eta();
+         j1dRCand1Trk1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
+	 if (j1dRCand1Trk1 < 0.1){j1Trk1PFCand1Match = 1;}
+         j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
         std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
         std::cout<<"PT of the Leading Jet: " << j1PT << std::endl;
-	std::cout<<"Trk12PT/j1PT: "<< (j1trk12PT/j1PT)<<std::endl;
-       //std::cout<<"TrackRef copy contents end"<<std::endl;
+	j1trk12Ratio = (j1trk12PT/j1PT);
+  	std::cout<<"Trk12PT/j1PT: "<< j1trk12Ratio <<std::endl;
        }
        j1CMty = jet.chargedMultiplicity();
        j1NMty = jet.neutralMultiplicity();
@@ -1364,12 +1428,14 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        JetWidthCalculator jwc(jet);
        j1etaWidth = jwc.getEtaWidth();
        j1phiWidth = jwc.getPhiWidth();
-       //std::cout<<"j1etaWidth: "<<j1etaWidth<<std::endl;
-       //std::cout<<"j1phiWidth: "<<j1phiWidth<<std::endl;
        j1etaWidthInECal = jwc.getEtaWidthInECal();
        j1phiWidthInECal = jwc.getPhiWidthInECal();
        j1etaWidthInHCal = jwc.getEtaWidthInHCal();
        j1phiWidthInHCal = jwc.getPhiWidthInHCal();
+       j1PFCand12PtSum = jwc.getPFCand12PtSum();
+       j1PFCandsPtSum = jwc.getPFCandsPtSum();
+       j1PFCand12Ratio = jwc.getPFCand12Ratio(); //j1PFCand12PtSum/j1PFCandsPtSum
+       std::cout<<"j1PFCand12Ratio: "<<j1PFCand12Ratio<<std::endl;
        //std::cout<<"end of info about leading jet"<<std::endl;
      }
      else if(j == 1) {
@@ -1386,39 +1452,67 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2MuEFr = jet.muonEnergyFraction();
        j2CMuEFr = jet.chargedMuEnergyFraction();
        j2nCons = jet.nConstituents();
-       if(!jet.getTrackRefs().isNull()){
-       //get all tracks associated with second leading Jet. All PFCandidates hold a reference to a track.
+       j2nCarrying60 = jet.nCarrying(0.60);
+       j2nCarrying90 = jet.nCarrying(0.90); //return # of consitutents carrying 90% of energy
+       j2nCarrying92 = jet.nCarrying(0.92);
+       j2nCarrying94 = jet.nCarrying(0.94);
+       j2nCarrying96 = jet.nCarrying(0.96);
+       j2nCarrying98 = jet.nCarrying(0.98);
+       //std::cout<<"Info starts about Leading Jet"<<std::endl;
+       //get all tracks in the jets. All PFCandidates hold a reference to a track.
        const reco::TrackRefVector j2tracks = jet.getTrackRefs();
        std::vector<reco::TrackRef> j2tracksRef;//make a copy of RefVector to sort it
        j2nTracks = j2tracks.size();
        if(j2nTracks >0){
-      // std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
+       std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
        for (const auto &trkRef : j2tracks){
         reco::Track trk = *trkRef;
         j2tracksRef.push_back(trkRef);
         }
+       const std::vector<reco::PFCandidatePtr> pfCands = jet.getPFConstituents(); //get pfCands to match with tracks 
        std::sort(j2tracksRef.begin(),j2tracksRef.end(),[](const reco::TrackRef& track1, const reco::TrackRef& track2)
            {return track1->pt() > track2->pt();}); //sorting the copy of the TrackRefVector by pT
        //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j2tracksRef.size()>1){
+         j2trk1Quality = j2tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);//determining the quality of track
          j2trk1PT = j2tracksRef.at(0)->pt();
+         j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track
+         j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);
          j2trk1Eta = j2tracksRef.at(0)->eta();
          j2trk1Phi = j2tracksRef.at(0)->phi();
-         //std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
+         std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
+         j2trk2Quality = j2tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
+         std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
+         //matching leading track candidate with PF-Candidate
+         j2dRCand1Trk1 = deltaR((*j2tracksRef.at(0)),(*pfCands[0]));
+         if (j2dRCand1Trk1 < 0.1){j2Trk1PFCand1Match = 1;}
          j2trk2PT = j2tracksRef.at(1)->pt();
+         j2trk2PtError = j2tracksRef.at(1)->ptError();//ptError of second leading track
+         j2ptTrk2Ratio = (j2trk2PtError/j2trk2PT);
          j2trk2Eta = j2tracksRef.at(1)->eta();
          j2trk2Phi = j2tracksRef.at(1)->phi();
-         //std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
+         std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
+         std::cout<<"DPt/Pt: "<<j2ptTrk2Ratio<<std::endl;
+         j2dRCand2Trk2 = deltaR((*j2tracksRef.at(1)),(*pfCands[1]));
+         if (j2dRCand2Trk2 < 0.1){j2Trk2PFCand2Match = 1;}
          j2trk12PT = j2trk1PT+j2trk2PT;//access pt of the first and second track in list
          }
        else{
+         j2trk1Quality = j2tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
          j2trk1PT = j2tracksRef.at(0)->pt();
+         j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track
+         j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);
+         std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
+         j2dRCand1Trk1 = deltaR((*j2tracksRef.at(0)),(*pfCands[0]));
+         if (j2dRCand1Trk1 < 0.1){j2Trk1PFCand1Match = 1;}
          j2trk1Eta = j2tracksRef.at(0)->eta();
          j2trk1Phi = j2tracksRef.at(0)->phi();
          j2trk12PT = j2trk1PT;
         }
-       //std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
-       //std::cout<<"TrackRef copy contents end"<<std::endl;
+        std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
+        std::cout<<"PT of the Second Leading Jet: " << j2PT << std::endl;
+        j2trk12Ratio = (j2trk12PT/j2PT);
+	std::cout<<"Trk12PT/j2PT: "<< j2trk12Ratio<<std::endl;
        }
        j2CMty = jet.chargedMultiplicity();
        j2NMty = jet.neutralMultiplicity();
@@ -1427,16 +1521,21 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        j2PhoMty = jet.photonMultiplicity();
        j2EleMty = jet.electronMultiplicity();
        j2MuMty = jet.muonMultiplicity();
-       /*JetWidthCalculator jwc(jet);
+       JetWidthCalculator jwc(jet);
        j2etaWidth = jwc.getEtaWidth();
        j2phiWidth = jwc.getPhiWidth();
        j2etaWidthInECal = jwc.getEtaWidthInECal();
        j2phiWidthInECal = jwc.getPhiWidthInECal();
        j2etaWidthInHCal = jwc.getEtaWidthInHCal();
-       j2phiWidthInHCal = jwc.getPhiWidthInHCal();*/
+       j2phiWidthInHCal = jwc.getPhiWidthInHCal();
+       j2PFCand12PtSum = jwc.getPFCand12PtSum();
+       j2PFCandsPtSum = jwc.getPFCandsPtSum();
+       j2PFCand12Ratio = jwc.getPFCand12Ratio(); //j2PFCand12PtSum/j2PFCandsPtSum
+       std::cout<<"j2PFCand12Ratio: "<<j2PFCand12Ratio<<std::endl;
+
      }
       // std::cout<<"end of info about second leading jet"<<std::endl; 
-     }
+     
      if(jet.pt() > 30.) { // Good jets have high pt
        HT += jet.pt();
        nGoodJets++;
@@ -1625,13 +1724,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      muType_.push_back(muon->type());
      muD0_    .push_back(muon->muonBestTrack()->dxy(pv.position()));
      muDz_    .push_back(muon->muonBestTrack()->dz(pv.position()));
-     //std::cout<<"It is fine here"<<std::endl;
      muIsLooseID_ .push_back(muon->isLooseMuon());;
      muIsMediumID_.push_back(muon->isMediumMuon());
      muIsTightID_ .push_back(muon->isTightMuon(pv));
      muIsSoftID_  .push_back(muon->isSoftMuon(pv));
      muIsHighPtID_.push_back(muon->isHighPtMuon(pv));
-     std::cout<<"It is fine here"<<std::endl;
      muBestTrkPtError_        .push_back(muon->muonBestTrack()->ptError());
      muBestTrkPt_             .push_back(muon->muonBestTrack()->pt());
      musegmentCompatibility_  .push_back(muon->segmentCompatibility());
