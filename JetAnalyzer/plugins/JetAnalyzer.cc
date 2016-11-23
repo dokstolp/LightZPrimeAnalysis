@@ -1047,9 +1047,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     if (boson) {
       
-      const reco::Candidate *p = (const reco::Candidate*)&(*ip);
-      if (!p->mother()) continue;
-
       BosonPID    .push_back(ip->pdgId());
       BosonVtx    .push_back(ip->vx());
       BosonVty    .push_back(ip->vy());
