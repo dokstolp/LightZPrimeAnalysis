@@ -129,6 +129,9 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<int>      nPU_;
   vector<int>      puBX_;
   vector<float>    puTrue_;
+  double bosonMass;
+  double bosonPt;
+  int neutrinos;
   vector<int>      BosonPID;
   vector<float>    BosonVtx;
   vector<float>    BosonVty;
@@ -360,9 +363,11 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   //track variables associated with leading Jet
   uint32_t j1nTracks;
   bool j1trk1Quality;
+  int j1trk1Charge;
   double j1dRCand1Trk1;
   int j1Trk1PFCand1Match;
   bool j1trk2Quality;
+  int j1trk2Charge;
   double j1dRCand2Trk2;
   int j1Trk2PFCand2Match;
   double j1trk1PtError;
@@ -380,9 +385,11 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   //track variables associated with second leading Jet
   uint32_t j2nTracks;
   bool j2trk1Quality;
+  int j2trk1Charge;
   double j2dRCand1Trk1;
   int j2Trk1PFCand1Match;
   bool j2trk2Quality;
+  int j2trk2Charge;
   double j2dRCand2Trk2;
   int j2Trk2PFCand2Match;
   double j2trk1PtError;
@@ -539,6 +546,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   hPUTrue_    = fs->make<TH1F>("hPUTrue",    "number of true pilepu", 1000, 0, 200);
 
   //genlevel info about W/Z boson
+  tree->Branch("bosonMass", &bosonMass);
+  tree->Branch("bosonPt",&bosonPt);
+  tree->Branch("neutrinos",&neutrinos);
   tree->Branch("BosonPID",        &BosonPID);
   tree->Branch("BosonVtx",        &BosonVtx);
   tree->Branch("BosonVty",        &BosonVty);
@@ -719,13 +729,15 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   //
   tree->Branch("j1nTracks",&j1nTracks);
   tree->Branch("j1trk1Quality",&j1trk1Quality);
+  tree->Branch("j1trk1Charge",&j1trk1Charge);
   tree->Branch("j1dRCand1Trk1",&j1dRCand1Trk1);
   tree->Branch("j1Trk1PFCand1Match",&j1Trk1PFCand1Match);
   tree->Branch("j1trk2Quality",&j1trk2Quality);
+  tree->Branch("j1trk2Charge",&j1trk2Charge);
   tree->Branch("j1dRCand2Trk2",&j1dRCand2Trk2);
   tree->Branch("j1Trk2PFCand2Match",&j1Trk2PFCand2Match);
   tree->Branch("j1trk1PtError",&j1trk1PtError);
-  tree->Branch("j1trk2PtError",&j1trk1PtError);
+  tree->Branch("j1trk2PtError",&j1trk2PtError);
   tree->Branch("j1ptTrk1Ratio",&j1ptTrk1Ratio);
   tree->Branch("j1ptTrk2Ratio",&j1ptTrk2Ratio);
   tree->Branch("j1trk12PT", &j1trk12PT);
@@ -740,13 +752,15 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   //Two leading Tracks associated with the second leading Jet
   tree->Branch("j2nTracks",&j2nTracks);
   tree->Branch("j2trk1Quality",&j2trk1Quality);
+  tree->Branch("j2trk1Charge",&j2trk1Charge);
   tree->Branch("j2dRCand1Trk1",&j2dRCand1Trk1);
   tree->Branch("j2Trk1PFCand1Match",&j2Trk1PFCand1Match);
   tree->Branch("j2trk2Quality",&j2trk2Quality);
+  tree->Branch("j2trk2Charge",&j2trk2Charge);
   tree->Branch("j2dRCand2Trk2",&j2dRCand2Trk2);
   tree->Branch("j2Trk2PFCand2Match",&j2Trk2PFCand2Match);
   tree->Branch("j2trk1PtError",&j2trk1PtError);
-  tree->Branch("j2trk2PtError",&j2trk1PtError); 
+  tree->Branch("j2trk2PtError",&j2trk2PtError); 
   tree->Branch("j2ptTrk1Ratio",&j2ptTrk1Ratio);
   tree->Branch("j2ptTrk2Ratio",&j2ptTrk2Ratio);
   tree->Branch("j2trk12PT", &j2trk12PT);
@@ -1028,18 +1042,21 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<vector<reco::GenParticle> > genParticlesHandle;
    iEvent.getByToken(genParticlesCollection_, genParticlesHandle);
 
-   if (!genParticlesHandle.isValid()) {
-    edm::LogWarning("JetAnalyzer") << "no reco::GenParticles in event";
-    return;
-    }
-
+   reco::Candidate::LorentzVector p4(0,0,0,0);
+   if (genParticlesHandle.isValid()) {
    int genIndex = 0;
-
+   neutrinos = 0; //count the no.of neutrinos in an event.
    for (vector<reco::GenParticle>::const_iterator ip = genParticlesHandle->begin(); ip != genParticlesHandle->end(); ++ip) {
      genIndex++;
-
+     int pdg = abs(ip->pdgId());
+     if ((ip->isHardProcess()) &&  (pdg==11 || pdg==13 || pdg==15 || pdg==12||pdg==14 ||pdg==16)   ){
+	  p4+= ip->p4();
+	}
+     if((ip->isHardProcess()) && (pdg==12||pdg==14 ||pdg==16)){
+	neutrinos++;
+	}
      //int status = ip->status();
- 
+
     //select Z/W boson
     bool boson =
       ((    ip->pdgId()  == 23 && ip->isHardProcess()) || 
@@ -1060,6 +1077,12 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       BosonStatus .push_back(ip->status());    
        }
      }
+    bosonMass = p4.M();
+    bosonPt = p4.Pt(); 
+     }
+
+    else
+      edm::LogWarning("JetAnalyzer") << "no reco::GenParticles in event";
 //   if (vtxHandle.isValid()) {
 //   nVtx_ = 0;
 //   for (uint32_t v = 0; v < vtxHandle->size(); v++) {
@@ -1376,34 +1399,40 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j1tracksRef.size()>1){
 	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);//determining the quality of track
-         j1trk1PT = j1tracksRef.at(0)->pt();
-	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
-         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
+         j1trk1Charge = j1tracksRef.at(0)->charge();
+	 j1trk1PT = j1tracksRef.at(0)->pt();
+         if(j1trk1Charge!=0){
+	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //error on Pt (set to 1000 TeV if charge==0 for safety) 
+         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);}
  	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
          std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
          j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
-	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
+	 //std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
 	 //matching leading track candidate with PF-Candidate
 	 j1dRCand1Trk1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
 	 if (j1dRCand1Trk1 < 0.1){j1Trk1PFCand1Match = 1;}
          j1trk2PT = j1tracksRef.at(1)->pt();
+         j1trk2Charge = j1tracksRef.at(1)->charge();
+	 if(j1trk2Charge!=0){
          j1trk2PtError = j1tracksRef.at(1)->ptError();//ptError of second leading track
-	 j1ptTrk2Ratio = (j1trk2PtError/j1trk2PT);
+	 j1ptTrk2Ratio = (j1trk2PtError/j1trk2PT);}
 	 j1trk2Eta = j1tracksRef.at(1)->eta();
          j1trk2Phi = j1tracksRef.at(1)->phi();
          std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
-	 std::cout<<"DPt/Pt: "<<j1ptTrk2Ratio<<std::endl;
+	 //std::cout<<"DPt/Pt: "<<j1ptTrk2Ratio<<std::endl;
          j1dRCand2Trk2 = deltaR((*j1tracksRef.at(1)),(*pfCands[1]));
          if (j1dRCand2Trk2 < 0.1){j1Trk2PFCand2Match = 1;}         
 	 j1trk12PT = j1trk1PT+j1trk2PT;//access pt of the first and second track in list
          }
        else{
 	 j1trk1Quality = j1tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
+	 j1trk1Charge = j1tracksRef.at(0)->charge();
 	 j1trk1PT = j1tracksRef.at(0)->pt();
-	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //ptError for leading track
-         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);
-	 std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
+         if(j1trk1Charge!=0){
+         j1trk1PtError = j1tracksRef.at(0)->ptError(); //error on Pt (set to 1000 TeV if charge==0 for safety)
+         j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);}
+	 //std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
          j1dRCand1Trk1 = deltaR((*j1tracksRef.at(0)),(*pfCands[0]));
 	 if (j1dRCand1Trk1 < 0.1){j1Trk1PFCand1Match = 1;}
          j1trk1Eta = j1tracksRef.at(0)->eta();
@@ -1472,34 +1501,40 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        //std::cout<<"TrackRef Copy begin"<<std::endl;
        if(j2tracksRef.size()>1){
          j2trk1Quality = j2tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);//determining the quality of track
-         j2trk1PT = j2tracksRef.at(0)->pt();
-         j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track
-         j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);
+         j2trk1Charge = j2tracksRef.at(0)->charge();
+ 	 j2trk1PT = j2tracksRef.at(0)->pt();
+         if(j2trk1Charge!=0){
+	 j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track
+         j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);}
          j2trk1Eta = j2tracksRef.at(0)->eta();
          j2trk1Phi = j2tracksRef.at(0)->phi();
          std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
          j2trk2Quality = j2tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
-         std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
+         //std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
          //matching leading track candidate with PF-Candidate
          j2dRCand1Trk1 = deltaR((*j2tracksRef.at(0)),(*pfCands[0]));
          if (j2dRCand1Trk1 < 0.1){j2Trk1PFCand1Match = 1;}
          j2trk2PT = j2tracksRef.at(1)->pt();
-         j2trk2PtError = j2tracksRef.at(1)->ptError();//ptError of second leading track
-         j2ptTrk2Ratio = (j2trk2PtError/j2trk2PT);
+         j2trk2Charge = j2tracksRef.at(1)->charge();
+         if(j2trk2Charge!=0){
+	 j2trk2PtError = j2tracksRef.at(1)->ptError();//ptError of second leading track
+         j2ptTrk2Ratio = (j2trk2PtError/j2trk2PT);}
          j2trk2Eta = j2tracksRef.at(1)->eta();
          j2trk2Phi = j2tracksRef.at(1)->phi();
          std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
-         std::cout<<"DPt/Pt: "<<j2ptTrk2Ratio<<std::endl;
+         //std::cout<<"DPt/Pt: "<<j2ptTrk2Ratio<<std::endl;
          j2dRCand2Trk2 = deltaR((*j2tracksRef.at(1)),(*pfCands[1]));
          if (j2dRCand2Trk2 < 0.1){j2Trk2PFCand2Match = 1;}
          j2trk12PT = j2trk1PT+j2trk2PT;//access pt of the first and second track in list
          }
        else{
          j2trk1Quality = j2tracksRef.at(0)->quality(reco::TrackBase::TrackQuality::highPurity);
-         j2trk1PT = j2tracksRef.at(0)->pt();
-         j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track
-         j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);
-         std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
+         j2trk1Charge = j2tracksRef.at(0)->charge();
+	 j2trk1PT = j2tracksRef.at(0)->pt();
+         if(j2trk1Charge!=0){
+         j2trk1PtError = j2tracksRef.at(0)->ptError(); //ptError for leading track         
+  	 j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);}
+         //std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
          j2dRCand1Trk1 = deltaR((*j2tracksRef.at(0)),(*pfCands[0]));
          if (j2dRCand1Trk1 < 0.1){j2Trk1PFCand1Match = 1;}
          j2trk1Eta = j2tracksRef.at(0)->eta();
