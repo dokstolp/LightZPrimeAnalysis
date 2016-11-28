@@ -491,7 +491,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
 {
 
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
-  pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("ak4PFJetsCHS"));
+  pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("jetsTag"));
   JetsToken = consumes< vector<pat::Jet> >(edm::InputTag("selectedPatJets"));
   caloJetsToken = consumes< vector<reco::CaloJet> >(edm::InputTag("ak4CaloJets"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
@@ -1370,18 +1370,23 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Handle< vector<pat::Jet> > Jets;
    iEvent.getByToken(JetsToken, Jets);
-   for(const pat::Jet &j : *Jets) {
+   for(uint32_t J = 0; J < Jets->size(); J++) {
+     const pat::Jet &j = (*Jets)[J];
      //b-tagging
      jetCSV2BJetTags_           .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
      jetJetProbabilityBJetTags_ .push_back(j.bDiscriminator("pfJetProbabilityBJetTags"));
      jetpfCombinedMVAV2BJetTags_.push_back(j.bDiscriminator("pfCombinedMVAV2BJetTags"));
    }
+   std::cout<<"pat jetPt[0]: "<<(*Jets)[0].pt()<<std::endl;  
+   std::cout<<"pat Uncorrected jetPt[0]: "<<(*Jets)[0].correctedJet("Uncorrected").pt()<<std::endl;
 
    // Compute HT
    std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
    for(uint32_t j = 0; j < pfJets->size(); j++) {
      const reco::PFJet &jet = (*pfJets)[j];
+     //std::cout<<"reco jetPt[0]: "<<(*pfJets)[0].pt()<<std::endl;
      if(j == 0) {
+       std::cout<<"j1PT: " <<jet.pt()<<std::endl;
        j1PT = jet.pt();
        j1Eta = jet.eta();
        j1Phi = jet.phi();
