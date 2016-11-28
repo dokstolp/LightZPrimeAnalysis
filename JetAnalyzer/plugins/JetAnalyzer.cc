@@ -175,6 +175,9 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> jetHFHAE_;
   vector<float> jetHFEME_;
   vector<int>   jetNConstituents_;
+  vector<float> jetCSV2BJetTags_; // recommended
+  vector<float> jetJetProbabilityBJetTags_;
+  vector<float> jetpfCombinedMVAV2BJetTags_;  
   vector<float> jetEtaWidth_;
   vector<float> jetPhiWidth_;
   vector<float> jetEtaWidthInECal_;
@@ -594,6 +597,9 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("jetHFHAE",         &jetHFHAE_);
   tree->Branch("jetHFEME",         &jetHFEME_);
   tree->Branch("jetNConstituents", &jetNConstituents_);
+  tree->Branch("jetCSV2BJetTags", &jetCSV2BJetTags_);
+  tree->Branch("jetJetProbabilityBJetTags", &jetJetProbabilityBJetTags_);
+  tree->Branch("jetpfCombinedMVAV2BJetTags", &jetpfCombinedMVAV2BJetTags_);
   tree->Branch("jetEtaWidth", &jetEtaWidth_);
   tree->Branch("jetPhiWidth", &jetPhiWidth_);
   tree->Branch("jetEtaWidthInECal", &jetEtaWidthInECal_);
@@ -1096,15 +1102,6 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //   }
 //   }
 //  
-   Handle< vector<pat::Jet> > Jets;
-   iEvent.getByToken(JetsToken, Jets);
-   bool btagged = false;
-   for (const pat::Jet &j : *Jets) {
-       if (j.pt() < 20 || fabs(j.eta()) > 2.4 || j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") < 0.8) continue;
-       btagged = true;
-   }
-   if (btagged) return;
-
  
    nEle_ = 0;
    
@@ -1209,6 +1206,9 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    jetHFHAE_                               .clear();
    jetHFEME_                               .clear();
    jetNConstituents_                       .clear();
+   jetCSV2BJetTags_                        .clear();
+   jetJetProbabilityBJetTags_              .clear();
+   jetpfCombinedMVAV2BJetTags_             .clear();
    jetEtaWidth_.clear();
    jetPhiWidth_.clear();   
    jetEtaWidthInECal_.clear();
@@ -1368,6 +1368,14 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      calojetMaxEInHadTowers_.push_back(jet.maxEInHadTowers());
    }
 
+   Handle< vector<pat::Jet> > Jets;
+   iEvent.getByToken(JetsToken, Jets);
+   for(const pat::Jet &j : *Jets) {
+     //b-tagging
+     jetCSV2BJetTags_           .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+     jetJetProbabilityBJetTags_ .push_back(j.bDiscriminator("pfJetProbabilityBJetTags"));
+     jetpfCombinedMVAV2BJetTags_.push_back(j.bDiscriminator("pfCombinedMVAV2BJetTags"));
+   }
 
    // Compute HT
    std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
