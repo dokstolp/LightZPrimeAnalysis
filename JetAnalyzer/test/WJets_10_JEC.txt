@@ -1,0 +1,321 @@
+# Conditions read from  CMS_CONDITIONS  via FrontierProd 
+******************* RunOnData *******************
+************** MC dependence removal ************
+removing MC dependencies for photons
+removing MC dependencies for electrons
+removing MC dependencies for muons
+removing MC dependencies for taus
+removing MC dependencies for taus boosted 
+...skipped since taus boosted  are not part of process.
+removing MC dependencies for jets
+adding L2L3Residual JEC for: patJetCorrFactors
+pat jetPt[0]: 383.782
+pat Uncorrected jetPt[0]: 348.226
+1:479:837948
+j1PT: 383.782
+Number of tracks(Leading Jet): 20
+Leading track Pt: 30.2455
+Second leading track Pt: 27.8462
+SumPT of two leading Tracks: 58.0917
+PT of the Leading Jet: 383.782
+Trk12PT/j1PT: 0.151366
+No. of pfCands/Constituents of a jet: 48
+pfCand1pt(22): 58.0074
+pfCand2pt(22): 35.6659
+ptSum: 349.099
+pfCand12PtSum: 93.6733
+pt12ratio: 0.268329
+j1PFCand12Ratio: 0.268329
+Number of tracks(Second Leading Jet): 4
+Leading track Pt: 71.97
+Second leading track Pt: 0.515142
+SumPT of two leading Tracks: 72.4851
+PT of the Second Leading Jet: 79.4566
+Trk12PT/j2PT: 0.91226
+No. of pfCands/Constituents of a jet: 4
+pfCand1pt(-13): 71.97
+pfCand2pt(-211): 0.515143
+ptSum: 73.1363
+pfCand12PtSum: 72.4851
+pt12ratio: 0.991096
+j2PFCand12Ratio: 0.991096
+TotalET = 569.382; nJets = 16; HT = 463.239; nGoodJets = 2; pfMET = (303.476, 2.18478); nPFCands = 908
+pat jetPt[0]: 229.178
+pat Uncorrected jetPt[0]: 206.61
+1:479:837970
+j1PT: 229.178
+Number of tracks(Leading Jet): 13
+Leading track Pt: 24.4019
+Second leading track Pt: 17.6135
+SumPT of two leading Tracks: 42.0154
+PT of the Leading Jet: 229.178
+Trk12PT/j1PT: 0.18333
+No. of pfCands/Constituents of a jet: 20
+pfCand1pt(22): 110.895
+pfCand2pt(-211): 24.4019
+ptSum: 206.951
+pfCand12PtSum: 135.297
+pt12ratio: 0.653765
+j1PFCand12Ratio: 0.653765
+Number of tracks(Second Leading Jet): 21
+Leading track Pt: 11.368
+Second leading track Pt: 10.0728
+SumPT of two leading Tracks: 21.4408
+PT of the Second Leading Jet: 166.77
+Trk12PT/j2PT: 0.128565
+No. of pfCands/Constituents of a jet: 34
+pfCand1pt(22): 44.7775
+pfCand2pt(211): 11.368
+ptSum: 151.174
+pfCand12PtSum: 56.1455
+pt12ratio: 0.371397
+j2PFCand12Ratio: 0.371397
+TotalET = 917.768; nJets = 83; HT = 505.457; nGoodJets = 5; pfMET = (93.5767, -2.11539); nPFCands = 1832
+pat jetPt[0]: 170.432
+pat Uncorrected jetPt[0]: 153.792
+1:479:837984
+j1PT: 170.432
+Number of tracks(Leading Jet): 22
+Leading track Pt: 24.8634
+Second leading track Pt: 13.4774
+SumPT of two leading Tracks: 38.3408
+PT of the Leading Jet: 170.432
+Trk12PT/j1PT: 0.224962
+No. of pfCands/Constituents of a jet: 35
+pfCand1pt(22): 25.0488
+pfCand2pt(211): 11.095
+ptSum: 154.579
+pfCand12PtSum: 36.1438
+pt12ratio: 0.23382
+j1PFCand12Ratio: 0.23382
+Number of tracks(Second Leading Jet): 11
+Leading track Pt: 50.0393
+Second leading track Pt: 26.4041
+SumPT of two leading Tracks: 76.4433
+PT of the Second Leading Jet: 159.406
+Trk12PT/j2PT: 0.479553
+No. of pfCands/Constituents of a jet: 30
+pfCand1pt(211): 50.0393
+pfCand2pt(-211): 26.4041
+ptSum: 141.286
+pfCand12PtSum: 76.4433
+pt12ratio: 0.541052
+j2PFCand12Ratio: 0.541052
+TotalET = 732.064; nJets = 29; HT = 565.545; nGoodJets = 5; pfMET = (81.8607, 2.81764); nPFCands = 1157
+pat jetPt[0]: 301.975
+pat Uncorrected jetPt[0]: 285.271
+1:479:837988
+j1PT: 301.975
+Number of tracks(Leading Jet): 18
+Leading track Pt: 155.042
+Second leading track Pt: 20.3782
+SumPT of two leading Tracks: 175.42
+PT of the Leading Jet: 301.975
+Trk12PT/j1PT: 0.580909
+No. of pfCands/Constituents of a jet: 28
+pfCand1pt(-211): 134.606
+pfCand2pt(211): 20.3782
+ptSum: 285.608
+pfCand12PtSum: 154.984
+pt12ratio: 0.542646
+j1PFCand12Ratio: 0.542646
+Number of tracks(Second Leading Jet): 24
+Leading track Pt: 43.7206
+Second leading track Pt: 12.93
+SumPT of two leading Tracks: 56.6506
+PT of the Second Leading Jet: 234.961
+Trk12PT/j2PT: 0.241106
+No. of pfCands/Constituents of a jet: 30
+pfCand1pt(-211): 43.7206
+pfCand2pt(22): 33.5647
+ptSum: 213.895
+pfCand12PtSum: 77.2853
+pt12ratio: 0.361324
+j2PFCand12Ratio: 0.361324
+TotalET = 831.31; nJets = 54; HT = 570.693; nGoodJets = 3; pfMET = (156.503, 2.42942); nPFCands = 1538
+pat jetPt[0]: 344.957
+pat Uncorrected jetPt[0]: 306.654
+1:479:837999
+j1PT: 344.957
+Number of tracks(Leading Jet): 28
+Leading track Pt: 35.4613
+Second leading track Pt: 24.02
+SumPT of two leading Tracks: 59.4812
+PT of the Leading Jet: 344.957
+Trk12PT/j1PT: 0.172431
+No. of pfCands/Constituents of a jet: 57
+pfCand1pt(211): 35.4613
+pfCand2pt(211): 24.02
+ptSum: 307.987
+pfCand12PtSum: 59.4812
+pt12ratio: 0.193129
+j1PFCand12Ratio: 0.193129
+Number of tracks(Second Leading Jet): 18
+Leading track Pt: 77.0767
+Second leading track Pt: 6.17577
+SumPT of two leading Tracks: 83.2525
+PT of the Second Leading Jet: 125.031
+Trk12PT/j2PT: 0.665854
+No. of pfCands/Constituents of a jet: 24
+pfCand1pt(211): 77.0767
+pfCand2pt(-211): 6.17577
+ptSum: 120.875
+pfCand12PtSum: 83.2525
+pt12ratio: 0.688749
+j2PFCand12Ratio: 0.688749
+TotalET = 847.168; nJets = 52; HT = 571.61; nGoodJets = 4; pfMET = (195.871, -1.89499); nPFCands = 1365
+pat jetPt[0]: 232.505
+pat Uncorrected jetPt[0]: 213.314
+1:479:838005
+j1PT: 232.505
+Number of tracks(Leading Jet): 18
+Leading track Pt: 23.077
+Second leading track Pt: 16.769
+SumPT of two leading Tracks: 39.846
+PT of the Leading Jet: 232.505
+Trk12PT/j1PT: 0.171377
+No. of pfCands/Constituents of a jet: 36
+pfCand1pt(11): 30.8869
+pfCand2pt(211): 23.077
+ptSum: 215.198
+pfCand12PtSum: 53.9639
+pt12ratio: 0.250764
+j1PFCand12Ratio: 0.250764
+Number of tracks(Second Leading Jet): 9
+Leading track Pt: 28.7425
+Second leading track Pt: 9.54081
+SumPT of two leading Tracks: 38.2833
+PT of the Second Leading Jet: 120.256
+Trk12PT/j2PT: 0.318348
+No. of pfCands/Constituents of a jet: 28
+pfCand1pt(-211): 28.7425
+pfCand2pt(-211): 9.54081
+ptSum: 106.771
+pfCand12PtSum: 38.2833
+pt12ratio: 0.358555
+j2PFCand12Ratio: 0.358555
+TotalET = 543.498; nJets = 7; HT = 518.74; nGoodJets = 4; pfMET = (143.793, -1.21932); nPFCands = 708
+pat jetPt[0]: 256.575
+pat Uncorrected jetPt[0]: 229.337
+1:479:838024
+j1PT: 256.575
+Number of tracks(Leading Jet): 9
+Leading track Pt: 158.698
+Second leading track Pt: 37.4337
+SumPT of two leading Tracks: 196.132
+PT of the Leading Jet: 256.575
+Trk12PT/j1PT: 0.764423
+No. of pfCands/Constituents of a jet: 24
+pfCand1pt(211): 158.698
+pfCand2pt(211): 37.4337
+ptSum: 229.586
+pfCand12PtSum: 196.132
+pt12ratio: 0.854285
+j1PFCand12Ratio: 0.854285
+Number of tracks(Second Leading Jet): 10
+Leading track Pt: 38.9995
+Second leading track Pt: 38.818
+SumPT of two leading Tracks: 77.8174
+PT of the Second Leading Jet: 194.215
+Trk12PT/j2PT: 0.400676
+No. of pfCands/Constituents of a jet: 19
+pfCand1pt(-211): 38.9995
+pfCand2pt(211): 38.818
+ptSum: 174.326
+pfCand12PtSum: 77.8174
+pt12ratio: 0.446391
+j2PFCand12Ratio: 0.446391
+TotalET = 1201.78; nJets = 70; HT = 828.254; nGoodJets = 10; pfMET = (48.1942, 2.58611); nPFCands = 1537
+pat jetPt[0]: 301.032
+pat Uncorrected jetPt[0]: 263.028
+1:479:838036
+j1PT: 301.032
+Number of tracks(Leading Jet): 14
+Leading track Pt: 47.7394
+Second leading track Pt: 24.2231
+SumPT of two leading Tracks: 71.9624
+PT of the Leading Jet: 301.032
+Trk12PT/j1PT: 0.239053
+No. of pfCands/Constituents of a jet: 30
+pfCand1pt(22): 122.851
+pfCand2pt(-211): 24.2231
+ptSum: 263.931
+pfCand12PtSum: 147.074
+pt12ratio: 0.557244
+j1PFCand12Ratio: 0.557244
+Number of tracks(Second Leading Jet): 15
+Leading track Pt: 36.176
+Second leading track Pt: 11.4718
+SumPT of two leading Tracks: 47.6478
+PT of the Second Leading Jet: 117.82
+Trk12PT/j2PT: 0.40441
+No. of pfCands/Constituents of a jet: 31
+pfCand1pt(211): 36.176
+pfCand2pt(211): 11.4718
+ptSum: 104.847
+pfCand12PtSum: 47.6478
+pt12ratio: 0.454452
+j2PFCand12Ratio: 0.454452
+TotalET = 609.913; nJets = 29; HT = 418.852; nGoodJets = 2; pfMET = (134.622, -2.11344); nPFCands = 1053
+pat jetPt[0]: 236.376
+pat Uncorrected jetPt[0]: 226.341
+1:479:838041
+j1PT: 236.376
+Number of tracks(Leading Jet): 5
+Leading track Pt: 72.413
+Second leading track Pt: 0.767492
+SumPT of two leading Tracks: 73.1805
+PT of the Leading Jet: 236.376
+Trk12PT/j1PT: 0.309594
+No. of pfCands/Constituents of a jet: 13
+pfCand1pt(211): 72.413
+pfCand2pt(22): 67.1109
+ptSum: 226.736
+pfCand12PtSum: 139.524
+pt12ratio: 0.615358
+j1PFCand12Ratio: 0.615358
+Number of tracks(Second Leading Jet): 9
+Leading track Pt: 89.7725
+Second leading track Pt: 7.61523
+SumPT of two leading Tracks: 97.3877
+PT of the Second Leading Jet: 140.921
+Trk12PT/j2PT: 0.691079
+No. of pfCands/Constituents of a jet: 19
+pfCand1pt(-211): 89.7725
+pfCand2pt(-211): 7.61523
+ptSum: 136.893
+pfCand12PtSum: 97.3877
+pt12ratio: 0.711416
+j2PFCand12Ratio: 0.711416
+TotalET = 842.989; nJets = 70; HT = 422.935; nGoodJets = 3; pfMET = (83.6657, 1.00041); nPFCands = 1584
+pat jetPt[0]: 204.81
+pat Uncorrected jetPt[0]: 181.625
+1:479:838061
+j1PT: 204.81
+Number of tracks(Leading Jet): 20
+Leading track Pt: 19.1344
+Second leading track Pt: 16.6514
+SumPT of two leading Tracks: 35.7859
+PT of the Leading Jet: 204.81
+Trk12PT/j1PT: 0.174727
+No. of pfCands/Constituents of a jet: 31
+pfCand1pt(22): 56.4842
+pfCand2pt(-211): 19.1344
+ptSum: 182.158
+pfCand12PtSum: 75.6186
+pt12ratio: 0.415127
+j1PFCand12Ratio: 0.415127
+Number of tracks(Second Leading Jet): 43
+Leading track Pt: 11.4704
+Second leading track Pt: 10.8274
+SumPT of two leading Tracks: 22.2979
+PT of the Second Leading Jet: 165.135
+Trk12PT/j2PT: 0.135028
+No. of pfCands/Constituents of a jet: 64
+pfCand1pt(-211): 11.4704
+pfCand2pt(211): 10.8274
+ptSum: 159.093
+pfCand12PtSum: 22.2979
+pt12ratio: 0.140157
+j2PFCand12Ratio: 0.140157
+TotalET = 606.59; nJets = 35; HT = 369.946; nGoodJets = 2; pfMET = (30.479, 2.70885); nPFCands = 1237
