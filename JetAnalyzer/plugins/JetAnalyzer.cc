@@ -931,8 +931,8 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle< vector<reco::CaloJet> > caloJets;
    iEvent.getByToken(caloJetsToken, caloJets);
 
-   Handle< vector<pat::Jet> > Jets;
-   iEvent.getByToken(JetsToken, Jets);
+  // Handle< vector<pat::Jet> > Jets;
+  // iEvent.getByToken(JetsToken, Jets);
 
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
@@ -1095,7 +1095,17 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //    }
 //   }
 //   }
-//   
+//  
+   Handle< vector<pat::Jet> > Jets;
+   iEvent.getByToken(JetsToken, Jets);
+   bool btagged = false;
+   for (const pat::Jet &j : *Jets) {
+       if (j.pt() < 20 || fabs(j.eta()) > 2.4 || j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") < 0.8) continue;
+       btagged = true;
+   }
+   if (btagged) return;
+
+ 
    nEle_ = 0;
    
    Handle<edm::View<reco::GsfElectron> > electronHandle;
