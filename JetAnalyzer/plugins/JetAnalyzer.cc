@@ -163,6 +163,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> calojetMaxEInEmTowers_;
   vector<float> calojetMaxEInHadTowers_;
  
+  double jet1Ptdiff; //variable to test JEC
   vector<float> jetPt_;
   vector<float> jetEn_;
   vector<float> jetEta_;
@@ -487,11 +488,13 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // constructors and destructor
 //
-JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
+JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig):
+
+pfJetsToken(consumes< vector<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("jetsTag")))
 {
 
   pfCandsToken = consumes< vector<reco::PFCandidate> >(edm::InputTag("particleFlow"));
-  pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("jetsTag"));
+  //pfJetsToken = consumes< vector<reco::PFJet> >(edm::InputTag("jetsTag"));
   JetsToken = consumes< vector<pat::Jet> >(edm::InputTag("selectedPatJets"));
   caloJetsToken = consumes< vector<reco::CaloJet> >(edm::InputTag("ak4CaloJets"));
   pfMETsToken = consumes< vector<reco::PFMET> >(edm::InputTag("pfMet"));
@@ -584,6 +587,7 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig)
   tree->Branch("calojetMaxEInHadTowers",&calojetMaxEInHadTowers_);
 
   tree->Branch("nJets", &nJets);
+  tree->Branch("jet1Ptdiff", &jet1Ptdiff); //checking that JEC are applied correctly. It should be zero
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
   tree->Branch("jetEn",           &jetEn_);
@@ -1367,7 +1371,8 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      calojetMaxEInEmTowers_.push_back( jet.maxEInEmTowers());
      calojetMaxEInHadTowers_.push_back(jet.maxEInHadTowers());
    }
-
+   
+   jet1Ptdiff = 0;
    Handle< vector<pat::Jet> > Jets;
    iEvent.getByToken(JetsToken, Jets);
    for(uint32_t J = 0; J < Jets->size(); J++) {
@@ -1380,6 +1385,13 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    std::cout<<"pat jetPt[0]: "<<(*Jets)[0].pt()<<std::endl;  
    std::cout<<"pat Uncorrected jetPt[0]: "<<(*Jets)[0].correctedJet("Uncorrected").pt()<<std::endl;
 
+   //test the JEC by filling the following variable
+   jet1Ptdiff = ((*Jets)[0].pt() - (*pfJets)[0].pt());
+   
+   j1trk1PtError = 0;
+   j1trk2PtError = 0;
+   j2trk1PtError = 0;
+   j2trk2PtError = 0;
    // Compute HT
    std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
    for(uint32_t j = 0; j < pfJets->size(); j++) {
@@ -1425,7 +1437,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1trk1Charge = j1tracksRef.at(0)->charge();
 	 j1trk1PT = j1tracksRef.at(0)->pt();
          if(j1trk1Charge!=0){
-	 j1trk1PtError = j1tracksRef.at(0)->ptError(); //error on Pt (set to 1000 TeV if charge==0 for safety) 
+	 j1trk1PtError=j1tracksRef.at(0)->ptError(); //error on Pt (set to 1000 TeV if charge==0 for safety) 
          j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);}
  	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
@@ -1462,6 +1474,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
+	std::cout<<"j1trk1PtError: "<<j1trk1PtError<<std::endl;
         std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
         std::cout<<"PT of the Leading Jet: " << j1PT << std::endl;
 	j1trk12Ratio = (j1trk12PT/j1PT);
