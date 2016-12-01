@@ -163,7 +163,7 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   vector<float> calojetMaxEInEmTowers_;
   vector<float> calojetMaxEInHadTowers_;
  
-  double jet1Ptdiff; //variable to test JEC
+  //double jet1Ptdiff; //variable to test JEC
   vector<float> jetPt_;
   vector<float> jetEn_;
   vector<float> jetEta_;
@@ -587,7 +587,7 @@ pfJetsToken(consumes< vector<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("
   tree->Branch("calojetMaxEInHadTowers",&calojetMaxEInHadTowers_);
 
   tree->Branch("nJets", &nJets);
-  tree->Branch("jet1Ptdiff", &jet1Ptdiff); //checking that JEC are applied correctly. It should be zero
+  //tree->Branch("jet1Ptdiff", &jet1Ptdiff); //checking that JEC are applied correctly. It should be zero
   tree->Branch("jetPt",&jetPt_);
   tree->Branch("jetEta",          &jetEta_);
   tree->Branch("jetEn",           &jetEn_);
@@ -946,6 +946,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    Handle< vector<reco::PFMET> > pfMETs;
    iEvent.getByToken(pfMETsToken, pfMETs);
+
 
    Handle< vector<reco::CaloMET> > caloMETs;
    iEvent.getByToken(caloMETToken, caloMETs);
@@ -1371,34 +1372,29 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      calojetMaxEInEmTowers_.push_back( jet.maxEInEmTowers());
      calojetMaxEInHadTowers_.push_back(jet.maxEInHadTowers());
    }
-   
-   jet1Ptdiff = 0;
+   //jet1Ptdiff = 0;
    Handle< vector<pat::Jet> > Jets;
    iEvent.getByToken(JetsToken, Jets);
    for(uint32_t J = 0; J < Jets->size(); J++) {
      const pat::Jet &j = (*Jets)[J];
+     //if(j.pt() < 20) continue;
      //b-tagging
      jetCSV2BJetTags_           .push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
      jetJetProbabilityBJetTags_ .push_back(j.bDiscriminator("pfJetProbabilityBJetTags"));
      jetpfCombinedMVAV2BJetTags_.push_back(j.bDiscriminator("pfCombinedMVAV2BJetTags"));
    }
-   std::cout<<"pat jetPt[0]: "<<(*Jets)[0].pt()<<std::endl;  
-   std::cout<<"pat Uncorrected jetPt[0]: "<<(*Jets)[0].correctedJet("Uncorrected").pt()<<std::endl;
+   //std::cout<<"pat jetPt[0]: "<<(*Jets)[0].pt()<<std::endl;  
+   //std::cout<<"pat Uncorrected jetPt[0]: "<<(*Jets)[0].correctedJet("Uncorrected").pt()<<std::endl;
 
    //test the JEC by filling the following variable
-   jet1Ptdiff = ((*Jets)[0].pt() - (*pfJets)[0].pt());
-   
-   j1trk1PtError = 0;
-   j1trk2PtError = 0;
-   j2trk1PtError = 0;
-   j2trk2PtError = 0;
+   //jet1Ptdiff = ((*Jets)[0].pt() - (*pfJets)[0].pt());
    // Compute HT
    std::cout<<run_<<":"<<lumis_<<":"<<event_<<std::endl;
    for(uint32_t j = 0; j < pfJets->size(); j++) {
      const reco::PFJet &jet = (*pfJets)[j];
      //std::cout<<"reco jetPt[0]: "<<(*pfJets)[0].pt()<<std::endl;
      if(j == 0) {
-       std::cout<<"j1PT: " <<jet.pt()<<std::endl;
+       //std::cout<<"j1PT: " <<jet.pt()<<std::endl;
        j1PT = jet.pt();
        j1Eta = jet.eta();
        j1Phi = jet.phi();
@@ -1423,7 +1419,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        std::vector<reco::TrackRef> j1tracksRef;//make a copy of RefVector to sort it
        j1nTracks = j1tracks.size();
        if(j1nTracks >0){
-       std::cout<<"Number of tracks(Leading Jet): "<< j1nTracks<<std::endl;
+       //std::cout<<"Number of tracks(Leading Jet): "<< j1nTracks<<std::endl;
        for (const auto &trkRef : j1tracks){
         reco::Track trk = *trkRef;
         j1tracksRef.push_back(trkRef);
@@ -1441,7 +1437,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1ptTrk1Ratio = (j1trk1PtError/j1trk1PT);}
  	 j1trk1Eta = j1tracksRef.at(0)->eta();
          j1trk1Phi = j1tracksRef.at(0)->phi();
-         std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
+         //std::cout<<"Leading track Pt: "<< j1trk1PT<<std::endl;
          j1trk2Quality = j1tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
 	 //std::cout<<"DPt/Pt: "<<j1ptTrk1Ratio<<std::endl;
 	 //matching leading track candidate with PF-Candidate
@@ -1454,7 +1450,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 j1ptTrk2Ratio = (j1trk2PtError/j1trk2PT);}
 	 j1trk2Eta = j1tracksRef.at(1)->eta();
          j1trk2Phi = j1tracksRef.at(1)->phi();
-         std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
+        // std::cout<<"Second leading track Pt: "<< j1trk2PT<<std::endl;
 	 //std::cout<<"DPt/Pt: "<<j1ptTrk2Ratio<<std::endl;
          j1dRCand2Trk2 = deltaR((*j1tracksRef.at(1)),(*pfCands[1]));
          if (j1dRCand2Trk2 < 0.1){j1Trk2PFCand2Match = 1;}         
@@ -1474,11 +1470,11 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j1trk1Phi = j1tracksRef.at(0)->phi();
          j1trk12PT = j1trk1PT;
         }
-	std::cout<<"j1trk1PtError: "<<j1trk1PtError<<std::endl;
-        std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
-        std::cout<<"PT of the Leading Jet: " << j1PT << std::endl;
+	//std::cout<<"j1trk1PtError: "<<j1trk1PtError<<std::endl;
+        //std::cout<<"SumPT of two leading Tracks: " << j1trk12PT << std::endl;
+        //std::cout<<"PT of the Leading Jet: " << j1PT << std::endl;
 	j1trk12Ratio = (j1trk12PT/j1PT);
-  	std::cout<<"Trk12PT/j1PT: "<< j1trk12Ratio <<std::endl;
+  	//std::cout<<"Trk12PT/j1PT: "<< j1trk12Ratio <<std::endl;
        }
        j1CMty = jet.chargedMultiplicity();
        j1NMty = jet.neutralMultiplicity();
@@ -1526,7 +1522,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
        std::vector<reco::TrackRef> j2tracksRef;//make a copy of RefVector to sort it
        j2nTracks = j2tracks.size();
        if(j2nTracks >0){
-       std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
+       //std::cout<<"Number of tracks(Second Leading Jet): "<< j2nTracks<<std::endl;
        for (const auto &trkRef : j2tracks){
         reco::Track trk = *trkRef;
         j2tracksRef.push_back(trkRef);
@@ -1544,7 +1540,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j2ptTrk1Ratio = (j2trk1PtError/j2trk1PT);}
          j2trk1Eta = j2tracksRef.at(0)->eta();
          j2trk1Phi = j2tracksRef.at(0)->phi();
-         std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
+         //std::cout<<"Leading track Pt: "<< j2trk1PT<<std::endl;
          j2trk2Quality = j2tracksRef.at(1)->quality(reco::TrackBase::TrackQuality::highPurity);
          //std::cout<<"DPt/Pt: "<<j2ptTrk1Ratio<<std::endl;
          //matching leading track candidate with PF-Candidate
@@ -1557,7 +1553,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j2ptTrk2Ratio = (j2trk2PtError/j2trk2PT);}
          j2trk2Eta = j2tracksRef.at(1)->eta();
          j2trk2Phi = j2tracksRef.at(1)->phi();
-         std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
+         //std::cout<<"Second leading track Pt: "<< j2trk2PT<<std::endl;
          //std::cout<<"DPt/Pt: "<<j2ptTrk2Ratio<<std::endl;
          j2dRCand2Trk2 = deltaR((*j2tracksRef.at(1)),(*pfCands[1]));
          if (j2dRCand2Trk2 < 0.1){j2Trk2PFCand2Match = 1;}
@@ -1577,10 +1573,10 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          j2trk1Phi = j2tracksRef.at(0)->phi();
          j2trk12PT = j2trk1PT;
         }
-        std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
-        std::cout<<"PT of the Second Leading Jet: " << j2PT << std::endl;
+        //std::cout<<"SumPT of two leading Tracks: " << j2trk12PT << std::endl;
+        //std::cout<<"PT of the Second Leading Jet: " << j2PT << std::endl;
         j2trk12Ratio = (j2trk12PT/j2PT);
-	std::cout<<"Trk12PT/j2PT: "<< j2trk12Ratio<<std::endl;
+	//std::cout<<"Trk12PT/j2PT: "<< j2trk12Ratio<<std::endl;
        }
        j2CMty = jet.chargedMultiplicity();
        j2NMty = jet.neutralMultiplicity();
@@ -1849,7 +1845,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
  
    pfMET = -99, pfMETPhi = -99, pfMETsumEt_ = -99, pfMETmEtSig_ = -99, pfMETSig_ = -99;
- 
+   
    pfMET = (*pfMETs)[0].pt();
    pfMETPhi = (*pfMETs)[0].phi();
    pfMETsumEt_ = (*pfMETs)[0].sumEt();
