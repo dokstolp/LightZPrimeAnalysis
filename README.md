@@ -23,7 +23,8 @@ the energy weighted eta-, phi- width of jets and also varaibles to do the analys
 
 Important git commands to get stuff from another repository 
 
-```git remote add newdir https://github.com/uhussain/LightZPrimeAnalysis.git
+```bash
+git remote add newdir https://github.com/uhussain/LightZPrimeAnalysis.git
 git pull newdir master:master
 ```
 
