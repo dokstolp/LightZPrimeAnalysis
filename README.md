@@ -22,7 +22,8 @@ The second analyzer JetAnalyzer makes simple calculations of
 the energy weighted eta-, phi- width of jets and also varaibles to do the analysis
 
 Important git commands to get stuff from another repository 
-``` git remote add newdir https://github.com/uhussain/LightZPrimeAnalysis.git
+
+```git remote add newdir https://github.com/uhussain/LightZPrimeAnalysis.git
 git pull newdir master:master
 ```
 
