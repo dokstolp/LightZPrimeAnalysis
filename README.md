@@ -21,6 +21,10 @@ information from the generator level for testing.
 The second analyzer JetAnalyzer makes simple calculations of
 the energy weighted eta-, phi- width of jets and also varaibles to do the analysis
 
+Important git commands to get stuff from another repository 
+``` git remote add newdir https://github.com/uhussain/LightZPrimeAnalysis.git
+git pull newdir master:master
+```
 
 Instructions:
 
@@ -38,13 +42,13 @@ cmsRun testJetAnalyzer.py
 
 
 
-Instructions (in order to apply all recommended MET Filters):
+Instructions (in order to apply all recommended MET Filters) Everything is updated to master branch:
 ```bash
 cmsrel CMSSW_8_0_18_patch1
 cmsenv
 git cms-init
 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
-git clone -b darphoton https://github.com/gomber/LightZPrimeAnalysis.git
+git clone https://github.com/gomber/LightZPrimeAnalysis.git
 scram b
 cd CMSSW_8_0_18_patch1/src/LightZPrimeAnalysis/JetAnalyzer/test
 cmsRun testJetAnalyzer.py
