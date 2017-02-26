@@ -5,6 +5,7 @@
 // widths of a jet.  Width in ECal and HCal are available 
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include <vector>
 using namespace std;
 class JetWidthCalculator {
 
@@ -24,7 +25,18 @@ public:
 
   double getPFCand12PtSum() {return pfCand12PtSum;}
   double getPFCandsPtSum() {return ptSum;}
-  double getPFCand12Ratio() {return pt12ratio;} 
+  double getPFCand12Ratio() {return pt12ratio;}
+
+  double getMinPt() {return minPt;}
+  double getMinEt() {return minEt;}
+  std::vector<int> getNConstituents() {return NConstituents;}
+  std::vector<int> getNunknown() {return Nunknown;}
+  std::vector<int> getNchargedHad() {return NchargedHad;}
+  std::vector<int> getNelectrons() {return Nelectrons;}
+  std::vector<int> getNmuons() {return Nmuons;}
+  std::vector<int> getNgamma() {return Ngamma;}
+  std::vector<int> getNneutralHad() {return NneutralHad;}
+   
 private:
 
   // No default constructor is possible
@@ -50,6 +62,17 @@ private:
   double pfCand12PtSum;
   double ptSum;
   double pt12ratio;
+
+  double minPt;
+  double minEt;
+
+  std::vector<int> NConstituents;
+  std::vector<int> Nunknown;
+  std::vector<int> NchargedHad;
+  std::vector<int> Nelectrons;
+  std::vector<int> Nmuons;
+  std::vector<int> Ngamma;
+  std::vector<int> NneutralHad;
 };
 
 #endif

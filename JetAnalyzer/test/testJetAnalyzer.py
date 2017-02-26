@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+#from LightZPrimeAnalysis.JetAnalyzer.JetAnalyzer_cfi import *
+
 process = cms.Process('JetAnalyzer')
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -17,13 +19,15 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 #process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/data/Run2016C/SinglePhoton/AOD/23Sep2016-v1/90000/009435BC-1F86-E611-9241-0CC47A6C1034.root'))#
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/group/lpcgg/dokstolp/RECO/df1en0/170125_092918/0000/reco_df1en0_327.root'))#
+
 #process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_1.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_2.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_3.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_4.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_5.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_6.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_7.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_8.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_9.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_10.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_11.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_12.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_13.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_14.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_15.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_16.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_17.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_18.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_19.root','file:root://cmsxrootd.hep.wisc.edu//store/user/uhussain/Zprime_3a-Zprime_UH-Mzp1_MET300_pLHE-10000_3b/Zprime_3b_20.root'))#'/store/mc/RunIISpring16DR80/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v2/00000/0062C1C4-8419-E611-9214-002590A83308.root'))## Set up electron ID (VID framework)
 #process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('/store/mc/RunIISpring16DR80/ZJetsToNuNu_HT-400To600_13TeV-madgraph/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3_ext1-v1/00000/085F9D18-0451-E611-9A17-FA163EC2FCE4.root'))#'/store/mc/RunIISpring16DR80/WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v2/00000/0062C1C4-8419-E611-9214-002590A83308.root'))
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:pickevents_tracks.root'))
+#process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring('file:pickevents_tracks.root'))
 
 process.load( "PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff" )
 process.load( "PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cff" )

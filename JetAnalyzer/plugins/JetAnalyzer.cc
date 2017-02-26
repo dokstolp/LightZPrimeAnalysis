@@ -48,6 +48,8 @@ using namespace std;
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include <DataFormats/HepMCCandidate/interface/GenParticle.h>
+#include "DataFormats/EgammaCandidates/interface/Conversion.h"
+//#include "DataFormats/EgammaCandidates/interface/Conversion.h
 
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
@@ -59,6 +61,7 @@ using namespace std;
 #include "DataFormats/EgammaCandidates/interface/Conversion.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TTree.h"
+#include <TVector3.h>
 
 //
 // class declaration
@@ -133,6 +136,8 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     //some genlevel variables
     int              nup_;  
     int              numGenJets_; 
+
+    ROOT::Math::XYZPoint beamSpot;
 
     vector<float>    pdf_;
     float            pthat_;
@@ -236,6 +241,81 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
     vector<bool>  jetPFLooseId_;
 
+    vector<int> JetNConstituents0_;
+    vector<int> JetNConstituents025_;
+    vector<int> JetNConstituents05_;
+    vector<int> JetNConstituents075_;
+    vector<int> JetNConstituents1_;
+    vector<int> JetNConstituents2_;
+    vector<int> JetNConstituents5_;
+    vector<int> JetNConstituents7_;
+    vector<int> JetNConstituents10_;
+    vector<int> JetNunknown0_;
+    vector<int> JetNunknown025_;
+    vector<int> JetNunknown05_;
+    vector<int> JetNunknown075_;
+    vector<int> JetNunknown1_;
+    vector<int> JetNunknown2_;
+    vector<int> JetNunknown5_;
+    vector<int> JetNunknown7_;
+    vector<int> JetNunknown10_;
+    vector<int> JetNchargedHad0_;
+    vector<int> JetNchargedHad025_;
+    vector<int> JetNchargedHad05_;
+    vector<int> JetNchargedHad075_;
+    vector<int> JetNchargedHad1_;
+    vector<int> JetNchargedHad2_;
+    vector<int> JetNchargedHad5_;
+    vector<int> JetNchargedHad7_;
+    vector<int> JetNchargedHad10_;
+    vector<int> JetNelectrons0_;
+    vector<int> JetNelectrons025_;
+    vector<int> JetNelectrons05_;
+    vector<int> JetNelectrons075_;
+    vector<int> JetNelectrons1_;
+    vector<int> JetNelectrons2_;
+    vector<int> JetNelectrons5_;
+    vector<int> JetNelectrons7_;
+    vector<int> JetNelectrons10_;
+    vector<int> JetNmuons0_;
+    vector<int> JetNmuons025_;
+    vector<int> JetNmuons05_;
+    vector<int> JetNmuons075_;
+    vector<int> JetNmuons1_;
+    vector<int> JetNmuons2_;
+    vector<int> JetNmuons5_;
+    vector<int> JetNmuons7_;
+    vector<int> JetNmuons10_;
+    vector<int> JetNgamma0_;
+    vector<int> JetNgamma025_;
+    vector<int> JetNgamma05_;
+    vector<int> JetNgamma075_;
+    vector<int> JetNgamma1_;
+    vector<int> JetNgamma2_;
+    vector<int> JetNgamma5_;
+    vector<int> JetNgamma7_;
+    vector<int> JetNgamma10_;
+    vector<int> JetNneutralHad0_;
+    vector<int> JetNneutralHad025_;
+    vector<int> JetNneutralHad05_;
+    vector<int> JetNneutralHad075_;
+    vector<int> JetNneutralHad1_;
+    vector<int> JetNneutralHad2_;
+    vector<int> JetNneutralHad5_;
+    vector<int> JetNneutralHad7_;
+    vector<int> JetNneutralHad10_;
+    vector<int> Constituents;
+    vector<int> unknown;
+    vector<int> chargedHad;
+    vector<int> electrons;
+    vector<int> muons;
+    vector<int> gamma;
+    vector<int> neutralHad;
+    vector<double> JetMinPt_;
+    vector<double> JetMinEt_;
+
+
+
     //electron variables
     Int_t          nEle_;
     vector<float>  elePt_;
@@ -324,9 +404,33 @@ class JetAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::vector<Float_t> phoisoNeutralHadrons_;
     std::vector<Float_t> phoisoPhotons_;
 
-
-
-
+    bool   convInfo;
+    double convDist;
+    double convDCot; 
+    double convVtxChi2;
+    int    convVtxNdof;
+    double convVertX;
+    double convVertY;
+    double convVertZ;
+    double convDxy;
+    double convDz;
+    double convLxy;
+    double convLz;
+    double convZofPVFromTracks;
+   
+    std::vector<bool>    phoconvInfo_;
+    std::vector<double>  phoconvDist_;
+    std::vector<double>  phoconvDCot_; 
+    std::vector<double>  phoconvVtxChi2_;
+    std::vector<int>     phoconvVtxNdof_;
+    std::vector<double>  phoconvVertX_;
+    std::vector<double>  phoconvVertY_;
+    std::vector<double>  phoconvVertZ_;
+    std::vector<double>  phoconvDxy_;
+    std::vector<double>  phoconvDz_;
+    std::vector<double>  phoconvLxy_;
+    std::vector<double>  phoconvLz_;
+    std::vector<double>  phoconvZofPVFromTracks_;
 
     //muon variables 
     Int_t          nMu_;
@@ -690,6 +794,71 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("jetPileup",&jetPileup_);
   tree->Branch("jetN60",&jetN60_);
   tree->Branch("jetN90",&jetN90_);
+  tree->Branch("JetMinPt",&JetMinPt_);
+  tree->Branch("JetMinEt",&JetMinEt_);
+  tree->Branch("JetNConstituents0",&JetNConstituents0_);
+  tree->Branch("JetNConstituents025",&JetNConstituents025_);
+  tree->Branch("JetNConstituents05",&JetNConstituents05_);
+  tree->Branch("JetNConstituents075",&JetNConstituents075_);
+  tree->Branch("JetNConstituents1",&JetNConstituents1_);
+  tree->Branch("JetNConstituents2",&JetNConstituents2_);
+  tree->Branch("JetNConstituents5",&JetNConstituents5_);
+  tree->Branch("JetNConstituents7",&JetNConstituents7_);
+  tree->Branch("JetNConstituents10",&JetNConstituents10_);
+  tree->Branch("JetNunknown0",&JetNunknown0_);
+  tree->Branch("JetNunknown025",&JetNunknown025_);
+  tree->Branch("JetNunknown05",&JetNunknown05_);
+  tree->Branch("JetNunknown075",&JetNunknown075_);
+  tree->Branch("JetNunknown1",&JetNunknown1_);
+  tree->Branch("JetNunknown2",&JetNunknown2_);
+  tree->Branch("JetNunknown5",&JetNunknown5_);
+  tree->Branch("JetNunknown7",&JetNunknown7_);
+  tree->Branch("JetNunknown10",&JetNunknown10_);
+  tree->Branch("JetNchargedHad0",&JetNchargedHad0_);
+  tree->Branch("JetNchargedHad025",&JetNchargedHad025_);
+  tree->Branch("JetNchargedHad05",&JetNchargedHad05_);
+  tree->Branch("JetNchargedHad075",&JetNchargedHad075_);
+  tree->Branch("JetNchargedHad1",&JetNchargedHad1_);
+  tree->Branch("JetNchargedHad2",&JetNchargedHad2_);
+  tree->Branch("JetNchargedHad5",&JetNchargedHad5_);
+  tree->Branch("JetNchargedHad7",&JetNchargedHad7_);
+  tree->Branch("JetNchargedHad10",&JetNchargedHad10_);
+  tree->Branch("JetNelectrons0",&JetNelectrons0_);
+  tree->Branch("JetNelectrons025",&JetNelectrons025_);
+  tree->Branch("JetNelectrons05",&JetNelectrons05_);
+  tree->Branch("JetNelectrons075",&JetNelectrons075_);
+  tree->Branch("JetNelectrons1",&JetNelectrons1_);
+  tree->Branch("JetNelectrons2",&JetNelectrons2_);
+  tree->Branch("JetNelectrons5",&JetNelectrons5_);
+  tree->Branch("JetNelectrons7",&JetNelectrons7_);
+  tree->Branch("JetNelectrons10",&JetNelectrons10_);
+  tree->Branch("JetNmuons0",&JetNmuons0_);
+  tree->Branch("JetNmuons025",&JetNmuons025_);
+  tree->Branch("JetNmuons05",&JetNmuons05_);
+  tree->Branch("JetNmuons075",&JetNmuons075_);
+  tree->Branch("JetNmuons1",&JetNmuons1_);
+  tree->Branch("JetNmuons2",&JetNmuons2_);
+  tree->Branch("JetNmuons5",&JetNmuons5_);
+  tree->Branch("JetNmuons7",&JetNmuons7_);
+  tree->Branch("JetNmuons10",&JetNmuons10_);
+  tree->Branch("JetNgamma0",&JetNgamma0_);
+  tree->Branch("JetNgamma025",&JetNgamma025_);
+  tree->Branch("JetNgamma05",&JetNgamma05_);
+  tree->Branch("JetNgamma075",&JetNgamma075_);
+  tree->Branch("JetNgamma1",&JetNgamma1_);
+  tree->Branch("JetNgamma2",&JetNgamma2_);
+  tree->Branch("JetNgamma5",&JetNgamma5_);
+  tree->Branch("JetNgamma7",&JetNgamma7_);
+  tree->Branch("JetNgamma10",&JetNgamma10_);
+  tree->Branch("JetNchargedHad0",&JetNchargedHad0_);
+  tree->Branch("JetNchargedHad025",&JetNchargedHad025_);
+  tree->Branch("JetNchargedHad05",&JetNchargedHad05_);
+  tree->Branch("JetNchargedHad075",&JetNchargedHad075_);
+  tree->Branch("JetNchargedHad1",&JetNchargedHad1_);
+  tree->Branch("JetNchargedHad2",&JetNchargedHad2_);
+  tree->Branch("JetNchargedHad5",&JetNchargedHad5_);
+  tree->Branch("JetNchargedHad7",&JetNchargedHad7_);
+  tree->Branch("JetNchargedHad10",&JetNchargedHad10_);
 
   tree->Branch("nMu",           &nMu_);
   tree->Branch("muPt",          &muPt_);
@@ -795,6 +964,20 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("phoSigmaIEtaIEtaFull5x5"   , &phoSigmaIEtaIEtaFull5x5_);
   tree->Branch("phohOverE"                 ,  &phohOverE_);
   tree->Branch("phohasPixelSeed"           ,  &phohasPixelSeed_);
+
+  tree->Branch("phoconvInfo",&phoconvInfo_);        
+  tree->Branch("phoconvDist",&phoconvDist_);
+  tree->Branch("phoconvDCot",&phoconvDCot_);
+  tree->Branch("phoconvVtxChi2",&phoconvVtxChi2_);
+  tree->Branch("phoconvVtxNdof",&phoconvVtxNdof_);
+  tree->Branch("phoconvVertX",&phoconvVertX_);
+  tree->Branch("phoconvVertY",&phoconvVertY_);
+  tree->Branch("phoconvVertZ",&phoconvVertZ_);
+  tree->Branch("phoconvDxy",&phoconvDxy_);
+  tree->Branch("phoconvDz",&phoconvDz_);
+  tree->Branch("phoconvLxy",&phoconvLxy_);
+  tree->Branch("phoconvLz",&phoconvLz_);
+  tree->Branch("phoconvZofPVFromTracks",&phoconvZofPVFromTracks_);
 
   tree->Branch("phoisoChargedHadrons"      , &phoisoChargedHadrons_);
   tree->Branch("phoWorstisoChargedHadrons" , &phoWorstisoChargedHadrons_);
@@ -1296,7 +1479,7 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //edm::Handle<vector<reco::Muon> > recoMuons;
   iEvent.getByToken(muonToken, recoMuons);
 
-
+  beamSpot.SetXYZ(theBeamSpot->position().x(), theBeamSpot->position().y(), theBeamSpot->position().z());
 
   //   Handle< vector<pat::Muon> > recoMuons;
   //   iEvent.getByToken(muonToken, recoMuons);
@@ -1389,7 +1572,73 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   jetN60_.clear();
   jetN90_.clear();
 
-  
+  JetMinEt_.clear();
+  JetMinPt_.clear();
+
+  JetNConstituents0_.clear();
+  JetNConstituents025_.clear();
+  JetNConstituents05_.clear();
+  JetNConstituents075_.clear();
+  JetNConstituents1_.clear();
+  JetNConstituents2_.clear();
+  JetNConstituents5_.clear();
+  JetNConstituents7_.clear();
+  JetNConstituents10_.clear();
+  JetNunknown0_.clear();
+  JetNunknown025_.clear();
+  JetNunknown05_.clear();
+  JetNunknown075_.clear();
+  JetNunknown1_.clear();
+  JetNunknown2_.clear();
+  JetNunknown5_.clear();
+  JetNunknown7_.clear();
+  JetNunknown10_.clear();
+  JetNchargedHad0_.clear();
+  JetNchargedHad025_.clear();
+  JetNchargedHad05_.clear();
+  JetNchargedHad075_.clear();
+  JetNchargedHad1_.clear();
+  JetNchargedHad2_.clear();
+  JetNchargedHad5_.clear();
+  JetNchargedHad7_.clear();
+  JetNchargedHad10_.clear();
+  JetNelectrons0_.clear();
+  JetNelectrons025_.clear();
+  JetNelectrons05_.clear();
+  JetNelectrons075_.clear();
+  JetNelectrons1_.clear();
+  JetNelectrons2_.clear();
+  JetNelectrons5_.clear();
+  JetNelectrons7_.clear();
+  JetNelectrons10_.clear();
+  JetNmuons0_.clear();
+  JetNmuons025_.clear();
+  JetNmuons05_.clear();
+  JetNmuons075_.clear();
+  JetNmuons1_.clear();
+  JetNmuons2_.clear();
+  JetNmuons5_.clear();
+  JetNmuons7_.clear();
+  JetNmuons10_.clear();
+  JetNgamma0_.clear();
+  JetNgamma025_.clear();
+  JetNgamma05_.clear();
+  JetNgamma075_.clear();
+  JetNgamma1_.clear();
+  JetNgamma2_.clear();
+  JetNgamma5_.clear();
+  JetNgamma7_.clear();
+  JetNgamma10_.clear();
+  JetNneutralHad0_.clear();
+  JetNneutralHad025_.clear();
+  JetNneutralHad05_.clear();
+  JetNneutralHad075_.clear();
+  JetNneutralHad1_.clear();
+  JetNneutralHad2_.clear();
+  JetNneutralHad5_.clear();
+  JetNneutralHad7_.clear();
+  JetNneutralHad10_.clear();
+
   PassVeto_.clear();
   PassLoose_.clear();
   PassMedium_.clear();
@@ -1509,6 +1758,19 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   phoE_ .clear();
   phor9_.clear();
 
+  phoconvInfo_.clear();
+  phoconvDist_.clear();
+  phoconvDCot_.clear();
+  phoconvVtxChi2_.clear();
+  phoconvVtxNdof_.clear();
+  phoconvVertX_.clear();
+  phoconvVertY_.clear();
+  phoconvVertZ_.clear();
+  phoconvDxy_.clear();
+  phoconvDz_.clear();
+  phoconvLxy_.clear();
+  phoconvLz_.clear();
+  phoconvZofPVFromTracks_.clear();
 
   totalET = 0;
   HT = 0;
@@ -1781,13 +2043,90 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     jetHFHAE_.push_back( jet.HFHadronEnergy());
     jetHFEME_.push_back( jet.HFEMEnergy());
     jetNConstituents_.push_back(jet.numberOfDaughters());
-    /*JetWidthCalculator jwc(jet);
-      jetEtaWidth_.push_back(jwc.getEtaWidth());     
-      jetPhiWidth_.push_back(jwc.getPhiWidth());
-      jetEtaWidthInECal_.push_back(jwc.getEtaWidthInECal());
-      jetPhiWidthInECal_.push_back(jwc.getPhiWidthInECal());
-      jetEtaWidthInHCal_.push_back(jwc.getEtaWidthInHCal());
-      jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());*/
+    
+    //std::cout<<"Number of Constituents: "<<jet.numberOfDaughters()<<"\t"<<"Number of Neutral Hadrons: "<<jet.neutralMultiplicity() <<"\t"<<"Number of Charged Hadrons: "<<jet.chargedMultiplicity()<<std::endl;
+
+    JetWidthCalculator jwc(jet);
+    jetEtaWidth_.push_back(jwc.getEtaWidth());     
+    jetPhiWidth_.push_back(jwc.getPhiWidth());
+    jetEtaWidthInECal_.push_back(jwc.getEtaWidthInECal());
+    jetPhiWidthInECal_.push_back(jwc.getPhiWidthInECal());
+    jetEtaWidthInHCal_.push_back(jwc.getEtaWidthInHCal());
+    jetPhiWidthInHCal_.push_back(jwc.getPhiWidthInHCal());
+
+    JetMinPt_.push_back(jwc.getMinPt());
+    JetMinEt_.push_back(jwc.getMinEt());
+    Constituents = jwc.getNConstituents();
+    unknown = jwc.getNunknown();
+    chargedHad = jwc.getNchargedHad();
+    electrons = jwc.getNelectrons();
+    muons = jwc.getNmuons();
+    gamma = jwc.getNgamma();
+    neutralHad = jwc.getNneutralHad();
+
+    JetNConstituents0_.push_back(Constituents[0]);
+    JetNConstituents025_.push_back(Constituents[1]);
+    JetNConstituents05_.push_back(Constituents[2]);
+    JetNConstituents075_.push_back(Constituents[3]);
+    JetNConstituents1_.push_back(Constituents[4]);
+    JetNConstituents2_.push_back(Constituents[5]);
+    JetNConstituents5_.push_back(Constituents[6]);
+    JetNConstituents7_.push_back(Constituents[7]);
+    JetNConstituents10_.push_back(Constituents[8]);
+    JetNunknown0_.push_back(unknown[0]);
+    JetNunknown025_.push_back(unknown[1]);
+    JetNunknown05_.push_back(unknown[2]);
+    JetNunknown075_.push_back(unknown[3]);
+    JetNunknown1_.push_back(unknown[4]);
+    JetNunknown2_.push_back(unknown[5]);
+    JetNunknown5_.push_back(unknown[6]);
+    JetNunknown7_.push_back(unknown[7]);
+    JetNunknown10_.push_back(unknown[8]);
+    JetNchargedHad0_.push_back(chargedHad[0]);
+    JetNchargedHad025_.push_back(chargedHad[1]);
+    JetNchargedHad05_.push_back(chargedHad[2]);
+    JetNchargedHad075_.push_back(chargedHad[3]);
+    JetNchargedHad1_.push_back(chargedHad[4]);
+    JetNchargedHad2_.push_back(chargedHad[5]);
+    JetNchargedHad5_.push_back(chargedHad[6]);
+    JetNchargedHad7_.push_back(chargedHad[7]);
+    JetNchargedHad10_.push_back(chargedHad[8]);
+    JetNelectrons0_.push_back(electrons[0]);
+    JetNelectrons025_.push_back(electrons[1]);
+    JetNelectrons05_.push_back(electrons[2]);
+    JetNelectrons075_.push_back(electrons[3]);
+    JetNelectrons1_.push_back(electrons[4]);
+    JetNelectrons2_.push_back(electrons[5]);
+    JetNelectrons5_.push_back(electrons[6]);
+    JetNelectrons7_.push_back(electrons[7]);
+    JetNelectrons10_.push_back(electrons[8]);
+    JetNmuons0_.push_back(muons[0]);
+    JetNmuons025_.push_back(muons[1]);
+    JetNmuons05_.push_back(muons[2]);
+    JetNmuons075_.push_back(muons[3]);
+    JetNmuons1_.push_back(muons[4]);
+    JetNmuons2_.push_back(muons[5]);
+    JetNmuons5_.push_back(muons[6]);
+    JetNmuons7_.push_back(muons[7]);
+    JetNmuons10_.push_back(muons[8]);
+    JetNgamma0_.push_back(gamma[0]);
+    JetNgamma025_.push_back(gamma[1]);
+    JetNgamma05_.push_back(gamma[2]);
+    JetNgamma075_.push_back(gamma[3]);
+    JetNgamma1_.push_back(gamma[4]);
+    JetNgamma2_.push_back(gamma[5]);
+    JetNgamma5_.push_back(gamma[6]);
+    JetNgamma7_.push_back(gamma[7]);
+    JetNgamma10_.push_back(gamma[8]);
+    JetNneutralHad0_.push_back(neutralHad[0]);
+    JetNneutralHad025_.push_back(neutralHad[1]);
+    JetNneutralHad05_.push_back(neutralHad[2]);
+    JetNneutralHad075_.push_back(neutralHad[3]);
+    JetNneutralHad1_.push_back(neutralHad[4]);
+    JetNneutralHad2_.push_back(neutralHad[5]);
+    JetNneutralHad5_.push_back(neutralHad[6]);
+    JetNneutralHad7_.push_back(neutralHad[7]);
+    JetNneutralHad10_.push_back(neutralHad[8]);
 
     jetPhotonEnergyFraction_.push_back(jet.photonEnergyFraction());
     jetJetArea_.push_back(jet.jetArea());
@@ -1938,7 +2277,77 @@ JetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     phopz_.push_back(pho->pz());
     phoE_ .push_back(pho->energy());
     phor9_.push_back(pho->r9());
+    
+    convInfo = kFALSE;
+    convDist = 9999.0;
+    convDCot = 9999.0; 
+    convVtxChi2 = 9999.0;
+    convVtxNdof = 9999.0;
+    convVertX = 9999.0;
+    convVertY = 9999.0;
+    convVertZ = 9999.0;
+    convDxy = 9999.0;
+    convDz = 9999.0;
+    convLxy = 9999.0;
+    convLz = 9999.0;
+    convZofPVFromTracks = 9999.0;
 
+    reco::ConversionRefVector conversions(pho->conversions());
+    if(conversions.size() !=0){
+	    reco::Conversion const& conversion(*conversions[0]);
+	    if(conversion.nTracks()==2
+	       && conversion.conversionVertex().isValid()
+	       &&!conversion.conversionVertex().isFake()){
+//		  phoconvVertex.SetXYZ(conversion.conversionVertex().x(),
+//		       		conversion.conversionVertex().y(),
+//		       		conversion.conversionVertex().z());
+		  convInfo   = kTRUE;
+		  convDist = conversion.distOfMinimumApproach();
+		  convDCot = conversion.pairCotThetaSeparation();
+		  convVtxChi2 = conversion.conversionVertex().chi2();
+		  convVtxNdof = conversion.conversionVertex().ndof();
+		  convVertX = conversion.conversionVertex().x();
+		  convVertY = conversion.conversionVertex().y();
+		  convVertZ = conversion.conversionVertex().z();
+		  convDxy = conversion.dxy(beamSpot);
+		  convDz = conversion.dz(beamSpot);
+		  convLxy = conversion.lxy(beamSpot);
+		  convLz = conversion.lz(beamSpot);
+		  convZofPVFromTracks = conversion.zOfPrimaryVertexFromTracks(beamSpot);
+/*
+		  phoconvTrackChargeProd_.push_back(track0.charge() * track1.charge());
+		  phoconvTrack1nHit_.push_back(track0.found());
+		  phoconvTrack2nHit_.push_back(track1.found());
+		  phoconvTrack1chi2_.push_back(track0.chi2());
+		  phoconvTrack1pT_.push_back(track0.pt());
+		  phoconvTrack2chi2_.push_back(track1.chi2());
+		  phoconvTrack2pT_.push_back(track1.pt());
+		  std::vector<math::XYZPointF> InnerPos = conversion.tracksInnerPosition();
+		  phoconvTrack1InnerZ_.push_back(InnerPos[0].z());
+		  phoconvTrack2InnerZ_.push_back(InnerPos[1].z());
+		  phoconvTrack1InnerX_.push_back(InnerPos[0].x());
+		  phoconvTrack2InnerX_.push_back(InnerPos[1].x());
+		  phoconvTrack1InnerY_.push_back(InnerPos[0].y());
+		  phoconvTrack2InnerY_.push_back(InnerPos[1].y());
+		  std::vector<double> signedd0 = conversion.tracksSigned_d0();
+		  phoconvTrack1Signedd0_.push_back(signedd0[0]);
+		  phoconvTrack2Signedd0_.push_back(signedd0[1]);
+*/
+	    }
+    }
+    phoconvInfo_.push_back(convInfo);
+    phoconvDist_.push_back(convDist);
+    phoconvDCot_.push_back(convDCot);
+    phoconvVtxChi2_.push_back(convVtxChi2);
+    phoconvVtxNdof_.push_back(convVtxNdof);
+    phoconvVertX_.push_back(convVertX);
+    phoconvVertY_.push_back(convVertY);
+    phoconvVertZ_.push_back(convVertZ);
+    phoconvDxy_.push_back(convDxy);
+    phoconvDz_.push_back(convDz);
+    phoconvLxy_.push_back(convLxy);
+    phoconvLz_.push_back(convLz);
+    phoconvZofPVFromTracks_.push_back(convZofPVFromTracks);
   }
 
 
