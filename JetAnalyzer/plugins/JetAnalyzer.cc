@@ -850,15 +850,15 @@ JetAnalyzer::JetAnalyzer(const edm::ParameterSet& iConfig):
   tree->Branch("JetNgamma5",&JetNgamma5_);
   tree->Branch("JetNgamma7",&JetNgamma7_);
   tree->Branch("JetNgamma10",&JetNgamma10_);
-  tree->Branch("JetNchargedHad0",&JetNchargedHad0_);
-  tree->Branch("JetNchargedHad025",&JetNchargedHad025_);
-  tree->Branch("JetNchargedHad05",&JetNchargedHad05_);
-  tree->Branch("JetNchargedHad075",&JetNchargedHad075_);
-  tree->Branch("JetNchargedHad1",&JetNchargedHad1_);
-  tree->Branch("JetNchargedHad2",&JetNchargedHad2_);
-  tree->Branch("JetNchargedHad5",&JetNchargedHad5_);
-  tree->Branch("JetNchargedHad7",&JetNchargedHad7_);
-  tree->Branch("JetNchargedHad10",&JetNchargedHad10_);
+  tree->Branch("JetNneutralHad0",&JetNneutralHad0_);
+  tree->Branch("JetNneutralHad025",&JetNneutralHad025_);
+  tree->Branch("JetNneutralHad05",&JetNneutralHad05_);
+  tree->Branch("JetNneutralHad075",&JetNneutralHad075_);
+  tree->Branch("JetNneutralHad1",&JetNneutralHad1_);
+  tree->Branch("JetNneutralHad2",&JetNneutralHad2_);
+  tree->Branch("JetNneutralHad5",&JetNneutralHad5_);
+  tree->Branch("JetNneutralHad7",&JetNneutralHad7_);
+  tree->Branch("JetNneutralHad10",&JetNneutralHad10_);
 
   tree->Branch("nMu",           &nMu_);
   tree->Branch("muPt",          &muPt_);
