@@ -50,7 +50,7 @@ cmsrel CMSSW_8_0_18_patch1
 cmsenv
 git cms-init
 git cms-merge-topic -u cms-met:CMSSW_8_0_X-METFilterUpdate
-git clone https://github.com/gomber/LightZPrimeAnalysis.git
+git clone https://github.com/dokstolp/LightZPrimeAnalysis.git
 scram b
 cd CMSSW_8_0_18_patch1/src/LightZPrimeAnalysis/JetAnalyzer/test
 cmsRun testJetAnalyzer.py

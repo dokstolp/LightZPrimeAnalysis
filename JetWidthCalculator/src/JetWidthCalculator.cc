@@ -51,13 +51,13 @@ JetWidthCalculator::JetWidthCalculator(const reco::PFJet& jet) {
     const edm::Ptr<reco::PFCandidate> pfCand = pfCands[i];
     if(pfCand->et()<minEt) minEt = pfCand->et();
     if(pfCand->pt()<minPt) minPt = pfCand->pt();
-    Nunknown[0]++;
-    NchargedHad[0]++;
-    Nelectrons[0]++;
-    Nmuons[0]++;
-    Ngamma[0]++;
-    NneutralHad[0]++;
     NConstituents[0]++;
+    if(pfCand->particleId() == 0) Nunknown[0]++;
+    if(pfCand->particleId() == 1) NchargedHad[0]++;
+    if(pfCand->particleId() == 2) Nelectrons[0]++;
+    if(pfCand->particleId() == 3) Nmuons[0]++;
+    if(pfCand->particleId() == 4) Ngamma[0]++;
+    if(pfCand->particleId() == 5) NneutralHad[0]++;
 
     //std::cout<<i+1<<")"<<"PfCand constituent of Jet: "<< pfCand->pdgId()<<std::endl;
   /*  if (pfCand->pdgId() == 211 || pfCand->pdgId() == -211){
